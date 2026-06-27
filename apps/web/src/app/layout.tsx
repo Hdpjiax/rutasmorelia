@@ -15,26 +15,26 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://rutasmorelia.vercel.app"),
-  title: "MoreliVía | Rutas de Transporte Público en Morelia",
+  title: "ViaMorelia | Rutas de Transporte Público en Morelia",
   description: "Encuentra rutas de combis, camiones, paradas de transporte público y planea viajes en Morelia con facilidad y claridad.",
-  keywords: ["Morelia", "transporte público", "rutas de combi", "camiones Morelia", "MoreliVía", "movilidad urbana", "viajar en Morelia"],
-  authors: [{ name: "MoreliVía Team" }],
+  keywords: ["Morelia", "transporte público", "rutas de combi", "camiones Morelia", "ViaMorelia", "movilidad urbana", "viajar en Morelia"],
+  authors: [{ name: "ViaMorelia Team" }],
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",
     apple: "/icon.png",
   },
   openGraph: {
-    title: "MoreliVía | Rutas de Transporte Público en Morelia",
+    title: "ViaMorelia | Rutas de Transporte Público en Morelia",
     description: "Encuentra rutas de combis, camiones, paradas de transporte público y planea viajes en Morelia con facilidad y claridad.",
     url: "https://rutasmorelia.vercel.app",
-    siteName: "MoreliVía",
+    siteName: "ViaMorelia",
     images: [
       {
         url: "/icon.png",
         width: 512,
         height: 512,
-        alt: "MoreliVía App Icon",
+        alt: "ViaMorelia App Icon",
       },
     ],
     locale: "es_MX",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "MoreliVía | Rutas de Transporte Público en Morelia",
+    title: "ViaMorelia | Rutas de Transporte Público en Morelia",
     description: "Encuentra rutas de combis, camiones, paradas de transporte público y planea viajes en Morelia con facilidad y claridad.",
     images: ["/icon.png"],
   },

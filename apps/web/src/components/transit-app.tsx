@@ -704,12 +704,12 @@ export function TransitApp() {
         {/* DESKTOP VIEW COMPONENT LAYOUT                                             */}
         {/* ========================================================================= */}
         <header className="topbar desktop-only" aria-label="Navegación principal">
-          <div className="brand" aria-label="Sistema Integral de Movilidad Urbana de Morelia">
+          <div className="brand" aria-label="ViaMorelia - Movilidad Urbana de Morelia">
             <div className="brand-mark" aria-hidden="true">
               <BusIcon size={23} weight="fill" />
             </div>
             <div className="brand-copy">
-              <strong>SIMUM</strong>
+              <strong>ViaMorelia</strong>
               <span>Movilidad urbana de Morelia</span>
             </div>
           </div>
@@ -1000,7 +1000,7 @@ export function TransitApp() {
                     <div className="brand-mark" style={{ width: 34, height: 34, borderRadius: 8 }}>
                       <BusIcon size={18} weight="fill" />
                     </div>
-                    <strong>SIMUM</strong>
+                    <strong>ViaMorelia</strong>
                   </div>
                   <button className="close-drawer-button" type="button" onClick={() => setIsMenuOpen(false)}>
                     ✕
