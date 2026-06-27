@@ -1,7 +1,7 @@
 -- Ensure Morelia city exists
-insert into public.cities (name, state, country)
-values ('Morelia', 'Michoacán', 'México')
-on conflict (name, state, country) do nothing;
+insert into public.cities (name, state, country_code)
+values ('Morelia', 'Michoacán', 'MX')
+on conflict (name, state, country_code) do nothing;
 
 -- Retrieve city ID and seed popular landmarks into public.places
 do $$
