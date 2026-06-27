@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Rutas Morelia",
+    "name": "ViaMorelia",
     "slug": "rutas-morelia",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,9 +19,14 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
-      ,
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.anonymous.rutasmorelia"
     },
     "web": {
       "favicon": "./assets/favicon.png"
