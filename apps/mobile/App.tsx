@@ -47,28 +47,28 @@ type TransitSuggestion = {
 
 const LIGHT = {
   bg: '#ffffff',
-  surface: '#f4f5ef',
-  surfaceStrong: '#e8eadf',
-  ink: '#25271f',
-  muted: '#626657',
-  line: '#d9dccf',
-  primary: '#6f7e24',
-  primarySoft: '#edf2d5',
+  surface: '#f3f4f6',
+  surfaceStrong: '#e5e7eb',
+  ink: '#111827',
+  muted: '#4b5563',
+  line: '#e5e7eb',
+  primary: '#2e7d32', // Verde Esmeralda
+  primarySoft: '#e8f5e9',
   white: '#ffffff',
-  accent: '#c9542d',
+  accent: '#e64a19', // Naranja-Rojo
 };
 
 const DARK = {
-  bg: '#181914',
-  surface: '#22241d',
-  surfaceStrong: '#303329',
-  ink: '#f3f4ed',
-  muted: '#b5b9aa',
-  line: '#424538',
-  primary: '#b3c456',
-  primarySoft: '#343a20',
+  bg: '#111827',
+  surface: '#1f2937',
+  surfaceStrong: '#374151',
+  ink: '#f9fafb',
+  muted: '#9ca3af',
+  line: '#374151',
+  primary: '#4caf50',
+  primarySoft: '#1b5e20',
   white: '#ffffff',
-  accent: '#e2724a',
+  accent: '#ff5722',
 };
 
 export default function App() {
@@ -350,7 +350,7 @@ export default function App() {
         style={StyleSheet.absoluteFill}
         mapStyle={scheme === 'dark' 
           ? "https://a.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png"
-          : "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"
+          : "https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png"
         }
         logo={false}
         attribution
@@ -395,8 +395,8 @@ export default function App() {
             <Bus size={22} color={colors.white} weight="fill" />
           </View>
           <View style={styles.brandCopy}>
-            <Text style={[styles.brandTitle, { color: colors.ink }]}>SIMUM Móvil</Text>
-            <Text style={[styles.brandSubtitle, { color: colors.muted }]}>Muévete con claridad</Text>
+            <Text style={[styles.brandTitle, { color: colors.ink }]}>ViaMorelia</Text>
+            <Text style={[styles.brandSubtitle, { color: colors.muted }]}>Movilidad urbana en tu mano</Text>
           </View>
           <Pressable
             accessibilityRole="button"
