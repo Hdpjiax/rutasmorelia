@@ -717,9 +717,9 @@ export function TransitApp() {
                     <stop offset="100%" stop-color="#047857" />
                   </linearGradient>
                 </defs>
-                <path d="M15 80V40C15 22 42 22 42 40V80" stroke="url(#blueGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M42 80V40C42 22 69 22 69 40V80" stroke="url(#greenGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
-                <circle cx="42" cy="55" r="7" fill="#ffffff" stroke="#111827" stroke-width="4" />
+                <path d="M15 80V40C15 22 42 22 42 40V80" stroke="url(#blueGrad)" strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M42 80V40C42 22 69 22 69 40V80" stroke="url(#greenGrad)" strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="42" cy="55" r="7" fill="#ffffff" stroke="#111827" strokeWidth={4} />
               </svg>
             </div>
             <div className="brand-copy">
@@ -1023,9 +1023,9 @@ export function TransitApp() {
                             <stop offset="100%" stop-color="#047857" />
                           </linearGradient>
                         </defs>
-                        <path d="M15 80V40C15 22 42 22 42 40V80" stroke="url(#blueGradMobile)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M42 80V40C42 22 69 22 69 40V80" stroke="url(#greenGradMobile)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
-                        <circle cx="42" cy="55" r="7" fill="#ffffff" stroke="#111827" stroke-width="4" />
+                        <path d="M15 80V40C15 22 42 22 42 40V80" stroke="url(#blueGradMobile)" strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M42 80V40C42 22 69 22 69 40V80" stroke="url(#greenGradMobile)" strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="42" cy="55" r="7" fill="#ffffff" stroke="#111827" strokeWidth={4} />
                       </svg>
                     </div>
                     <strong>ViaMorelia</strong>
