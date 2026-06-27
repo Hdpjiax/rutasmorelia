@@ -1,0 +1,32 @@
+# Dependencies
+**/node_modules/
+
+# Next.js build output
+**/.next/
+**/out/
+
+# Expo / Mobile outputs
+**/.expo/
+**/dist/
+
+# Env files
+**/.env
+**/.env*.local
+
+# Logs and system files
+**/*.log
+**/.DS_Store
+
+# Test outputs
+**/coverage/
+
+# Database local folders
+**/postgres_data/
+
+# Large ZIP Archives
+*.zip
+public-archivedwl-*.zip
+
+# Large SQL data dumps / dumps not meant for source control
+import_routes.sql
+update_routes_kml.sql
