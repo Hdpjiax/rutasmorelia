@@ -705,8 +705,22 @@ export function TransitApp() {
         {/* ========================================================================= */}
         <header className="topbar desktop-only" aria-label="Navegación principal">
           <div className="brand" aria-label="ViaMorelia - Movilidad Urbana de Morelia">
-            <div className="brand-mark" aria-hidden="true">
-              <BusIcon size={23} weight="fill" />
+            <div className="brand-mark" aria-hidden="true" style={{ background: "transparent", width: 28, height: 28, minWidth: 28 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
+                <defs>
+                  <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#3b82f6" />
+                    <stop offset="100%" stop-color="#1d4ed8" />
+                  </linearGradient>
+                  <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#10b981" />
+                    <stop offset="100%" stop-color="#047857" />
+                  </linearGradient>
+                </defs>
+                <path d="M15 80V40C15 22 42 22 42 40V80" stroke="url(#blueGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M42 80V40C42 22 69 22 69 40V80" stroke="url(#greenGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="42" cy="55" r="7" fill="#ffffff" stroke="#111827" stroke-width="4" />
+              </svg>
             </div>
             <div className="brand-copy">
               <strong>ViaMorelia</strong>
@@ -997,8 +1011,22 @@ export function TransitApp() {
               >
                 <div className="mobile-drawer-header">
                   <div className="brand">
-                    <div className="brand-mark" style={{ width: 34, height: 34, borderRadius: 8 }}>
-                      <BusIcon size={18} weight="fill" />
+                    <div className="brand-mark" style={{ width: 28, height: 28, background: "transparent" }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
+                        <defs>
+                          <linearGradient id="blueGradMobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#3b82f6" />
+                            <stop offset="100%" stop-color="#1d4ed8" />
+                          </linearGradient>
+                          <linearGradient id="greenGradMobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#10b981" />
+                            <stop offset="100%" stop-color="#047857" />
+                          </linearGradient>
+                        </defs>
+                        <path d="M15 80V40C15 22 42 22 42 40V80" stroke="url(#blueGradMobile)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M42 80V40C42 22 69 22 69 40V80" stroke="url(#greenGradMobile)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="42" cy="55" r="7" fill="#ffffff" stroke="#111827" stroke-width="4" />
+                      </svg>
                     </div>
                     <strong>ViaMorelia</strong>
                   </div>

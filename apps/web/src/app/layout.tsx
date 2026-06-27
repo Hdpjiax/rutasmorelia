@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   keywords: ["Morelia", "transporte público", "rutas de combi", "camiones Morelia", "ViaMorelia", "movilidad urbana", "viajar en Morelia"],
   authors: [{ name: "ViaMorelia Team" }],
   icons: {
-    icon: "/icon.png",
-    shortcut: "/icon.png",
-    apple: "/icon.png",
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
   openGraph: {
     title: "ViaMorelia | Rutas de Transporte Público en Morelia",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "ViaMorelia",
     images: [
       {
-        url: "/icon.png",
+        url: "/icon.svg",
         width: 512,
         height: 512,
         alt: "ViaMorelia App Icon",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "ViaMorelia | Rutas de Transporte Público en Morelia",
     description: "Encuentra rutas de combis, camiones, paradas de transporte público y planea viajes en Morelia con facilidad y claridad.",
-    images: ["/icon.png"],
+    images: ["/icon.svg"],
   },
 };
 
