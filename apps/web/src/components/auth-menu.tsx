@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AppleLogoIcon, GoogleLogoIcon, SignOutIcon, UserCircleIcon } from "@phosphor-icons/react";
+import { GoogleLogoIcon, SignOutIcon, UserCircleIcon } from "@phosphor-icons/react";
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -32,7 +32,7 @@ export function AuthMenu({ onMessage }: AuthMenuProps) {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  async function signInWithProvider(provider: "google" | "apple") {
+  async function signInWithProvider(provider: "google") {
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return onMessage("Configura Supabase para iniciar sesión.");
     setLoading(true);
@@ -100,8 +100,7 @@ export function AuthMenu({ onMessage }: AuthMenuProps) {
               <p>Inicia sesión para sincronizar favoritos, casa, trabajo e historial.</p>
               {!configured && <div className="inline-notice">Supabase aún no está conectado en este entorno.</div>}
               <div className="provider-actions">
-                <button className="secondary-button" type="button" disabled={loading} onClick={() => signInWithProvider("google")}><GoogleLogoIcon size={18} /> Google</button>
-                <button className="secondary-button" type="button" disabled={loading} onClick={() => signInWithProvider("apple")}><AppleLogoIcon size={18} /> Apple</button>
+                <button className="secondary-button" type="button" disabled={loading} onClick={() => signInWithProvider("google")} style={{ width: "100%" }}><GoogleLogoIcon size={18} /> Google</button>
               </div>
               <form className="email-auth" onSubmit={handleSubmit(sendMagicLink)}>
                 <label htmlFor="auth-email">Correo electrónico</label>
