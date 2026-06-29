@@ -38,18 +38,34 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 1. Fetch direct options (0 transfers, close to both origin and destination)
+    // Run independent spatial lookups concurrently. They previously executed
+    // sequentially, making every request pay three network/database round trips.
     let directOptions: any[] = [];
+    let originRoutes: any[] = [];
+    let destRoutes: any[] = [];
     try {
-      const { data, error } = await supabase.rpc("direct_journey_options", {
+      const [directResult, originResult, destinationResult] = await Promise.all([
+        supabase.rpc("direct_journey_options", {
         p_origin_latitude: body.origin.latitude,
         p_origin_longitude: body.origin.longitude,
         p_destination_latitude: body.destination.latitude,
         p_destination_longitude: body.destination.longitude,
         p_max_walk_meters: 1500,
-      });
-      if (!error && data) {
-        directOptions = data.map((option: any) => ({
+        }),
+        supabase.rpc("nearby_routes", {
+          p_lat: body.origin.latitude,
+          p_lng: body.origin.longitude,
+          p_max_dist: 1500,
+        }),
+        supabase.rpc("nearby_routes", {
+          p_lat: body.destination.latitude,
+          p_lng: body.destination.longitude,
+          p_max_dist: 1500,
+        }),
+      ]);
+
+      if (!directResult.error && directResult.data) {
+        directOptions = directResult.data.map((option: any) => ({
           ...option,
           transfers: 0,
           type: "direct",
@@ -59,41 +75,16 @@ Deno.serve(async (req) => {
           ),
         }));
       }
+      if (!originResult.error && originResult.data) originRoutes = originResult.data;
+      if (!destinationResult.error && destinationResult.data) destRoutes = destinationResult.data;
+      if (directResult.error) console.error("Direct journey options query failed:", directResult.error);
+      if (originResult.error) console.error("Origin nearby routes query failed:", originResult.error);
+      if (destinationResult.error) console.error("Destination nearby routes query failed:", destinationResult.error);
     } catch (err) {
-      console.error("Direct journey options query failed:", err);
+      console.error("Journey lookup failed:", err);
     }
 
-    // 2. Fetch routes near origin (within 1.5km)
-    let originRoutes: any[] = [];
-    try {
-      const { data, error } = await supabase.rpc("nearby_routes", {
-        p_lat: body.origin.latitude,
-        p_lng: body.origin.longitude,
-        p_max_dist: 1500,
-      });
-      if (!error && data) {
-        originRoutes = data;
-      }
-    } catch (err) {
-      console.error("Origin nearby routes query failed:", err);
-    }
-
-    // 3. Fetch routes near destination (within 1.5km)
-    let destRoutes: any[] = [];
-    try {
-      const { data, error } = await supabase.rpc("nearby_routes", {
-        p_lat: body.destination.latitude,
-        p_lng: body.destination.longitude,
-        p_max_dist: 1500,
-      });
-      if (!error && data) {
-        destRoutes = data;
-      }
-    } catch (err) {
-      console.error("Destination nearby routes query failed:", err);
-    }
-
-    // 4. Combine results: direct options first, then unique nearby options
+    // Combine results: direct options first, then unique nearby options
     const directRouteIds = new Set(directOptions.map((o) => o.route_id));
     const combinedOptions = [...directOptions];
 
@@ -134,7 +125,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ data: combinedOptions }), { headers: jsonHeaders });
+    const rankedOptions = combinedOptions
+      .sort((a, b) => Number(a.transfers) - Number(b.transfers) || Number(a.estimatedMinutes) - Number(b.estimatedMinutes))
+      .slice(0, 20);
+
+    return new Response(JSON.stringify({ data: rankedOptions }), { headers: jsonHeaders });
 
   } catch (error) {
     console.error("plan-journey error:", error);

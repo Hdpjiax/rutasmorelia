@@ -20,7 +20,7 @@ import { TransitModule } from './transit/transit.module';
         synchronize: false,
         ssl:
           config.get('DATABASE_SSL') === 'true'
-            ? { rejectUnauthorized: true }
+            ? { rejectUnauthorized: false }
             : false,
         extra: {
           max: Number(config.get('DATABASE_POOL_SIZE', '10')),

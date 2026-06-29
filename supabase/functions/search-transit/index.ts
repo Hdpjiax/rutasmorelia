@@ -41,18 +41,20 @@ Deno.serve(async (req) => {
     if (authHeader) {
       try {
         const token = authHeader.replace("Bearer ", "");
-        const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-        if (!userError && user) {
-          userId = user.id;
+        const payloadPart = token.split(".")[1];
+        const payload = payloadPart
+          ? JSON.parse(atob(payloadPart.replace(/-/g, "+").replace(/_/g, "/")))
+          : null;
+        if (typeof payload?.sub === "string") {
+          const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+          if (!userError && user) userId = user.id;
         }
       } catch (err) {
         console.error("Error resolving user from token:", err);
       }
     }
 
-    // 1. Query Supabase local routes, stops and places via RPC, passing user ID for favorites prioritization
-    let dbResults: any[] = [];
-    try {
+    const loadDatabaseResults = async () => {
       const { data, error } = await supabase.rpc("search_transit", {
         p_query: query,
         p_city_id: null,
@@ -60,34 +62,28 @@ Deno.serve(async (req) => {
         p_user_id: userId,
       });
       if (!error && data) {
-        // Exclude routes since they are handled separately on the client's sidebar lists
-        dbResults = data.filter((item: any) => item.entity_type !== "route");
-      } else if (error) {
-        console.error("search_transit RPC error:", error);
+        return data.filter((item: any) => item.entity_type !== "route");
       }
-    } catch (dbErr) {
-      console.error("Local DB query failed:", dbErr);
-    }
+      if (error) console.error("search_transit RPC error:", error);
+      return [];
+    };
 
-    // 2. Query Nominatim OpenStreetMap for streets and addresses in Morelia
-    let geoResults: any[] = [];
-    try {
+    const loadGeocodingResults = async () => {
       const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}+Morelia&format=json&limit=5&addressdetails=1&accept-language=es`;
-      
       const geoRes = await fetch(geocodeUrl, {
         headers: {
           "User-Agent": "SIMUM-Morelia-Transit-App (antogar89.b@gmail.com)",
         },
+        signal: AbortSignal.timeout(2500),
       });
 
       if (geoRes.ok) {
         const geoData = await geoRes.json();
         if (Array.isArray(geoData)) {
-          geoResults = geoData.map((item: any, idx: number) => {
+          return geoData.map((item: any, idx: number) => {
             const parts = item.display_name.split(",");
             const label = parts[0].trim();
-            const subtitle = parts.slice(1, 4).join(",").trim(); // E.g. "Morelia, Michoacán, México"
-            
+            const subtitle = parts.slice(1, 4).join(",").trim();
             return {
               entity_type: "place",
               entity_id: 900000 + idx,
@@ -99,9 +95,17 @@ Deno.serve(async (req) => {
           });
         }
       }
-    } catch (geoErr) {
-      console.error("Nominatim geocoding failed:", geoErr);
-    }
+      return [];
+    };
+
+    const [databaseResult, geocodingResult] = await Promise.allSettled([
+      loadDatabaseResults(),
+      loadGeocodingResults(),
+    ]);
+    const dbResults = databaseResult.status === "fulfilled" ? databaseResult.value : [];
+    const geoResults = geocodingResult.status === "fulfilled" ? geocodingResult.value : [];
+    if (databaseResult.status === "rejected") console.error("Local DB query failed:", databaseResult.reason);
+    if (geocodingResult.status === "rejected") console.error("Nominatim geocoding failed:", geocodingResult.reason);
 
     // 3. Merge and return results
     const combined = [...dbResults, ...geoResults];

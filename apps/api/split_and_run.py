@@ -43,9 +43,9 @@ def main():
         
     print(f"Split into {len(chunks)} chunks.")
     
-    token = "sbp_29ed543ad4b6e7a6a5b5712754a50b1ae695ec3f"
     env = os.environ.copy()
-    env["SUPABASE_ACCESS_TOKEN"] = token
+    if not env.get("SUPABASE_ACCESS_TOKEN"):
+        raise RuntimeError("Define SUPABASE_ACCESS_TOKEN en el entorno antes de ejecutar la importación.")
     
     for idx, chunk in enumerate(chunks):
         chunk_file = f"import_routes_part_{idx+1}.sql"

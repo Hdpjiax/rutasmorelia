@@ -370,6 +370,7 @@ input:focus-visible {
 .journey-form {
   display: grid;
   gap: 10px;
+  margin-bottom: 18px;
 }
 
 .suggestion-list {

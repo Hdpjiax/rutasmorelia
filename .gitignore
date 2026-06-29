@@ -26,6 +26,17 @@
 # Large ZIP Archives
 *.zip
 public-archivedwl-*.zip
+public-archivedwl-*/
+
+# Installers, signing material, and generated native caches
+**/*.apk
+**/*.aab
+**/*.ipa
+**/*.jks
+**/*.keystore
+!**/debug.keystore
+**/.cxx/
+geo-cache/
 
 # Large SQL data dumps / dumps not meant for source control
 import_routes.sql

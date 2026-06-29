@@ -5,7 +5,6 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   ArrowRightIcon,
   ArrowsDownUpIcon,
-  BusIcon,
   CrosshairIcon,
   HeartIcon,
   List,
@@ -45,10 +44,51 @@ function getContrastTextColor(hexColor: string): string {
   return yiq >= 155 ? "#111111" : "#ffffff";
 }
 
+interface RouteType {
+  id: string;
+  number: string;
+  name: string;
+  detail: string;
+  time: string;
+  color: string;
+}
+
+interface FavoriteType {
+  id: number;
+  route_id: number | null;
+  stop_id: number | null;
+  place_id: number | null;
+  custom_name: string | null;
+}
+
+interface DbRoute {
+  id: number;
+  name: string;
+  code: string;
+  color: string | null;
+  transport_type: string;
+  description: string | null;
+}
+
+interface JourneyOption {
+  route_id: number;
+  route_color: string | null;
+  route_code: string | null;
+  route_name: string;
+  boarding_stop_name: string | null;
+  alighting_stop_name: string | null;
+  origin_walk_meters: number | null;
+  destination_walk_meters: number | null;
+  stops_count: number;
+  estimatedMinutes: number | null;
+  fare: number | null;
+  [key: string]: unknown;
+}
+
 export function TransitApp() {
   const prefersReducedMotion = useReducedMotion();
   const theme = "light"; // Force Light Mode completely
-  const [tab, setTab] = useState<"routes" | "stops">("routes");
+  const [selectedOrigSuggestion, setSelectedOrigSuggestion] = useState<TransitSuggestion | null>(null);
   const [origin, setOrigin] = useState("Mi ubicación");
   const [destination, setDestination] = useState("");
   const [activeRoute, setActiveRoute] = useState("3");
@@ -61,9 +101,9 @@ export function TransitApp() {
   const [destinationSuggestions, setDestinationSuggestions] = useState<TransitSuggestion[]>([]);
   const [destinationSearchStatus, setDestinationSearchStatus] = useState<"idle" | "loading" | "error">("idle");
   
-  const [routes, setRoutes] = useState<any[]>(DEFAULT_ROUTES);
-  const [isLoadingRoutes, setIsLoadingRoutes] = useState(true);
-  const [journeyOptions, setJourneyOptions] = useState<any[]>([]);
+  const [routes, setRoutes] = useState<RouteType[]>(DEFAULT_ROUTES);
+  const [isLoadingRoutes, setIsLoadingRoutes] = useState(false);
+  const [journeyOptions, setJourneyOptions] = useState<JourneyOption[]>([]);
   const [isSearchingJourney, setIsSearchingJourney] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ latitude: number; longitude: number; timestamp: number } | null>(null);
 
@@ -76,7 +116,7 @@ export function TransitApp() {
 
   // User session and favorites
   const [user, setUser] = useState<User | null>(null);
-  const [favorites, setFavorites] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteType[]>([]);
   const [selectedDestSuggestion, setSelectedDestSuggestion] = useState<TransitSuggestion | null>(null);
 
   // Lock refs to prevent autocomplete queries when setting a selected suggestion
@@ -86,7 +126,6 @@ export function TransitApp() {
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
     if (!supabase) {
-      setIsLoadingRoutes(false);
       return;
     }
     const client = supabase;
@@ -107,7 +146,7 @@ export function TransitApp() {
       }
 
       if (data && data.length > 0) {
-        const mapped = data.map((r: any) => {
+        const mapped = data.map((r: DbRoute) => {
           let num = r.transport_type === "combi" ? "C" : "A";
           const match = r.code.match(/\d+/);
           if (match) num += match[0];
@@ -136,6 +175,18 @@ export function TransitApp() {
     window.localStorage.setItem("rutas-morelia-theme", "light");
   }, []);
 
+  async function fetchFavorites(userId: string) {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) return;
+    const { data, error } = await supabase
+      .from("favorites")
+      .select("id, route_id, stop_id, place_id, custom_name")
+      .eq("user_id", userId);
+    if (!error && data) {
+      setFavorites(data);
+    }
+  }
+
   // Listen to Auth State changes to load and sync favorites
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -161,18 +212,6 @@ export function TransitApp() {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  async function fetchFavorites(userId: string) {
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) return;
-    const { data, error } = await supabase
-      .from("favorites")
-      .select("id, route_id, stop_id, place_id, custom_name")
-      .eq("user_id", userId);
-    if (!error && data) {
-      setFavorites(data);
-    }
-  }
-
   useEffect(() => {
     if (!message) return;
     const timeout = window.setTimeout(() => setMessage(null), 2800);
@@ -183,8 +222,10 @@ export function TransitApp() {
   useEffect(() => {
     const query = origin.trim();
     if (query === "Mi ubicación") {
-      setOriginSuggestions([]);
-      setOriginSearchStatus("idle");
+      Promise.resolve().then(() => {
+        setOriginSuggestions([]);
+        setOriginSearchStatus("idle");
+      });
       return;
     }
 
@@ -253,8 +294,12 @@ export function TransitApp() {
   function swapLocations() {
     setOrigin(destination || "Centro Histórico");
     setDestination(origin === "Mi ubicación" ? "" : origin);
+    const tempCoords = originCoordinates;
     setOriginCoordinates(destinationCoordinates);
-    setDestinationCoordinates(null);
+    setDestinationCoordinates(tempCoords);
+    const tempSugg = selectedOrigSuggestion;
+    setSelectedOrigSuggestion(selectedDestSuggestion);
+    setSelectedDestSuggestion(tempSugg);
     setOriginSuggestions([]);
     setDestinationSuggestions([]);
     setShowOriginSuggestions(false);
@@ -289,18 +334,22 @@ export function TransitApp() {
         setIsSearchingJourney(false);
         return;
       }
-      const options = data?.data as any[] | undefined;
+      const options = data?.data as JourneyOption[] | undefined;
       if (options && options.length > 0) {
         setJourneyOptions(options);
         setMessage(`${options.length} opciones encontradas.`);
         setActiveRoute(String(options[0].route_id));
-        setIsMenuOpen(true); // Open routes panel drawer on mobile
+        if (window.innerWidth < 768) {
+          setIsMenuOpen(true); // Open routes panel drawer on mobile
+        }
       } else {
         setMessage("No encontramos una ruta directa entre esos puntos.");
       }
     } else {
       setMessage(`Mostrando rutas relacionadas con ${destination.trim()}.`);
-      setIsMenuOpen(true); // Open routes panel drawer on mobile
+      if (window.innerWidth < 768) {
+        setIsMenuOpen(true); // Open routes panel drawer on mobile
+      }
     }
     setIsSearchingJourney(false);
   }
@@ -331,6 +380,7 @@ export function TransitApp() {
   function updateOrigin(value: string) {
     setOrigin(value);
     setOriginCoordinates(null);
+    setSelectedOrigSuggestion(null); // Reset context since user is typing manually
     setMapCenter(null);
     setShowOriginSuggestions(true);
     if (value.trim().length < 2) {
@@ -359,6 +409,7 @@ export function TransitApp() {
         ? { latitude: suggestion.latitude, longitude: suggestion.longitude }
         : null,
     );
+    setSelectedOrigSuggestion(suggestion); // Cache selection details
     setShowOriginSuggestions(false);
     setOriginSuggestions([]);
   }
@@ -540,11 +591,130 @@ export function TransitApp() {
     }
   }
 
+  // Resolves whether active selected origin place is favorited
+  const isOriginFavorited = useMemo(() => {
+    if (!selectedOrigSuggestion) return false;
+    const sugg = selectedOrigSuggestion;
+    return favorites.some((f) => {
+      if (sugg.entity_type === "stop") {
+        return String(f.stop_id) === String(sugg.entity_id);
+      } else if (sugg.entity_type === "place") {
+        if (sugg.entity_id >= 900000) {
+          return f.place_id && f.custom_name === sugg.label;
+        }
+        return String(f.place_id) === String(sugg.entity_id);
+      }
+      return false;
+    });
+  }, [selectedOrigSuggestion, favorites]);
+
+  // Saves origin stops/places to favorites (prompts for custom name)
+  async function toggleOriginPlaceFavorite() {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase || !selectedOrigSuggestion) return;
+
+    if (!user) {
+      setMessage("Inicia sesión o continúa como invitado para guardar favoritos.");
+      return;
+    }
+
+    const sugg = selectedOrigSuggestion;
+
+    if (isOriginFavorited) {
+      // Delete favorite
+      const existing = favorites.find((f) => {
+        if (sugg.entity_type === "stop") return String(f.stop_id) === String(sugg.entity_id);
+        if (sugg.entity_type === "place") {
+          if (sugg.entity_id >= 900000) return f.place_id && f.custom_name === sugg.label;
+          return String(f.place_id) === String(sugg.entity_id);
+        }
+        return false;
+      });
+
+      if (existing) {
+        const { error } = await supabase
+          .from("favorites")
+          .delete()
+          .eq("id", existing.id);
+        if (!error) {
+          setFavorites((favs) => favs.filter((f) => f.id !== existing.id));
+          setMessage("Lugar eliminado de favoritos.");
+        }
+      }
+    } else {
+      // Add favorite (prompt for custom name)
+      const customName = window.prompt(
+        "¿Cómo quieres guardar este lugar? (ej. Mi Casa, Trabajo, Universidad)",
+        sugg.label
+      );
+
+      if (customName === null) return; // Cancelled
+      const finalName = customName.trim() || sugg.label;
+
+      let targetPlaceId: number | null = null;
+      let targetStopId: number | null = null;
+
+      if (sugg.entity_type === "stop") {
+        targetStopId = sugg.entity_id;
+      } else if (sugg.entity_type === "place") {
+        if (sugg.entity_id >= 900000) {
+          // Geocoded OSM place - must insert into public.places first
+          const { data: cityData } = await supabase
+            .from("cities")
+            .select("id")
+            .eq("name", "Morelia")
+            .limit(1);
+          const cityId = cityData?.[0]?.id || 1;
+
+          const { data: placeData, error: placeError } = await supabase
+            .from("places")
+            .insert({
+              city_id: cityId,
+              name: finalName,
+              category: "Favorito",
+              address: sugg.subtitle || "Morelia, Michoacán",
+              location: `POINT(${sugg.longitude} ${sugg.latitude})`,
+            })
+            .select("id")
+            .single();
+
+          if (placeError || !placeData) {
+            console.error("Error creating place for favorite:", placeError);
+            setMessage("No se pudo guardar el lugar.");
+            return;
+          }
+          targetPlaceId = placeData.id;
+        } else {
+          targetPlaceId = sugg.entity_id;
+        }
+      }
+
+      const { data: favData, error: favError } = await supabase
+        .from("favorites")
+        .insert({
+          user_id: user.id,
+          place_id: targetPlaceId,
+          stop_id: targetStopId,
+          custom_name: finalName,
+        })
+        .select()
+        .single();
+
+      if (!favError && favData) {
+        setFavorites((favs) => [...favs, favData]);
+        setMessage(`Lugar "${finalName}" guardado en favoritos.`);
+      } else {
+        console.error("Error inserting favorite:", favError);
+        setMessage("No se pudo guardar el favorito.");
+      }
+    }
+  }
+
   // Shared rendered Lists component for both desktop side panel and mobile drawer
   const renderedLists = (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
-        key={tab}
+        key="routes"
         className="route-list"
         initial={prefersReducedMotion ? false : { opacity: 0, x: 8 }}
         animate={{ opacity: 1, x: 0 }}
@@ -552,144 +722,110 @@ export function TransitApp() {
         transition={{ duration: 0.18 }}
         role="tabpanel"
       >
-        {tab === "routes" ? (
-          journeyOptions.length > 0 ? (
-            journeyOptions.map((option, idx) => (
-              <button
-                key={`${option.route_id}-${idx}`}
-                type="button"
-                className="route-row journey-option-row"
-                aria-pressed={activeRoute === String(option.route_id)}
-                onClick={() => {
-                  setActiveRoute(String(option.route_id));
-                  setIsMenuOpen(false); // Close mobile menu drawer
-                }}
-              >
-                <span className="route-number" style={{ background: option.route_color || "#FFA500", color: getContrastTextColor(option.route_color || "#FFA500") }}>
-                  {option.route_code ? (option.route_code.split('_')[1] || option.route_code[0]) : "R"}
-                </span>
-                <span className="route-copy">
-                  <strong className="text-glow">{option.route_name}</strong>
-                  <span className="journey-details">
-                    Subir: <strong>{option.boarding_stop_name || "Parada cercana"}</strong>
-                    <br />
-                    Bajar: <strong>{option.alighting_stop_name || "Destino"}</strong>
-                  </span>
-                  <span className="journey-walk-info">
-                    Caminata: {Math.round((option.origin_walk_meters || 0) + (option.destination_walk_meters || 0))}m · {option.stops_count} paradas
-                  </span>
-                </span>
-                <div className="journey-meta" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
-                  <span className="route-time">{option.estimatedMinutes} min</span>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span className="route-fare">${option.fare || "11.00"}</span>
-                    {user && (
-                      <button
-                        type="button"
-                        style={{ background: "transparent", border: 0, padding: 2, cursor: "pointer" }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleRouteFavorite(String(option.route_id));
-                        }}
-                        aria-label="Favorito"
-                      >
-                        <HeartIcon
-                          size={15}
-                          weight={favorites.some((f) => String(f.route_id) === String(option.route_id)) ? "fill" : "regular"}
-                          color={favorites.some((f) => String(f.route_id) === String(option.route_id)) ? "var(--accent)" : "var(--muted)"}
-                        />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </button>
-            ))
-          ) : isLoadingRoutes ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="skeleton-row" aria-hidden="true">
-                <div className="skeleton-number" />
-                <div className="skeleton-text">
-                  <div className="skeleton-title" />
-                  <div className="skeleton-subtitle" />
-                </div>
-                <div className="skeleton-number" style={{ width: 36, height: 16 }} />
-              </div>
-            ))
-          ) : filteredRoutes.length ? filteredRoutes.map((route) => (
-            <motion.button
-              whileTap={{ scale: 0.98 }}
-              whileHover={{ y: -1 }}
-              key={route.id}
-              type="button"
-              className="route-row"
-              aria-pressed={activeRoute === route.id}
-              onClick={() => {
-                setActiveRoute(route.id);
-                setIsMenuOpen(false); // Close mobile menu drawer
-              }}
-            >
-              <span className="route-number" style={{ background: route.color, color: getContrastTextColor(route.color) }}>{route.number}</span>
-              <span className="route-copy">
-                <strong>{route.name}</strong>
-                <span>{route.detail}</span>
-              </span>
-              <div className="route-time-container" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
-                <span className="route-time">{route.time}</span>
-                {user && (
-                  <button
-                    type="button"
-                    style={{ background: "transparent", border: 0, padding: 4, cursor: "pointer" }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleRouteFavorite(route.id);
-                    }}
-                    aria-label="Favorito"
-                  >
-                    <HeartIcon
-                      size={17}
-                      weight={favorites.some((f) => String(f.route_id) === String(route.id)) ? "fill" : "regular"}
-                      color={favorites.some((f) => String(f.route_id) === String(route.id)) ? "var(--accent)" : "var(--muted)"}
-                    />
-                  </button>
-                )}
-              </div>
-            </motion.button>
-          )) : <div className="empty-state">No encontramos rutas con ese destino. Prueba con una colonia o punto conocido.</div>
-        ) : (
-          [
-            ["Catedral", "A 3 min caminando"],
-            ["Mercado Independencia", "A 6 min caminando"],
-            ["Las Tarascas", "A 9 min caminando"],
-          ].map(([name, distance]) => (
+        {journeyOptions.length > 0 ? (
+          journeyOptions.map((option, idx) => (
             <button
-              key={name}
+              key={`${option.route_id}-${idx}`}
               type="button"
-              className="route-row"
+              className="route-row journey-option-row"
+              aria-pressed={activeRoute === String(option.route_id)}
               onClick={() => {
-                setMessage(`Parada ${name} seleccionada.`);
+                setActiveRoute(String(option.route_id));
                 setIsMenuOpen(false); // Close mobile menu drawer
               }}
             >
-              <span className="route-number" style={{ background: "var(--primary-strong)" }}><MapPinIcon size={18} weight="fill" /></span>
-              <span className="route-copy"><strong>{name}</strong><span>{distance}</span></span>
-              <ArrowRightIcon size={18} aria-hidden="true" />
+              <span className="route-number" style={{ background: option.route_color || "#FFA500", color: getContrastTextColor(option.route_color || "#FFA500") }}>
+                {option.route_code ? (option.route_code.split('_')[1] || option.route_code[0]) : "R"}
+              </span>
+              <span className="route-copy">
+                <strong className="text-glow">{option.route_name}</strong>
+                <span className="journey-details">
+                  Subir: <strong>{option.boarding_stop_name || "Parada cercana"}</strong>
+                  <br />
+                  Bajar: <strong>{option.alighting_stop_name || "Destino"}</strong>
+                </span>
+                <span className="journey-walk-info">
+                  Caminata: {Math.round((option.origin_walk_meters || 0) + (option.destination_walk_meters || 0))}m · {option.stops_count} paradas
+                </span>
+              </span>
+              <div className="journey-meta" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
+                <span className="route-time">{option.estimatedMinutes} min</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span className="route-fare">${option.fare || "11.00"}</span>
+                  {user && (
+                    <button
+                      type="button"
+                      style={{ background: "transparent", border: 0, padding: 2, cursor: "pointer" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleRouteFavorite(String(option.route_id));
+                      }}
+                      aria-label="Favorito"
+                    >
+                      <HeartIcon
+                        size={15}
+                        weight={favorites.some((f) => String(f.route_id) === String(option.route_id)) ? "fill" : "regular"}
+                        color={favorites.some((f) => String(f.route_id) === String(option.route_id)) ? "var(--accent)" : "var(--muted)"}
+                      />
+                    </button>
+                  )}
+                </div>
+              </div>
             </button>
           ))
-        )}
+        ) : isLoadingRoutes ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="skeleton-row" aria-hidden="true">
+              <div className="skeleton-number" />
+              <div className="skeleton-text">
+                <div className="skeleton-title" />
+                <div className="skeleton-subtitle" />
+              </div>
+              <div className="skeleton-number" style={{ width: 36, height: 16 }} />
+            </div>
+          ))
+        ) : filteredRoutes.length ? filteredRoutes.map((route) => (
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            whileHover={{ y: -1 }}
+            key={route.id}
+            type="button"
+            className="route-row"
+            aria-pressed={activeRoute === route.id}
+            onClick={() => {
+              setActiveRoute(route.id);
+              setIsMenuOpen(false); // Close mobile menu drawer
+            }}
+          >
+            <span className="route-number" style={{ background: route.color, color: getContrastTextColor(route.color) }}>{route.number}</span>
+            <span className="route-copy">
+              <strong>{route.name}</strong>
+              <span>{route.detail}</span>
+            </span>
+            <div className="route-time-container" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
+              <span className="route-time">{route.time}</span>
+              {user && (
+                <button
+                  type="button"
+                  style={{ background: "transparent", border: 0, padding: 4, cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleRouteFavorite(route.id);
+                  }}
+                  aria-label="Favorito"
+                >
+                  <HeartIcon
+                    size={17}
+                    weight={favorites.some((f) => String(f.route_id) === String(route.id)) ? "fill" : "regular"}
+                    color={favorites.some((f) => String(f.route_id) === String(route.id)) ? "var(--accent)" : "var(--muted)"}
+                  />
+                </button>
+              )}
+            </div>
+          </motion.button>
+        )) : <div className="empty-state">No encontramos rutas con ese destino. Prueba con una colonia o punto conocido.</div>}
       </motion.div>
     </AnimatePresence>
-  );
-
-  // Shared rendered Tabs component
-  const renderedTabs = (
-    <div className="tabs" role="tablist" aria-label="Explorar transporte">
-      <button className="tab-button" role="tab" aria-selected={tab === "routes"} onClick={() => setTab("routes")} type="button">
-        Rutas cercanas
-      </button>
-      <button className="tab-button" role="tab" aria-selected={tab === "stops"} onClick={() => setTab("stops")} type="button">
-        Paradas
-      </button>
-    </div>
   );
 
   return (
@@ -709,12 +845,12 @@ export function TransitApp() {
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
                 <defs>
                   <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#3b82f6" />
-                    <stop offset="100%" stop-color="#1d4ed8" />
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#1d4ed8" />
                   </linearGradient>
                   <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#10b981" />
-                    <stop offset="100%" stop-color="#047857" />
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="100%" stopColor="#047857" />
                   </linearGradient>
                 </defs>
                 <path d="M15 80V40C15 22 42 22 42 40V80" stroke="url(#blueGrad)" strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" />
@@ -748,10 +884,71 @@ export function TransitApp() {
                 autoComplete="off"
                 placeholder="Origen (ej. Mi ubicación)"
               />
+              {originCoordinates && (
+                <button className="field-action" style={{ right: "44px" }} type="button" onClick={toggleOriginPlaceFavorite} aria-label="Favorito">
+                  <HeartIcon size={18} weight={isOriginFavorited ? "fill" : "regular"} color={isOriginFavorited ? "var(--accent)" : "currentColor"} />
+                </button>
+              )}
               <button className="field-action" type="button" onClick={requestLocation} aria-label="Usar mi ubicación">
                 <NavigationArrowIcon size={18} />
               </button>
             </label>
+
+            {/* Quick favorites list dropdown on focus when empty for Origen */}
+            {isSupabaseConfigured() && showOriginSuggestions && origin.trim().length < 2 && favorites.some((f) => f.place_id || f.stop_id) && (
+              <div className="suggestion-list" aria-live="polite">
+                <div style={{ padding: "8px 12px", fontSize: "11px", fontWeight: "bold", color: "var(--muted)", borderBottom: "1px solid var(--line)" }}>
+                  LUGARES FAVORITOS
+                </div>
+                {favorites.filter((f) => f.place_id || f.stop_id).map((fav) => (
+                  <button
+                    key={`fav-orig-dt-${fav.id}`}
+                    className="suggestion-row"
+                    type="button"
+                    onClick={async () => {
+                      const supabase = getSupabaseBrowserClient();
+                      if (!supabase) return;
+                      let label = fav.custom_name || "";
+                      let lat: number | null = null;
+                      let lon: number | null = null;
+                      const entityType: "stop" | "place" = fav.stop_id ? "stop" : "place";
+                      const entityId = fav.stop_id || fav.place_id || 0;
+
+                      if (fav.stop_id) {
+                        const { data } = await supabase.from("stops").select("name, reference, location").eq("id", fav.stop_id).single();
+                        if (data) {
+                          label = fav.custom_name || data.name;
+                          const loc = data.location as { coordinates?: [number, number] } | null;
+                          lat = loc?.coordinates?.[1] || null;
+                          lon = loc?.coordinates?.[0] || null;
+                        }
+                      } else if (fav.place_id) {
+                        const { data } = await supabase.from("places").select("name, address, location").eq("id", fav.place_id).single();
+                        if (data) {
+                          label = fav.custom_name || data.name;
+                          const loc = data.location as { coordinates?: [number, number] } | null;
+                          lat = loc?.coordinates?.[1] || null;
+                          lon = loc?.coordinates?.[0] || null;
+                        }
+                      }
+
+                      selectOriginSuggestion({
+                        entity_type: entityType,
+                        entity_id: entityId,
+                        label,
+                        subtitle: fav.stop_id ? "Parada favorita" : "Lugar favorito",
+                        latitude: lat,
+                        longitude: lon,
+                      });
+                    }}
+                  >
+                    <HeartIcon size={18} weight="fill" color="var(--accent)" />
+                    <span><strong>{fav.custom_name}</strong><small>{fav.stop_id ? "Parada favorita" : "Lugar favorito"}</small></span>
+                  </button>
+                ))}
+              </div>
+            )}
+
             {isSupabaseConfigured() && showOriginSuggestions && origin.trim().length >= 2 && origin !== "Mi ubicación" && (originSuggestions.length > 0 || originSearchStatus !== "idle") && (
               <div className="suggestion-list" aria-live="polite">
                 {originSearchStatus === "loading" && <div className="suggestion-loading"><span /><span /><span /></div>}
@@ -803,22 +1000,24 @@ export function TransitApp() {
                       let label = fav.custom_name || "";
                       let lat: number | null = null;
                       let lon: number | null = null;
-                      let entityType: "stop" | "place" = fav.stop_id ? "stop" : "place";
-                      let entityId = fav.stop_id || fav.place_id;
+                      const entityType: "stop" | "place" = fav.stop_id ? "stop" : "place";
+                      const entityId = fav.stop_id || fav.place_id || 0;
 
                       if (fav.stop_id) {
                         const { data } = await supabase.from("stops").select("name, reference, location").eq("id", fav.stop_id).single();
                         if (data) {
                           label = fav.custom_name || data.name;
-                          lat = (data.location as any)?.coordinates?.[1] || null;
-                          lon = (data.location as any)?.coordinates?.[0] || null;
+                          const loc = data.location as { coordinates?: [number, number] } | null;
+                          lat = loc?.coordinates?.[1] || null;
+                          lon = loc?.coordinates?.[0] || null;
                         }
                       } else if (fav.place_id) {
                         const { data } = await supabase.from("places").select("name, address, location").eq("id", fav.place_id).single();
                         if (data) {
                           label = fav.custom_name || data.name;
-                          lat = (data.location as any)?.coordinates?.[1] || null;
-                          lon = (data.location as any)?.coordinates?.[0] || null;
+                          const loc = data.location as { coordinates?: [number, number] } | null;
+                          lat = loc?.coordinates?.[1] || null;
+                          lon = loc?.coordinates?.[0] || null;
                         }
                       }
 
@@ -851,13 +1050,12 @@ export function TransitApp() {
                 ))}
               </div>
             )}
-            <button className="primary-button" type="submit">
+            <button className="primary-button" type="submit" disabled={isSearchingJourney}>
               <MagnifyingGlassIcon size={19} weight="bold" />
-              Buscar ruta
+              {isSearchingJourney ? "Buscando..." : "Buscar ruta"}
             </button>
           </form>
 
-          {renderedTabs}
           {renderedLists}
         </section>
 
@@ -882,6 +1080,11 @@ export function TransitApp() {
                   autoComplete="off"
                   placeholder="Origen (ej. Mi ubicación)"
                 />
+                {originCoordinates && (
+                  <button className="mobile-input-action" style={{ right: "32px" }} type="button" onClick={toggleOriginPlaceFavorite} aria-label="Favorito">
+                    <HeartIcon size={15} weight={isOriginFavorited ? "fill" : "regular"} color={isOriginFavorited ? "var(--accent)" : "currentColor"} />
+                  </button>
+                )}
                 <button className="mobile-input-action" type="button" onClick={requestLocation} aria-label="Usar mi ubicación">
                   <NavigationArrowIcon size={14} />
                 </button>
@@ -893,6 +1096,59 @@ export function TransitApp() {
                       <button key={`${suggestion.entity_type}-${suggestion.entity_id}`} className="suggestion-row" type="button" onClick={() => selectOriginSuggestion(suggestion)}>
                         <MapPinIcon size={16} />
                         <span><strong>{suggestion.label}</strong></span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {isSupabaseConfigured() && showOriginSuggestions && origin.trim().length < 2 && favorites.some((f) => f.place_id || f.stop_id) && (
+                  <div className="suggestion-list mobile-suggestions mobile-only" style={{ top: "66px", left: "62px", right: "62px" }} aria-live="polite">
+                    <div style={{ padding: "6px 10px", fontSize: "10px", fontWeight: "bold", color: "var(--muted)", borderBottom: "1px solid var(--line)" }}>
+                      LUGARES FAVORITOS
+                    </div>
+                    {favorites.filter((f) => f.place_id || f.stop_id).map((fav) => (
+                      <button
+                        key={`fav-orig-mb-${fav.id}`}
+                        className="suggestion-row"
+                        type="button"
+                        onClick={async () => {
+                          const supabase = getSupabaseBrowserClient();
+                          if (!supabase) return;
+                          let label = fav.custom_name || "";
+                          let lat: number | null = null;
+                          let lon: number | null = null;
+                          const entityType: "stop" | "place" = fav.stop_id ? "stop" : "place";
+                          const entityId = fav.stop_id || fav.place_id || 0;
+
+                          if (fav.stop_id) {
+                            const { data } = await supabase.from("stops").select("name, reference, location").eq("id", fav.stop_id).single();
+                            if (data) {
+                              label = fav.custom_name || data.name;
+                              const loc = data.location as { coordinates?: [number, number] } | null;
+                              lat = loc?.coordinates?.[1] || null;
+                              lon = loc?.coordinates?.[0] || null;
+                            }
+                          } else if (fav.place_id) {
+                            const { data } = await supabase.from("places").select("name, address, location").eq("id", fav.place_id).single();
+                            if (data) {
+                              label = fav.custom_name || data.name;
+                              const loc = data.location as { coordinates?: [number, number] } | null;
+                              lat = loc?.coordinates?.[1] || null;
+                              lon = loc?.coordinates?.[0] || null;
+                            }
+                          }
+
+                          selectOriginSuggestion({
+                            entity_type: entityType,
+                            entity_id: entityId,
+                            label,
+                            subtitle: fav.stop_id ? "Parada favorita" : "Lugar favorito",
+                            latitude: lat,
+                            longitude: lon,
+                          });
+                        }}
+                      >
+                        <HeartIcon size={15} weight="fill" color="var(--accent)" />
+                        <span><strong>{fav.custom_name}</strong><small>{fav.stop_id ? "Parada favorita" : "Lugar favorito"}</small></span>
                       </button>
                     ))}
                   </div>
@@ -917,7 +1173,7 @@ export function TransitApp() {
                 </button>
               </div>
             </div>
-            <button className="mobile-search-submit" type="submit" aria-label="Buscar">
+            <button className="mobile-search-submit" type="submit" disabled={isSearchingJourney} aria-label="Buscar">
               <MagnifyingGlassIcon size={18} weight="bold" />
             </button>
           </form>
@@ -940,22 +1196,24 @@ export function TransitApp() {
                   let label = fav.custom_name || "";
                   let lat: number | null = null;
                   let lon: number | null = null;
-                  let entityType: "stop" | "place" = fav.stop_id ? "stop" : "place";
-                  let entityId = fav.stop_id || fav.place_id;
+                  const entityType: "stop" | "place" = fav.stop_id ? "stop" : "place";
+                  const entityId = fav.stop_id || fav.place_id || 0;
 
                   if (fav.stop_id) {
                     const { data } = await supabase.from("stops").select("name, reference, location").eq("id", fav.stop_id).single();
                     if (data) {
                       label = fav.custom_name || data.name;
-                      lat = (data.location as any)?.coordinates?.[1] || null;
-                      lon = (data.location as any)?.coordinates?.[0] || null;
+                      const loc = data.location as { coordinates?: [number, number] } | null;
+                      lat = loc?.coordinates?.[1] || null;
+                      lon = loc?.coordinates?.[0] || null;
                     }
                   } else if (fav.place_id) {
                     const { data } = await supabase.from("places").select("name, address, location").eq("id", fav.place_id).single();
                     if (data) {
                       label = fav.custom_name || data.name;
-                      lat = (data.location as any)?.coordinates?.[1] || null;
-                      lon = (data.location as any)?.coordinates?.[0] || null;
+                      const loc = data.location as { coordinates?: [number, number] } | null;
+                      lat = loc?.coordinates?.[1] || null;
+                      lon = loc?.coordinates?.[0] || null;
                     }
                   }
 
@@ -1015,12 +1273,12 @@ export function TransitApp() {
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
                         <defs>
                           <linearGradient id="blueGradMobile" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#3b82f6" />
-                            <stop offset="100%" stop-color="#1d4ed8" />
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="100%" stopColor="#1d4ed8" />
                           </linearGradient>
                           <linearGradient id="greenGradMobile" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#10b981" />
-                            <stop offset="100%" stop-color="#047857" />
+                            <stop offset="0%" stopColor="#10b981" />
+                            <stop offset="100%" stopColor="#047857" />
                           </linearGradient>
                         </defs>
                         <path d="M15 80V40C15 22 42 22 42 40V80" stroke="url(#blueGradMobile)" strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" />
@@ -1039,7 +1297,6 @@ export function TransitApp() {
                   <div className="mobile-auth-container">
                     <AuthMenu onMessage={setMessage} />
                   </div>
-                  {renderedTabs}
                   <div style={{ flex: 1, overflowY: "auto", marginTop: 4 }}>
                     {renderedLists}
                   </div>

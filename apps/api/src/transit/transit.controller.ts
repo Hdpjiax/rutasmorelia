@@ -14,6 +14,12 @@ export class TransitController {
     return this.transit.listRoutes();
   }
 
+  @Get('traffic')
+  @ApiOperation({ summary: 'Obtiene el feed de tráfico en tiempo real en formato GeoJSON' })
+  getTrafficFeed() {
+    return this.transit.getTrafficFeed();
+  }
+
   @Get('stops/nearby')
   @ApiOperation({ summary: 'Busca paradas cercanas a una coordenada' })
   nearbyStops(@Query() query: NearbyStopsDto) {
