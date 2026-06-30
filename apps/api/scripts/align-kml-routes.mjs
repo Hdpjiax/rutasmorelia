@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 const DEFAULT_OSRM_BASE_URL = 'https://router.project-osrm.org';
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(SCRIPT_DIR, '../../..');
+const GENERIC_NAMES = new Set(['autobus', 'bus', 'camion', 'combi', 'microbus', 'microbuc', 'micro']);
 
 function projectPath(value) {
   if (!value) return value;
@@ -25,6 +26,7 @@ function args(argv) {
     chunk: Number(process.env.OSRM_MAX_CHUNK_POINTS ?? '90'),
     allowImperfect: false,
     listRoutes: false,
+    listFiles: false,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -39,6 +41,7 @@ function args(argv) {
     else if (k === '--chunk') { out.chunk = Number(v); i += 1; }
     else if (k === '--allow-imperfect') out.allowImperfect = true;
     else if (k === '--list-routes') out.listRoutes = true;
+    else if (k === '--list-files') out.listFiles = true;
     else throw new Error(`Argumento desconocido: ${k}`);
   }
   return out;
@@ -47,6 +50,34 @@ function args(argv) {
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const slug = (s) => norm(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'ruta';
 const xml = (s) => String(s ?? '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+const pretty = (s) => String(s ?? '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+function isGenericName(value) {
+  const n = norm(value).replace(/[^a-z0-9]+/g, ' ').trim();
+  return !n || GENERIC_NAMES.has(n);
+}
+
+function removeNumericPrefix(value) {
+  return String(value ?? '').replace(/^\s*\d+\s*[-_. ]\s*/, '').trim();
+}
+
+function routeNameFromFile(file) {
+  const parts = path.relative(REPO_ROOT, file).split(path.sep).filter(Boolean);
+  const basename = removeNumericPrefix(pretty(path.basename(file, path.extname(file))));
+  const parent = removeNumericPrefix(pretty(parts.length > 1 ? parts[parts.length - 2] : ''));
+  if (!isGenericName(basename) && !/^\d+$/.test(basename)) return basename;
+  if (!isGenericName(parent) && !/^\d+$/.test(parent)) return parent;
+  return basename || parent || path.basename(file, path.extname(file));
+}
+
+function pickRouteName(rawName, file) {
+  const fromFile = routeNameFromFile(file);
+  if (isGenericName(rawName)) return fromFile;
+  const cleanRaw = pretty(rawName);
+  const cleanFile = pretty(fromFile);
+  if (norm(cleanFile).includes(norm(cleanRaw)) && cleanFile.length > cleanRaw.length) return cleanFile;
+  return cleanRaw || cleanFile;
+}
 
 function tag(block, name) {
   const m = block.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)<\\/${name}>`, 'i'));
@@ -70,11 +101,12 @@ function parseKml(text, file) {
   const items = [];
   const placemarks = text.match(/<Placemark[\s\S]*?<\/Placemark>/gi) ?? [text];
   placemarks.forEach((pm, pmIndex) => {
-    const name = tag(pm, 'name') || path.basename(file, path.extname(file));
+    const rawName = tag(pm, 'name') || path.basename(file, path.extname(file));
+    const name = pickRouteName(rawName, file);
     const lines = [...pm.matchAll(/<LineString[\s\S]*?<coordinates[^>]*>([\s\S]*?)<\/coordinates>[\s\S]*?<\/LineString>/gi)];
     lines.forEach((m, lineIndex) => {
       const line = dedupe(coords(m[1]));
-      if (line.length > 1) items.push({ file, name, pmIndex, lineIndex, line });
+      if (line.length > 1) items.push({ file, name, rawName, pmIndex, lineIndex, line });
     });
   });
   return items;
@@ -90,7 +122,8 @@ function parseGeojson(text, file) {
     const lines = g.type === 'LineString' ? [g.coordinates] : g.type === 'MultiLineString' ? g.coordinates : [];
     lines.forEach((line, j) => {
       const clean = dedupe(line.map(([lon, lat]) => [Number(lon), Number(lat)]).filter(([lon, lat]) => Number.isFinite(lon) && Number.isFinite(lat)));
-      if (clean.length > 1) items.push({ file, name: p.routeName || p.name || path.basename(file, path.extname(file)), pmIndex: i, lineIndex: j, line: clean });
+      const rawName = p.routeName || p.name || p.route_id || path.basename(file, path.extname(file));
+      if (clean.length > 1) items.push({ file, name: pickRouteName(rawName, file), rawName, pmIndex: i, lineIndex: j, line: clean });
     });
   });
   return items;
@@ -134,9 +167,9 @@ function colorMeta(name) {
   return ['#FFC800', n.includes('alberca') ? 'Alberca' : 'Amarillo', 'A'];
 }
 
-function typeMeta(name) {
-  const n = norm(name);
-  if (n.includes('microbus')) return 'Microbús';
+function typeMeta(name, rawName = '') {
+  const n = norm(`${name} ${rawName}`);
+  if (n.includes('microbus') || n.includes('microbuc')) return 'Microbús';
   if (n.includes('autobus') || n.includes('camion')) return 'Autobús';
   return 'Combi';
 }
@@ -145,16 +178,16 @@ function group(items, filter) {
   const f = norm(filter);
   const routes = new Map();
   for (const item of items) {
-    const haystack = norm(`${item.name} ${item.file}`);
+    const haystack = norm(`${item.name} ${item.rawName ?? ''} ${item.file}`);
     if (f && !haystack.includes(f)) continue;
     const name = baseRouteName(item.name);
     const id = slug(name);
     if (!routes.has(id)) {
       const [color, colorName, colorLetter] = colorMeta(name);
-      routes.set(id, { id, name, color, colorName, colorLetter, transportType: typeMeta(name), variants: [] });
+      routes.set(id, { id, name, color, colorName, colorLetter, transportType: typeMeta(name, item.rawName), variants: [] });
     }
     const route = routes.get(id);
-    route.variants.push({ id: `${id}-${route.variants.length}`, direction: direction(item.name, route.variants.length), sourceName: item.name, sourceFile: item.file, source: item.line });
+    route.variants.push({ id: `${id}-${route.variants.length}`, direction: direction(`${item.name} ${item.rawName ?? ''}`, route.variants.length), sourceName: item.name, sourceFile: item.file, source: item.line });
   }
   return [...routes.values()].sort((a, b) => a.name.localeCompare(b.name, 'es-MX'));
 }
@@ -218,7 +251,7 @@ async function matchOsrm(line, cfg, radius) {
   const data = await getJson(url);
   if (data.code !== 'Ok' || !data.matchings?.length) throw new Error(`match ${data.code ?? 'sin respuesta'}`);
   const out = data.matchings.flatMap((m) => m.geometry?.coordinates ?? []);
-  if (out.length < 2) throw new Error('match sin geometría');
+  if (out.length < 2) throw new Error('match sin geometria');
   return dedupe(out);
 }
 
@@ -306,6 +339,13 @@ async function main() {
     throw new Error(`No se encontraron KML/GeoJSON en: ${cfg.input}`);
   }
 
+  if (cfg.listFiles) {
+    console.log(`Input: ${cfg.input}`);
+    console.log(`Archivos encontrados: ${files.length}`);
+    for (const file of files) console.log(`- ${path.relative(REPO_ROOT, file)} -> ${routeNameFromFile(file)}`);
+    return;
+  }
+
   const sources = [];
   for (const file of files) {
     const text = await fs.readFile(file, 'utf8');
@@ -332,7 +372,7 @@ async function main() {
       .map((route) => route.name)
       .filter((name) => norm(name).includes(needle.split(' ')[0] ?? needle) || needle.includes(norm(name).split(' ')[0] ?? ''))
       .slice(0, 12);
-    const hint = suggestions.length ? `\nSugerencias:\n- ${suggestions.join('\n- ')}` : `\nEjecuta con --list-routes para ver los nombres detectados.`;
+    const hint = suggestions.length ? `\nSugerencias:\n- ${suggestions.join('\n- ')}` : `\nEjecuta con --list-routes o --list-files para ver los nombres detectados.`;
     throw new Error(`No encontre rutas con filtro: ${cfg.route}\nInput resuelto: ${cfg.input}\nArchivos leidos: ${files.length}${hint}`);
   }
 
