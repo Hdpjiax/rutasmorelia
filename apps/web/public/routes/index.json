@@ -1,66 +1,6 @@
 {
   "type": "routes-index",
-<<<<<<< HEAD
-  "routes": [
-    {
-      "id": "2",
-      "name": "Amarilla Tenencia Morelos",
-      "color": "#FFC800",
-      "transportType": "Combi",
-      "colorName": "Amarillo",
-      "colorLetter": "A",
-      "geojsonFile": "/routes/2.geojson"
-    },
-    {
-      "id": "3",
-      "name": "Amarilla 1 Centro",
-      "color": "#FFC800",
-      "transportType": "Combi",
-      "colorName": "Amarillo",
-      "colorLetter": "A",
-      "geojsonFile": "/routes/3.geojson"
-    },
-    {
-      "id": "4",
-      "name": "Amarilla 2",
-      "color": "#FFC800",
-      "transportType": "Combi",
-      "colorName": "Amarillo",
-      "colorLetter": "A",
-      "geojsonFile": "/routes/4.geojson"
-    },
-    {
-      "id": "5",
-      "name": "Azul A Soriana-CBTA",
-      "color": "#004E98",
-      "transportType": "Combi",
-      "colorName": "Azul",
-      "colorLetter": "A",
-      "geojsonFile": "/routes/5.geojson"
-    },
-    {
-      "id": "78",
-      "name": "Alberca (Metropolis)",
-      "color": "#FFC800",
-      "transportType": "Microbús",
-      "colorName": "Alberca",
-      "colorLetter": "A",
-      "geojsonFile": "/routes/78.geojson"
-    },
-    {
-      "id": "79",
-      "name": "Alberca (Gertrudis)",
-      "color": "#FFC800",
-      "transportType": "Microbús",
-      "colorName": "Alberca",
-      "colorLetter": "A",
-      "geojsonFile": "/routes/79.geojson"
-    }
-  ]
-}
-=======
-  "generatedAt": "2026-06-30T00:00:00.000Z",
+  "generatedAt": "2026-06-30T12:00:00.000Z",
   "algorithm": "pending-osrm-road-network-map-matching-v1",
   "routes": []
 }
->>>>>>> 21d4e3f130da868704b02b20537c8e5e4c1fd764

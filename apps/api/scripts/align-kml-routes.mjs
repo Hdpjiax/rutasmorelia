@@ -2,13 +2,21 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 const DEFAULT_OSRM_BASE_URL = 'https://router.project-osrm.org';
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(SCRIPT_DIR, '../../..');
+
+function projectPath(value) {
+  if (!value) return value;
+  return path.isAbsolute(value) ? value : path.resolve(REPO_ROOT, value);
+}
 
 function args(argv) {
   const out = {
-    input: process.env.ROUTES_INPUT_DIR ?? 'rutastransporte',
-    output: process.env.ROUTES_OUTPUT_DIR ?? 'apps/web/public/routes',
+    input: projectPath(process.env.ROUTES_INPUT_DIR ?? 'rutastransporte'),
+    output: projectPath(process.env.ROUTES_OUTPUT_DIR ?? 'apps/web/public/routes'),
     route: process.env.ROUTE_FILTER ?? '',
     limit: Number(process.env.ROUTE_LIMIT ?? '0'),
     osrm: process.env.OSRM_BASE_URL ?? DEFAULT_OSRM_BASE_URL,
@@ -16,12 +24,13 @@ function args(argv) {
     densify: Number(process.env.DENSIFY_METERS ?? '18'),
     chunk: Number(process.env.OSRM_MAX_CHUNK_POINTS ?? '90'),
     allowImperfect: false,
+    listRoutes: false,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
     const v = argv[i + 1];
-    if (k === '--input') { out.input = v; i += 1; }
-    else if (k === '--output') { out.output = v; i += 1; }
+    if (k === '--input') { out.input = projectPath(v); i += 1; }
+    else if (k === '--output') { out.output = projectPath(v); i += 1; }
     else if (k === '--route') { out.route = v; i += 1; }
     else if (k === '--limit') { out.limit = Number(v); i += 1; }
     else if (k === '--osrm') { out.osrm = v; i += 1; }
@@ -29,6 +38,7 @@ function args(argv) {
     else if (k === '--densify') { out.densify = Number(v); i += 1; }
     else if (k === '--chunk') { out.chunk = Number(v); i += 1; }
     else if (k === '--allow-imperfect') out.allowImperfect = true;
+    else if (k === '--list-routes') out.listRoutes = true;
     else throw new Error(`Argumento desconocido: ${k}`);
   }
   return out;
@@ -292,15 +302,39 @@ function feature(route, variant) {
 async function main() {
   const cfg = args(process.argv.slice(2));
   const files = await walk(cfg.input);
+  if (!files.length) {
+    throw new Error(`No se encontraron KML/GeoJSON en: ${cfg.input}`);
+  }
+
   const sources = [];
   for (const file of files) {
     const text = await fs.readFile(file, 'utf8');
     try { sources.push(...(/\.kml$/i.test(file) ? parseKml(text, file) : parseGeojson(text, file))); }
     catch (e) { console.warn(`[WARN] ${file}: ${e.message}`); }
   }
+
+  if (!sources.length) throw new Error(`Se encontraron ${files.length} archivo(s), pero ninguno tenia LineString valido.`);
+
+  const allRoutes = group(sources, '');
+  if (cfg.listRoutes) {
+    console.log(`Input: ${cfg.input}`);
+    console.log(`Archivos leidos: ${files.length}`);
+    console.log('Rutas detectadas:');
+    for (const route of allRoutes) console.log(`- ${route.name} (${route.variants.length} variante/s)`);
+    return;
+  }
+
   let routes = group(sources, cfg.route);
   if (cfg.limit > 0) routes = routes.slice(0, cfg.limit);
-  if (!routes.length) throw new Error(`No encontré rutas con filtro: ${cfg.route || '(sin filtro)'}`);
+  if (!routes.length) {
+    const needle = norm(cfg.route);
+    const suggestions = allRoutes
+      .map((route) => route.name)
+      .filter((name) => norm(name).includes(needle.split(' ')[0] ?? needle) || needle.includes(norm(name).split(' ')[0] ?? ''))
+      .slice(0, 12);
+    const hint = suggestions.length ? `\nSugerencias:\n- ${suggestions.join('\n- ')}` : `\nEjecuta con --list-routes para ver los nombres detectados.`;
+    throw new Error(`No encontre rutas con filtro: ${cfg.route}\nInput resuelto: ${cfg.input}\nArchivos leidos: ${files.length}${hint}`);
+  }
 
   const report = { generatedAt: new Date().toISOString(), input: cfg.input, osrm: cfg.osrm, routes: [] };
   const index = { type: 'routes-index', generatedAt: new Date().toISOString(), algorithm: 'osrm-road-network-map-matching-v1', routes: [] };
@@ -311,7 +345,7 @@ async function main() {
     const variants = [];
     for (const v of route.variants) {
       const aligned = await alignVariant(v, cfg);
-      if (!cfg.allowImperfect && !aligned.metrics.passed) throw new Error(`${route.name} ${v.direction} no pasó validación: ${JSON.stringify(aligned.metrics)}`);
+      if (!cfg.allowImperfect && !aligned.metrics.passed) throw new Error(`${route.name} ${v.direction} no paso validacion: ${JSON.stringify(aligned.metrics)}`);
       variants.push(aligned);
     }
     route.variants = variants;
@@ -321,7 +355,7 @@ async function main() {
   }
   await fs.writeFile(path.join(cfg.output, 'index.json'), JSON.stringify(index, null, 2) + '\n');
   await fs.writeFile(path.join(cfg.output, 'ALIGNMENT_REPORT.json'), JSON.stringify(report, null, 2) + '\n');
-  console.log(`Listo: ${routes.length} ruta(s).`);
+  console.log(`Listo: ${routes.length} ruta(s). Salida: ${cfg.output}`);
 }
 
 main().catch((e) => { console.error(e.stack || e.message); process.exitCode = 1; });
