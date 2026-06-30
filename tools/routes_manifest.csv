@@ -1,0 +1,106 @@
+route_id,folder_name,route_name,color_name,color_hex,color_letter,transport_type,length_km,coord_count,placemark_name,kml_path,category
+10,10_CAFE_1,Café 1,Cafe,#8B4513,C,Combi,17.4513,804,Combi,rutastransporte\01_RUTAS_DE_COMBI\10_CAFE_1\KML\Café_1.kml,01_RUTAS_DE_COMBI
+11,11_CAFE_1A,Café 1A,Cafe,#8B4513,C,Combi,9.6713,1054,Combi,rutastransporte\01_RUTAS_DE_COMBI\11_CAFE_1A\KML\Café 1A.kml,01_RUTAS_DE_COMBI
+13,13_CAFE_ORO_2_LEANDRO_VALLE,Café - Oro 2 (Leandro Valle),Cafe,#8B4513,C,Combi,20.113,2004,Combi,rutastransporte\01_RUTAS_DE_COMBI\13_CAFE_ORO_2_LEANDRO_VALLE\KML\Café-Oro_2_Leandro_Valle.kml,01_RUTAS_DE_COMBI
+14,14_CAFE_ORO_2_RAFAEL_CARRILLO,Café Oro 2 Rafael Carrillo,Cafe,#8B4513,C,Combi,20.2542,949,Combi,rutastransporte\01_RUTAS_DE_COMBI\14_CAFE_ORO_2_RAFAEL_CARRILLO\KML\Café_Oro_2_Rafael_Carrillo.kml,01_RUTAS_DE_COMBI
+15,15_CAFE_ORO_2A,Café Oro 2A,Cafe,#8B4513,C,Combi,22.7243,1002,Combi,rutastransporte\01_RUTAS_DE_COMBI\15_CAFE_ORO_2A\KML\Café_Oro_2A.kml,01_RUTAS_DE_COMBI
+16,16_CAFE_ORO_2B_MADERO,Café Oro 2B Madero,Cafe,#8B4513,C,Combi,10.8537,669,Combi,rutastransporte\01_RUTAS_DE_COMBI\16_CAFE_ORO_2B_MADERO\KML\Café_Oro_2B_Madero.kml,01_RUTAS_DE_COMBI
+17,17_CAFE_ORO_2B_MICHOACAN,Café Oro 2B Michoacán,Cafe,#8B4513,C,Combi,10.857,611,Combi,rutastransporte\01_RUTAS_DE_COMBI\17_CAFE_ORO_2B_MICHOACAN\KML\Café_Oro_2B_Michoacán.kml,01_RUTAS_DE_COMBI
+18,18_CORAL_1,Coral 1,Coral,#FF6F61,C,Combi,11.8417,402,Combi,rutastransporte\01_RUTAS_DE_COMBI\18_CORAL_1\KML\Coral_1.kml,01_RUTAS_DE_COMBI
+19,19_CORAL_2,Coral 2,Coral,#FF6F61,C,Combi,14.0773,515,Combi,rutastransporte\01_RUTAS_DE_COMBI\19_CORAL_2\KML\Coral_2.kml,01_RUTAS_DE_COMBI
+1,1_COBERTURA_DEL_TRANSPORTE,Ruta 1 Pedregal,#76B91E,#76B91E,?,Autobús,36.5987,313135,Combi,rutastransporte\01_RUTAS_DE_COMBI\1_COBERTURA_DEL_TRANSPORTE\KML\Coberturas del transporte.kml,01_RUTAS_DE_COMBI
+20,20_CORAL_2A,Coral 2 A,Coral,#FF6F61,C,Combi,18.8905,674,Combi,rutastransporte\01_RUTAS_DE_COMBI\20_CORAL_2A\KML\Coral_2A.kml,01_RUTAS_DE_COMBI
+21,21_CREMA_1,Crema 1,Crema,#F9DCC4,C,Combi,12.4421,483,Combi,rutastransporte\01_RUTAS_DE_COMBI\21_CREMA_1\KML\Crema_1.kml,01_RUTAS_DE_COMBI
+22,22_CREMA_2,Crema 2,Crema,#F9DCC4,C,Combi,18.3801,737,Combi,rutastransporte\01_RUTAS_DE_COMBI\22_CREMA_2\KML\Crema_2.kml,01_RUTAS_DE_COMBI
+23,23_CREMA_2A,Crema 2A,Crema,#F9DCC4,C,Combi,7.8442,374,Combi,rutastransporte\01_RUTAS_DE_COMBI\23_CREMA_2A\KML\Crema_2A.kml,01_RUTAS_DE_COMBI
+24,24_GRIS_1_CIRCUITO,Gris 1 Circuito,Gris,#808080,G,Combi,26.666,1424,Combi,rutastransporte\01_RUTAS_DE_COMBI\24_GRIS_1_CIRCUITO\KML\Gris_1_Circuito.kml,01_RUTAS_DE_COMBI
+26,26_GRIS_3_FURAMO,Gris 3 Furamo,Gris,#808080,G,Combi,26.6941,1409,Combi,rutastransporte\01_RUTAS_DE_COMBI\26_GRIS_3_FURAMO\KML\Gris_3_Furamo.kml,01_RUTAS_DE_COMBI
+27,27_GRIS_3_OXXO,Gris 3 Oxxo,Gris,#808080,G,Combi,24.9363,1394,Combi,rutastransporte\01_RUTAS_DE_COMBI\27_GRIS_3_OXXO\KML\Gris_3_Oxxo.kml,01_RUTAS_DE_COMBI
+28,28_GRIS_4,Gris 4,Gris,#808080,G,Combi,23.5362,1640,Combi,rutastransporte\01_RUTAS_DE_COMBI\28_GRIS_4\KML\Gris_4.kml,01_RUTAS_DE_COMBI
+29,29_GUINDA_1_MORA,Guinda 1 Mora,Guinda,#611240,G,Combi,15.719,955,Combi,rutastransporte\01_RUTAS_DE_COMBI\29_GUINDA_1_MORA\KML\Guinda_1_Mora.kml,01_RUTAS_DE_COMBI
+2,2_COMBI_AMARILLA_TENENCIA_MORELOS,Amarilla Tenencia Morelos,Amarilla,#FFC800,A,Combi,9.1915,1538,Combi,rutastransporte\01_RUTAS_DE_COMBI\2_COMBI_AMARILLA_TENENCIA_MORELOS\KML\Amarilla Tenencia Morelos.kml,01_RUTAS_DE_COMBI
+30,30_GUINDA_1_PRADERAS,Guinda 1 Praderas,Guinda,#611240,G,Combi,13.786,909,Combi,rutastransporte\01_RUTAS_DE_COMBI\30_GUINDA_1_PRADERAS\KML\Guinda_1_Praderas.kml,01_RUTAS_DE_COMBI
+31,31_GUINDA_2,Guinda 2,Guinda,#611240,G,Combi,10.1713,702,Combi,rutastransporte\01_RUTAS_DE_COMBI\31_GUINDA_2\KML\Guinda_2.kml,01_RUTAS_DE_COMBI
+32,32_MORADA_1_ALDEA,Morada 1 Aldea,Morada,#8238EA,M,Combi,21.4938,1072,Combi,rutastransporte\01_RUTAS_DE_COMBI\32_MORADA_1_ALDEA\KML\Morada_1_Aldea.kml,01_RUTAS_DE_COMBI
+33,33_MORADA_1_BUENOS_AIRES,Morada 1 Buenos Aires,Morada,#8238EA,M,Combi,24.3885,1503,Combi,rutastransporte\01_RUTAS_DE_COMBI\33_MORADA_1_BUENOS_AIRES\KML\Morada_1_Buenos_Aires.kml,01_RUTAS_DE_COMBI
+34,34_MORADA_1_MISION_DEL_VALLE,Morada 1 Misión del Valle,Morada,#8238EA,M,Combi,26.2153,1755,Combi,rutastransporte\01_RUTAS_DE_COMBI\34_MORADA_1_MISION_DEL_VALLE\KML\Morada_1_Misión_del_Valle.kml,01_RUTAS_DE_COMBI
+35,35_MORADA_2_LOMAS_DE_MORELIA,Morada 2 Lomas de Morelia,Morada,#8238EA,M,Combi,11.3602,975,Combi,rutastransporte\01_RUTAS_DE_COMBI\35_MORADA_2_LOMAS_DE_MORELIA\KML\Morada_2_Lomas_de_Morelia.kml,01_RUTAS_DE_COMBI
+36,36_MORADA_2_SATELITE,Morada 2 Satelite,Morada,#8238EA,M,Combi,17.4879,1147,Combi,rutastransporte\01_RUTAS_DE_COMBI\36_MORADA_2_SATELITE\KML\Morada_2_Satélite.kml,01_RUTAS_DE_COMBI
+37,37_MORADA_ 2A,Morada 2A,Morada,#8238EA,M,Combi,12.7761,912,Combi,rutastransporte\01_RUTAS_DE_COMBI\37_MORADA_ 2A\KML\Morada_2A.kml,01_RUTAS_DE_COMBI
+38,38_NARANJA_1_ISSSTE,Naranja 1 ISSTE,Naranja,#FF5500,N,Combi,11.2924,752,Combi,rutastransporte\01_RUTAS_DE_COMBI\38_NARANJA_1_ISSSTE\KML_naranja_issste\Naranja1_issste_kml.kml,01_RUTAS_DE_COMBI
+39,39_NARANJA_1_LA_SOLEDAD,Naranja 1 La Soledad,Naranja,#FF5500,N,Combi,11.299,843,Combi,rutastransporte\01_RUTAS_DE_COMBI\39_NARANJA_1_LA_SOLEDAD\KML_naranja1_LaSoledad\Naranja_1_La_Soledad_kml.kml,01_RUTAS_DE_COMBI
+3,3_COMBI_AMARILLA_1_CENTRO,Amarilla 1 Centro,Amarilla,#FFC800,A,Combi,9.3757,431,Combi,rutastransporte\01_RUTAS_DE_COMBI\3_COMBI_AMARILLA_1_CENTRO\KML\Amarilla_1_centro.kml,01_RUTAS_DE_COMBI
+40,40_NARANJA_2-3_DE_AGOSTO,Naranja 2 - 3 de Agosto,Naranja,#FF5500,N,Combi,12.2529,747,Combi,rutastransporte\01_RUTAS_DE_COMBI\40_NARANJA_2-3_DE_AGOSTO\KML_naranja23a\Naranja2_3_de_Agosto_kml.kml,01_RUTAS_DE_COMBI
+41,41_NARANJA_2_SANTA_FE,Naranja 2 Santa Fe,Naranja,#FF5500,N,Combi,17.5322,1041,Combi,rutastransporte\01_RUTAS_DE_COMBI\41_NARANJA_2_SANTA_FE\KML_naranja2_sf\Naranja2_SantaFe_kml.kml,01_RUTAS_DE_COMBI
+42,42_NARANJA_3_CENTRO-PUERTA_DEL_SOL,Naranja 3 Centro - Puerta del Sol,Naranja,#FF5500,N,Combi,14.8313,979,Combi,rutastransporte\01_RUTAS_DE_COMBI\42_NARANJA_3_CENTRO-PUERTA_DEL_SOL\KML_naranja3_cps\Naranja_3_Centro_PuertaSol_kml.kml,01_RUTAS_DE_COMBI
+43,43_NARANJA_3_CENTRO,Naranja 3 (Directo),Naranja,#FF5500,N,Autobús,13.1143,1583,Autobús,rutastransporte\01_RUTAS_DE_COMBI\43_NARANJA_3_CENTRO\KML_naranja3centro\Naranja3_centro_kml.kml,01_RUTAS_DE_COMBI
+44,44_NARANJA_3_SANTA_MARIA-ERANDENI,Naranja 3 Santa Maria - Erandeni,Naranja,#FF5500,N,Combi,17.5691,1318,Combi,rutastransporte\01_RUTAS_DE_COMBI\44_NARANJA_3_SANTA_MARIA-ERANDENI\KML_naranja3_sme\Naranja3_SantaMaría_Erandeni_kml.kml,01_RUTAS_DE_COMBI
+45,45_NARANJA_3_SANTA_MARIA-ITA,Naranja 3 Santa Maria - ITA,Naranja,#FF5500,N,Combi,15.5267,1343,Combi,rutastransporte\01_RUTAS_DE_COMBI\45_NARANJA_3_SANTA_MARIA-ITA\KML_naraja3_smita\Naranja_3_SantaMaría_ITA_kml.kml,01_RUTAS_DE_COMBI
+46,46_NARANJA_3_TRICO-METROPOLIS,Naranja 3 Trico - Metropolis,Naranja,#FF5500,N,Combi,15.9546,1369,Combi,rutastransporte\01_RUTAS_DE_COMBI\46_NARANJA_3_TRICO-METROPOLIS\KML_naranja3_trico\Naranja_3_Trico_Metropolis_kml.kml,01_RUTAS_DE_COMBI
+47,47_NEGRA_1,Negra 1,Negra,#000000,N,Combi,19.9279,848,Combi,rutastransporte\01_RUTAS_DE_COMBI\47_NEGRA_1\KML_negra1\Negra_1_kml.kml,01_RUTAS_DE_COMBI
+48,48_NEGRA_2,Negra 2,Negra,#000000,N,Combi,11.8333,707,Combi,rutastransporte\01_RUTAS_DE_COMBI\48_NEGRA_2\KML_negra2\Negra 2_kml.kml,01_RUTAS_DE_COMBI
+49,49_ORO_VERDE_ENCINOS,Oro Verde Encinos,Oro_verde,#A8A800,O,Combi,22.0164,1143,Combi,rutastransporte\01_RUTAS_DE_COMBI\49_ORO_VERDE_ENCINOS\KML_ove\Oro Verde Encinos.kml,01_RUTAS_DE_COMBI
+4,4_COMBI_AMARILLA_2,Amarilla 2,Amarilla,#FFC800,A,Combi,22.4748,646,Combi,rutastransporte\01_RUTAS_DE_COMBI\4_COMBI_AMARILLA_2\KML\Amarilla_2.kml,01_RUTAS_DE_COMBI
+50,50_ORO_VERDE_SOLEDAD,Oro Verde Soledad,Oro_verde,#A8A800,O,Combi,19.7125,1248,Combi,rutastransporte\01_RUTAS_DE_COMBI\50_ORO_VERDE_SOLEDAD\KML_ovs\Oro Verde Soledad_kml.kml,01_RUTAS_DE_COMBI
+51,51_ORO_VERDE_TRINCHERAS,Oro Verde Trincheras,Oro_verde,#A8A800,O,Combi,19.5306,1482,Combi,rutastransporte\01_RUTAS_DE_COMBI\51_ORO_VERDE_TRINCHERAS\KML_ovt\Oro_Verde_Trincheras_kml.kml,01_RUTAS_DE_COMBI
+52,52_PALOMA_AZUL_ARQUITO,Paloma Azul Arquito,Azul,#004E98,A,Combi,11.812,1294,Combi,rutastransporte\01_RUTAS_DE_COMBI\52_PALOMA_AZUL_ARQUITO\KML_paa\Paloma_Azul_Arquito_kml.kml,01_RUTAS_DE_COMBI
+53,53_PALOMA_AZUL_CAMPIÑA,Paloma Azul Campina,Azul,#004E98,A,Combi,12.8505,1197,Combi,rutastransporte\01_RUTAS_DE_COMBI\53_PALOMA_AZUL_CAMPIÑA\KML_pac\Paloma_Azul_Campiña_kml.kml,01_RUTAS_DE_COMBI
+54,54_PALOMA_AZUL_ZIMPANIO,Paloma Azul Zimpanio,Azul,#004E98,A,Combi,9.9205,952,Combi,rutastransporte\01_RUTAS_DE_COMBI\54_PALOMA_AZUL_ZIMPANIO\KML_paz\Paloma_Azul_Zimpanio_kml.kml,01_RUTAS_DE_COMBI
+55,55_ROJA_1_COMERCIAL_MEXICANA,Roja 1 Comercial Mexicana,Roja,#A80000,R,Combi,13.066,916,Combi,rutastransporte\01_RUTAS_DE_COMBI\55_ROJA_1_COMERCIAL_MEXICANA\KML_rcm\Roja_1_Comercial_Mexicana_kml.kml,01_RUTAS_DE_COMBI
+56,56_ROJA_1_PUNHUATO,Roja 1 Punhuato,Roja,#A80000,R,Combi,13.2136,850,Combi,rutastransporte\01_RUTAS_DE_COMBI\56_ROJA_1_PUNHUATO\KML_rp\Roja_1_Punhuato_kml.kml,01_RUTAS_DE_COMBI
+57,57_ROJA_2_OKEN,Roja 2 Oken,Roja,#A80000,R,Combi,11.2471,655,Combi,rutastransporte\01_RUTAS_DE_COMBI\57_ROJA_2_OKEN\KML_oken\Roja_2_Oken_kml.kml,01_RUTAS_DE_COMBI
+58,58_ROJA_2_VILLAS_DEL_SOL,Roja 2 Villas del Sol,Roja,#A80000,R,Combi,9.8148,722,Combi,rutastransporte\01_RUTAS_DE_COMBI\58_ROJA_2_VILLAS_DEL_SOL\KML_rvillas\Roja 2 Villas del Sol_kml.kml,01_RUTAS_DE_COMBI
+59,59_ROJA_3,Roja 3,Roja,#A80000,R,Combi,14.4289,1341,Combi,rutastransporte\01_RUTAS_DE_COMBI\59_ROJA_3\KML_roja3\Roja_3_kml.kml,01_RUTAS_DE_COMBI
+5,5_COMBI_AZUL_A_SORIANA-CBTA,Azul A Soriana-CBTA,Azul,#004E98,A,Combi,18.0027,607,Combi,rutastransporte\01_RUTAS_DE_COMBI\5_COMBI_AZUL_A_SORIANA-CBTA\KML\Azul_A_Soriana-CBTA.kml,01_RUTAS_DE_COMBI
+60,60_ROJA_3A,Roja 3A,Roja,#A80000,R,Combi,17.3687,1522,Combi,rutastransporte\01_RUTAS_DE_COMBI\60_ROJA_3A\KML_roja3A\Roja_3A_kml.kml,01_RUTAS_DE_COMBI
+61,61_ROJA_3B,Roja 3B,Roja,#A80000,R,Combi,14.8248,1197,Combi,rutastransporte\01_RUTAS_DE_COMBI\61_ROJA_3B\KML_roja3B\Roja_3B_kml.kml,01_RUTAS_DE_COMBI
+62,62_ROJA_4_TINIJARO,Roja 4 Tinijaro,Roja,#A80000,R,Combi,13.6842,988,Combi,rutastransporte\01_RUTAS_DE_COMBI\62_ROJA_4_TINIJARO\KML_tinijaro\Roja_4_Tinijaro_kml.kml,01_RUTAS_DE_COMBI
+63,63_ROJA_4_TZINDURIO,Roja 4 Tzindurio,Roja,#A80000,R,Combi,14.96,1186,Combi,rutastransporte\01_RUTAS_DE_COMBI\63_ROJA_4_TZINDURIO\KML_tzindurio\Roja_4_Tzindurio_kml.kml,01_RUTAS_DE_COMBI
+64,64_ROJA_4A,Roja 4A,Roja,#A80000,R,Combi,13.8111,1123,Combi,rutastransporte\01_RUTAS_DE_COMBI\64_ROJA_4A\KML_roja4A\Roja_4A_kml.kml,01_RUTAS_DE_COMBI
+65,65_ROJA_4M,Roja 4M,Roja,#A80000,R,Combi,13.8823,1218,Combi,rutastransporte\01_RUTAS_DE_COMBI\65_ROJA_4M\KML_roja4M\Roja_4M_kml.kml,01_RUTAS_DE_COMBI
+66,66_ROSA_2,Rosa 2,Rosa,#FF00C5,R,Combi,16.9078,797,Combi,rutastransporte\01_RUTAS_DE_COMBI\66_ROSA_2\KML_rosa2\Rosa_2_kml.kml,01_RUTAS_DE_COMBI
+67,67_ROSA_2B,Rosa 2B,Rosa,#FF00C5,R,Combi,8.9623,690,Combi,rutastransporte\01_RUTAS_DE_COMBI\67_ROSA_2B\KML_rosa2B\Rosa_2B_kml.kml,01_RUTAS_DE_COMBI
+68,68_ROSA_3,Rosa 3,Rosa,#FF00C5,R,Combi,9.3415,875,Combi,rutastransporte\01_RUTAS_DE_COMBI\68_ROSA_3\KML_rosa3\Rosa_3_kml.kml,01_RUTAS_DE_COMBI
+69,69_ROSA_METROPOLIS-ESTRELLA,Rosa Metropolis - Estrella,Rosa,#FF00C5,R,Combi,17.8932,1148,Combi,rutastransporte\01_RUTAS_DE_COMBI\69_ROSA_METROPOLIS-ESTRELLA\KML_me\Rosa_Metropolis-Estrella_kml.kml,01_RUTAS_DE_COMBI
+6,6_COMBI_AZUL_A_SORIANA-VERGEL,Azul A Soriana-Vergel,Azul,#004E98,A,Combi,16.4719,623,Combi,rutastransporte\01_RUTAS_DE_COMBI\6_COMBI_AZUL_A_SORIANA-VERGEL\KML\Azul_A_Soriana-Vergel.kml,01_RUTAS_DE_COMBI
+70,70_ROSA_PUERTA_DEL_SOL-GALAXIA,Rosa Puerta del Sol - Galaxia,Rosa,#FF00C5,R,Combi,18.6013,1303,Combi,rutastransporte\01_RUTAS_DE_COMBI\70_ROSA_PUERTA_DEL_SOL-GALAXIA\KML_rpsg\Rosa_Puerta_del_Sol-Galaxia_kml.kml,01_RUTAS_DE_COMBI
+71,71_VERDE_1,Verde 1,Verde,#70A800,V,Combi,13.0058,1092,Combi,rutastransporte\01_RUTAS_DE_COMBI\71_VERDE_1\KML_verde1\Verde_1_kml.kml,01_RUTAS_DE_COMBI
+72,72_VERDE_2,Verde 2,Verde,#70A800,V,Combi,16.7071,1523,Combi,rutastransporte\01_RUTAS_DE_COMBI\72_VERDE_2\KML_verde2\Verde_2_kml.kml,01_RUTAS_DE_COMBI
+73,73_VERDE_3_INDECO,Verde 3 INDECO,Verde,#70A800,V,Combi,10.5524,901,Combi,rutastransporte\01_RUTAS_DE_COMBI\73_VERDE_3_INDECO\KML_indeco\Verde_3_INDECO_kml.kml,01_RUTAS_DE_COMBI
+74,74_VERDE_3_LOMAS_DEL_VALLE,Verde 3 Lomas del Valle,Verde,#70A800,V,Combi,7.7832,942,Combi,rutastransporte\01_RUTAS_DE_COMBI\74_VERDE_3_LOMAS_DEL_VALLE\KML_v3lv\Verde_3_Lomas_del_Valle_kml.kml,01_RUTAS_DE_COMBI
+75,75_VERDE_4,Verde 4,Verde,#70A800,V,Combi,14.9933,1135,Combi,rutastransporte\01_RUTAS_DE_COMBI\75_VERDE_4\KML_verde4\Verde_4_kml.kml,01_RUTAS_DE_COMBI
+76,76_VERDE_4B,Verde 4B,Verde,#70A800,V,Combi,19.3405,1824,Combi,rutastransporte\01_RUTAS_DE_COMBI\76_VERDE_4B\KML_verde4B\Verde_4B_kml.kml,01_RUTAS_DE_COMBI
+77,77_RUTA_2,Ruta 2 (Contra Reloj),#EBCF00,#EBCF00,?,Microbus,17.6775,583,Microbus,rutastransporte\01_RUTAS_DE_COMBI\77_RUTA_2\KML_ruta2\Ruta_2_kml.kml,01_RUTAS_DE_COMBI
+78,78_ALBERCA_METROPOLIS,Alberca (Metropolis),Alberca,#FFC800,A,Microbús,19.3952,2000,Microbús,rutastransporte\01_RUTAS_DE_COMBI\78_ALBERCA_METROPOLIS\KML_alberca_m\Alberca_Metropolis_kml.kml,01_RUTAS_DE_COMBI
+79,79_ALBERCA_GERTRUDIS,Alberca (Gertrudis),Alberca,#FFC800,A,Microbús,18.2367,1569,Microbús,rutastransporte\01_RUTAS_DE_COMBI\79_ALBERCA_GERTRUDIS\KML_alberga_g\Alberca_Gertrudis_kml.kml,01_RUTAS_DE_COMBI
+7,7_COMBI_AZUL_B_MICHELENA,Azul B Michelena,Azul,#004E98,A,Combi,15.5119,533,Combi,rutastransporte\01_RUTAS_DE_COMBI\7_COMBI_AZUL_B_MICHELENA\KML\Azul_B_Michelena.kml,01_RUTAS_DE_COMBI
+80,80_DORADO_INDUSTRIAL,Dorado (Industrial),Dorado,#D1BE3C,D,Microbús,10.4949,1034,Microbús,rutastransporte\01_RUTAS_DE_COMBI\80_DORADO_INDUSTRIAL\KML_dorado\Dorado_Industrial_kml.kml,01_RUTAS_DE_COMBI
+81,81_CIRCUITO_CARRILLO,Circuito Carrillo,#FFC800,#FFC800,?,Microbus,11.7565,1996,Microbuc,rutastransporte\01_RUTAS_DE_COMBI\81_CIRCUITO_CARRILLO\KML_circuito_carrillo\Circuito_Carrillo_kml.kml,01_RUTAS_DE_COMBI
+82,82_EL_PEDREGAL,El Pedregal,#FFC800,#FFC800,?,Microbús,13.6496,1923,Microbús,rutastransporte\01_RUTAS_DE_COMBI\82_EL_PEDREGAL\KML_pedregal\El_Pedregal_kml.kml,01_RUTAS_DE_COMBI
+83,83_PANTEON,Panteon,#FFC800,#FFC800,?,Microbús,18.513,1730,Microbús,rutastransporte\01_RUTAS_DE_COMBI\83_PANTEON\KML_panteón\Panteon_kml.kml,01_RUTAS_DE_COMBI
+84,84_PRADOS_VERDES_A,Prados Verdes A,Verde,#70A800,V,Microbús,6.1591,790,Microbús,rutastransporte\01_RUTAS_DE_COMBI\84_PRADOS_VERDES_A\KML_prados_verdesA\Prados_Verdes_A_kml.kml,01_RUTAS_DE_COMBI
+85,85_PRADOS_VERDES_B,Prados Verdes B,Verde,#70A800,V,Microbús,9.7346,933,Microbús,rutastransporte\01_RUTAS_DE_COMBI\85_PRADOS_VERDES_B\KML_prados_verdesB\Prados_Verdes_B_kml.kml,01_RUTAS_DE_COMBI
+86,86_ISSTE_SOLEDAD,ISSSTE - Soledad,#FFC800,#FFC800,?,Microbús,7.1562,830,Microbús,rutastransporte\01_RUTAS_DE_COMBI\86_ISSTE_SOLEDAD\KML_issste\ISSSTE_Soledad_kml.kml,01_RUTAS_DE_COMBI
+87,87_DURAZO-SANTA_MARIA,Durazno - Santa Maria,#FFC800,#FFC800,?,Microbús,6.255,593,Microbús,rutastransporte\01_RUTAS_DE_COMBI\87_DURAZO-SANTA_MARIA\KML_durazno_maría\Durazno_Santa_Maria_kml.kml,01_RUTAS_DE_COMBI
+88,88_TRINCHERAS,Trincheras,#FFC800,#FFC800,?,Microbús,5.293,554,Microbús,rutastransporte\01_RUTAS_DE_COMBI\88_TRINCHERAS\KML_trincheras\Trincheras_kml.kml,01_RUTAS_DE_COMBI
+89,89_DORADO-LOMAS_DE_MORELIA,Dorado (Lomas de Morelia),Dorado,#D1BE3C,D,Autobús,4.8095,250,Autobús,rutastransporte\01_RUTAS_DE_COMBI\89_DORADO-LOMAS_DE_MORELIA\KML_dorado_lomas\Dorado_Lomas_de_Morelia_kml.kml,01_RUTAS_DE_COMBI
+8,8_COMBI_AZUL_B_XANGARI,Azul B Xangari,Azul,#004E98,A,Combi,16.2647,1040,Combi,rutastransporte\01_RUTAS_DE_COMBI\8_COMBI_AZUL_B_XANGARI\KML\Azul B Xangari.kml,01_RUTAS_DE_COMBI
+9,9_COMBI_AZUL_C,Azul C,Azul,#004E98,A,Combi,17.2217,805,Combi,rutastransporte\01_RUTAS_DE_COMBI\9_COMBI_AZUL_C\KML\Azul_C.kml,01_RUTAS_DE_COMBI
+F10,10_CENTROS_COMERCIALES-LUCIO_CABAÑAS,Centros Comerciales (Lucio Cabañas),#FFC800,#FFC800,?,Autobús,18.486,1656,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\10_CENTROS_COMERCIALES-LUCIO_CABAÑAS\KML_cclc\Centros_Comerciales_Lucio_Cabañas_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F11,11_CHARO,Charo,#FFC800,#FFC800,?,Autobús,27.8553,1185,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\11_CHARO\KML_charo\Charo_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F12,12_CHARO_INDAPARAPEO_ATAPANEO_ISSSTE_SOLEDAD,Charo - Ind Atapaneo (ISSTE - Soledad),#FFC800,#FFC800,?,Autobús,17.9158,1057,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\12_CHARO_INDAPARAPEO_ATAPANEO_ISSSTE_SOLEDAD\KML_ciais\Charo_Indapa_Atapa_Issste_Soledad_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F13,13_CHARO-SAN_ANTONIO_CORRALES,Charo (San Antonio Corrales),#FFC800,#FFC800,?,Autobús,21.8529,1297,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\13_CHARO-SAN_ANTONIO_CORRALES\KML_csac\Charo_San_Antonio_Corrales_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F14,14_CHIHUERIO,Chihuerio,#FFC800,#FFC800,?,Autobús,36.5654,2041,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\14_CHIHUERIO\KML_chihuerio\Chihuerio_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+,15CHIQUIMITIO_POR_TORREON_NUEVO,Chiquimitio (Por Torreon Nuevo),#FFC800,#FFC800,?,Autobús,32.9924,1731,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\15CHIQUIMITIO_POR_TORREON_NUEVO\KML_chiquimitio_tn\Chiquimitío_por_Torreón_Nuevo_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F16,16_CHUCANDIRO,Chucandiro,#FFC800,#FFC800,?,Autobús,50.1727,3901,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\16_CHUCANDIRO\KML_chucandiro\Chucándiro_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F17,17_COENEO,Coeneo,#FFC800,#FFC800,?,Autobús,58.4329,3781,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\17_COENEO\KML_coeneo\Coeneo_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F18,18_COINTZIO,Cointzio,#FFC800,#FFC800,?,Autobús,17.9117,1280,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\18_COINTZIO\KML_cointzio\Cointzio_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F1,1_ARCO_SAN_PEDRO,Arcos San Pedro,#FFC800,#FFC800,?,Autobús,16.5558,817,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\1_ARCO_SAN_PEDRO\KML_asp\Arcos_San_Pedro_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F2,2_ARROYO_COLORADO,Arroyo Colorado,#FFC800,#FFC800,?,Autobús,19.5145,972,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\2_ARROYO_COLORADO\KML_ac\Arroyo_Colorado_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F3,3_ATECUARO,Atécuaro,#FFC800,#FFC800,?,Autobús,16.3761,2540,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\3_ATECUARO\KML_atecuaro\Atécuaro_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F4,4_CAMPESTRE_MISION_DEL_VALLE,Campestre (Misión del Valle),#FFC800,#FFC800,?,Autobús,16.468,806,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\4_CAMPESTRE_MISION_DEL_VALLE\KML_cmv\Campestre_Misión_del_Valle_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F5,5_CAMPESTRE_POSTA_TREBOL-MONARCA,Campestre (Posta Trebol - Monarca),#FFC800,#FFC800,?,Autobús,17.9173,1041,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\5_CAMPESTRE_POSTA_TREBOL-MONARCA\KML_campestre_ptm\Campestre_Posta_Trébol-Monarca_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F6,6_CANTERAS_BACHILLERES,Canteras Bachilleres (Alamos - San Bernabe),#FFC800,#FFC800,?,Autobús,13.9952,763,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\6_CANTERAS_BACHILLERES\KML_canteras_bachilleres\Canteras_Bachilleres_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F7,7_CAPULA,Capula,#FFC800,#FFC800,?,Autobús,22.4402,1074,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\7_CAPULA\KML_capula\Capula_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F8,8_CIUDAD_DE_HIDALGO,CD Hidalgo,#FFC800,#FFC800,?,Autobús,104.326,6377,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\8_CIUDAD_DE_HIDALGO\KML_cdhidalgo\Ciudad_de_Hildago_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+F9,9_CENTROS_COMERCIALES-LEANDRO_VALLE,Centros Comerciales (Lenadro Valle),#FFC800,#FFC800,?,Autobús,16.6321,1220,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\9_CENTROS_COMERCIALES-LEANDRO_VALLE\KML_cclv\Centros_Comerciales_Leandro_Valle_kml.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS

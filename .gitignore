@@ -20,6 +20,10 @@
 # Test outputs
 **/coverage/
 
+# Python generated caches
+__pycache__/
+*.py[cod]
+
 # Database local folders
 **/postgres_data/
 
@@ -37,6 +41,8 @@ public-archivedwl-*/
 !**/debug.keystore
 **/.cxx/
 geo-cache/
+tmp/
+work/
 
 # Large SQL data dumps / dumps not meant for source control
 import_routes.sql
