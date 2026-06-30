@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-06-30T22:02:54.289Z",
+  "routes": [
+    {
+      "id": "amarilla-2",
+      "name": "Amarilla 2",
+      "variants": [
+        {
+          "routeId": "amarilla-2",
+          "routeName": "Amarilla 2",
+          "direction": "ida",
+          "color": "#FFC800",
+          "casingColor": "#222222",
+          "longKm": 24.079,
+          "transportType": "Combi",
+          "name": "Ida",
+          "alignment": {
+            "method": "osrm-nearest-snap",
+            "sourceLengthM": 24073,
+            "alignedLengthM": 24079,
+            "lengthRatio": 1.0003
+          }
+        },
+        {
+          "routeId": "amarilla-2",
+          "routeName": "Amarilla 2",
+          "direction": "vuelta",
+          "color": "#FFC800",
+          "casingColor": "#222222",
+          "longKm": 22.5069,
+          "transportType": "Combi",
+          "name": "Vuelta",
+          "alignment": {
+            "method": "osrm-nearest-snap",
+            "sourceLengthM": 22505,
+            "alignedLengthM": 22507,
+            "lengthRatio": 1.0001
+          }
+        }
+      ]
+    }
+  ]
+}

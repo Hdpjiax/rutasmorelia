@@ -1,6 +1,16 @@
 {
   "type": "routes-index",
-  "generatedAt": "2026-06-30T12:00:00.000Z",
-  "algorithm": "pending-osrm-road-network-map-matching-v1",
-  "routes": []
+  "generatedAt": "2026-06-30T22:02:54.288Z",
+  "algorithm": "osrm-nearest-snap-v1",
+  "routes": [
+    {
+      "id": "amarilla-2",
+      "name": "Amarilla 2",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "A",
+      "geojsonFile": "/routes/amarilla-2.geojson"
+    }
+  ]
 }
