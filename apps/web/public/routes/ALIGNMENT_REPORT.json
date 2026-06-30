@@ -1,5 +1,6 @@
 {
-  "generatedAt": "2026-06-30T22:02:54.289Z",
+  "generatedAt": "2026-06-30T22:12:56.238Z",
+  "input": "C:\\RutasMorelia\\rutastransporte\\01_RUTAS_DE_COMBI\\4_COMBI_AMARILLA_2\\KML\\Amarilla_2.kml",
   "routes": [
     {
       "id": "amarilla-2",
@@ -11,14 +12,14 @@
           "direction": "ida",
           "color": "#FFC800",
           "casingColor": "#222222",
-          "longKm": 24.079,
+          "longKm": 24.0943,
           "transportType": "Combi",
           "name": "Ida",
           "alignment": {
-            "method": "osrm-nearest-snap",
+            "method": "topology-aware-nearest-viterbi",
             "sourceLengthM": 24073,
-            "alignedLengthM": 24079,
-            "lengthRatio": 1.0003
+            "alignedLengthM": 24094,
+            "lengthRatio": 1.0009
           }
         },
         {
@@ -27,14 +28,14 @@
           "direction": "vuelta",
           "color": "#FFC800",
           "casingColor": "#222222",
-          "longKm": 22.5069,
+          "longKm": 22.515,
           "transportType": "Combi",
           "name": "Vuelta",
           "alignment": {
-            "method": "osrm-nearest-snap",
+            "method": "topology-aware-nearest-viterbi",
             "sourceLengthM": 22505,
-            "alignedLengthM": 22507,
-            "lengthRatio": 1.0001
+            "alignedLengthM": 22515,
+            "lengthRatio": 1.0004
           }
         }
       ]

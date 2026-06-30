@@ -1,7 +1,7 @@
 {
   "type": "routes-index",
-  "generatedAt": "2026-06-30T22:02:54.288Z",
-  "algorithm": "osrm-nearest-snap-v1",
+  "generatedAt": "2026-06-30T22:12:56.237Z",
+  "algorithm": "topology-aware-nearest-viterbi-v1",
   "routes": [
     {
       "id": "amarilla-2",
