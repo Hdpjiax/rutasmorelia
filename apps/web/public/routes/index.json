@@ -1,5 +1,6 @@
 {
   "type": "routes-index",
+<<<<<<< HEAD
   "routes": [
     {
       "id": "2",
@@ -57,3 +58,9 @@
     }
   ]
 }
+=======
+  "generatedAt": "2026-06-30T00:00:00.000Z",
+  "algorithm": "pending-osrm-road-network-map-matching-v1",
+  "routes": []
+}
+>>>>>>> 21d4e3f130da868704b02b20537c8e5e4c1fd764
