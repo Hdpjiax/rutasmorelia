@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "align:routes": "node scripts/align-kml-routes.mjs",
+    "align:routes:snap": "node scripts/snap-kml-routes.mjs",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
