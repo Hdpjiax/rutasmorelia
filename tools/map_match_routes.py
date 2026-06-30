@@ -282,7 +282,7 @@ def line_length_m(coords: list[list[float]], roads: RoadIndex) -> float:
     return sum(math.dist(roads.to_xy(*left), roads.to_xy(*right)) for left, right in zip(coords, coords[1:]))
 
 
-def merge_source_lines(geometry: dict[str, Any], roads: RoadIndex, join_distance_m: float = 25.0) -> list[list[list[float]]]:
+def merge_source_lines(geometry: dict[str, Any], roads: RoadIndex, join_distance_m: float = 75.0) -> list[list[list[float]]]:
     candidates: list[list[list[float]]] = []
     seen: set[tuple[tuple[float, float], ...]] = set()
     for raw_line in geometry_lines(geometry):
@@ -308,15 +308,27 @@ def merge_source_lines(geometry: dict[str, Any], roads: RoadIndex, join_distance
             for index, line in enumerate(candidates):
                 start = roads.to_xy(*line[0])
                 end = roads.to_xy(*line[-1])
-                options.append((math.dist(chain_end, start), "append", index))
-                options.append((math.dist(end, chain_start), "prepend", index))
+                # Option 1: chain + line (append normal)
+                options.append((math.dist(chain_end, start), "append_normal", index))
+                # Option 2: chain + reversed(line) (append reversed)
+                options.append((math.dist(chain_end, end), "append_reversed", index))
+                # Option 3: line + chain (prepend normal)
+                options.append((math.dist(end, chain_start), "prepend_normal", index))
+                # Option 4: reversed(line) + chain (prepend reversed)
+                options.append((math.dist(start, chain_start), "prepend_reversed", index))
             distance, operation, index = min(options)
             if distance <= join_distance_m:
                 line = candidates.pop(index)
-                if operation == "append":
+                if operation == "append_normal":
                     chain.extend(line[1:] if chain[-1] == line[0] else line)
-                else:
+                elif operation == "append_reversed":
+                    rev_line = list(reversed(line))
+                    chain.extend(rev_line[1:] if chain[-1] == rev_line[0] else rev_line)
+                elif operation == "prepend_normal":
                     chain = line[:-1] + chain if line[-1] == chain[0] else line + chain
+                elif operation == "prepend_reversed":
+                    rev_line = list(reversed(line))
+                    chain = rev_line[:-1] + chain if rev_line[-1] == chain[0] else rev_line + chain
                 changed = True
         chains.append(chain)
     return chains
@@ -350,7 +362,14 @@ def align_route(route: dict[str, Any], roads: RoadIndex, max_distance: float, si
     source_lines = merge_source_lines(route["geometry"], roads)
 
     for source_line in source_lines:
-        line = densify_line(source_line, roads)
+        # Simplify the source line first to remove tiny GPS spikes, jitters, and overshoots
+        if len(source_line) > 2:
+            proj_source = LineString(roads.to_xy(*p) for p in source_line)
+            simplified_source = proj_source.simplify(6.0, preserve_topology=True)
+            simplified_coords = [roads.to_lonlat(x, y) for x, y in simplified_source.coords]
+        else:
+            simplified_coords = source_line
+        line = densify_line(simplified_coords, roads)
         T = len(line)
         if T == 0:
             continue
