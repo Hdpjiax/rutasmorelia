@@ -92,14 +92,40 @@ function parseGeojson(text, file) {
 }
 async function files(root) {
   const out = [];
+  const input = String(root || '').trim().replace(/^['"]|['"]$/g, '');
+  const candidates = [
+    input,
+    path.normalize(input),
+    input.replace(/\\/g, path.sep),
+    input.replace(/\//g, path.sep),
+  ];
+
   async function visit(p) {
-    const st = await fs.stat(p).catch(() => null);
+    const normalized = path.normalize(p);
+    const st = await fs.stat(normalized).catch(() => null);
     if (!st) return;
-    if (st.isDirectory()) for (const e of await fs.readdir(p)) if (!e.startsWith('.')) await visit(path.join(p, e));
-    else if (/\.(kml|geojson|json)$/i.test(p)) out.push(p);
+
+    if (st.isFile()) {
+      if (/\.(kml|geojson|json)$/i.test(normalized)) {
+        out.push(normalized);
+      }
+      return;
+    }
+
+    if (st.isDirectory()) {
+      for (const e of await fs.readdir(normalized)) {
+        if (!e.startsWith('.')) {
+          await visit(path.join(normalized, e));
+        }
+      }
+    }
   }
-  await visit(root);
-  return out.sort();
+
+  for (const candidate of candidates) {
+    await visit(candidate);
+  }
+
+  return [...new Set(out)].sort();
 }
 const rad = (x) => x * Math.PI / 180;
 function dist(a, b) {
