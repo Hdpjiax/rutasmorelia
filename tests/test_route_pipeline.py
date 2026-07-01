@@ -8,7 +8,8 @@ from route_pipeline.config import PILOT_KML, QualityThresholds
 from route_pipeline.bootstrap import _native_environment
 from route_pipeline.geometry import densify, distance_m
 from route_pipeline.kml import parse_kml
-from route_pipeline.pipeline import _select_components
+from route_pipeline.pipeline import _apply_reference_overrides, _select_components
+from route_pipeline.config import ROUTES
 from route_pipeline.validation import validate_component
 from route_pipeline.valhalla_engine import MatchedComponent, _chunks, _trace_request
 
@@ -38,6 +39,16 @@ class KmlTests(unittest.TestCase):
         return_selected = _select_components(2, directions[1].components, ignored)
         self.assertIn(5, [index for index, _ in return_selected])
         self.assertIn(6, [index for index, _ in return_selected])
+
+    def test_reviewed_corridor_override_changes_only_the_requested_slice(self):
+        original = parse_kml(PILOT_KML)
+        corrected, audit = _apply_reference_overrides(ROUTES["alberca-gertrudis"], original)
+        before = original[0].components[2]
+        after = corrected[0].components[2]
+        self.assertEqual(before[:325], after[:325])
+        self.assertEqual(before[376:], after[376:])
+        self.assertLess(after[350][1], before[350][1])
+        self.assertEqual("user_reviewed_lower_carriageway_at_prensa_libre", audit[0]["reason"])
 
 
 class GeometryTests(unittest.TestCase):

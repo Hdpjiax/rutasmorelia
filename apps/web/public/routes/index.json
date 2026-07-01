@@ -1,6 +1,6 @@
 {
   "type": "routes-index",
-  "generatedAt": "2026-07-01T22:47:40.547944+00:00",
+  "generatedAt": "2026-07-01T22:54:40.199786+00:00",
   "algorithm": "valhalla-kml-corridor-v1",
   "routes": [
     {
@@ -10,8 +10,8 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/79.geojson?v=c7de5c48934a",
-      "artifactSha256": "c7de5c48934aed1b02a3056d29df8368b2875ca8c63fa3fe349709b0ce468430"
+      "geojsonFile": "/routes/79.geojson?v=b357495deb2c",
+      "artifactSha256": "b357495deb2c67bde622b5a64f312975a2e6bfd29805f0feae87e696ae971f90"
     }
   ]
 }

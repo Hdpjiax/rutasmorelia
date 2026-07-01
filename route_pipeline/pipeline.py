@@ -8,7 +8,7 @@ from typing import Any
 from .artifacts import write_artifacts
 from .config import DATA_ROOT, OUTPUT_ROOT, QualityThresholds, RouteDefinition
 from .geometry import distance_m, line_length_m
-from .kml import parse_kml
+from .kml import Direction, parse_kml
 from .valhalla_engine import actor_version, create_actor, match_component
 from .validation import validate_component
 
@@ -19,7 +19,7 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
         raise FileNotFoundError(
             f"Falta {config_path}. Ejecute primero: python -m route_pipeline bootstrap-map --pbf <archivo.osm.pbf>"
         )
-    directions = parse_kml(route.kml)
+    directions, reference_overrides = _apply_reference_overrides(route, parse_kml(route.kml))
     if len(directions) != 2:
         raise ValueError(f"La ruta piloto debe contener exactamente ida y vuelta; se encontraron {len(directions)}")
     actor = create_actor(config_path)
@@ -44,11 +44,48 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
             "kml": str(route.kml),
             "pdf": str(route.pdf) if route.pdf else None,
             "ignored_kml_components": ignored_components,
+            "reference_overrides": reference_overrides,
         }
     )
     output = OUTPUT_ROOT / route.slug
     report = write_artifacts(output, route, directions, matched, reports, metadata)
     return output, report
+
+
+def _apply_reference_overrides(
+    route: RouteDefinition, directions: list[Direction]
+) -> tuple[list[Direction], list[dict[str, Any]]]:
+    """Apply user-reviewed, local corridor corrections without touching other geometry."""
+    if route.slug != "alberca-gertrudis":
+        return directions, []
+    corrected: list[Direction] = []
+    audit: list[dict[str, Any]] = []
+    for direction in directions:
+        components = [component[:] for component in direction.components]
+        if direction.index == 1 and len(components) >= 3:
+            component = components[2]
+            start, end, latitude_shift = 325, 375, -0.00070
+            taper_points = 12
+            adjusted = []
+            for index, (longitude, latitude) in enumerate(component):
+                if start <= index <= end:
+                    taper = max(0.0, min(1.0, (index - start) / taper_points, (end - index) / taper_points))
+                    latitude += latitude_shift * taper
+                adjusted.append((longitude, latitude))
+            components[2] = adjusted
+            audit.append(
+                {
+                    "direction": 1,
+                    "component": 3,
+                    "source_index_start": start,
+                    "source_index_end": end,
+                    "latitude_shift_degrees": latitude_shift,
+                    "taper_points": taper_points,
+                    "reason": "user_reviewed_lower_carriageway_at_prensa_libre",
+                }
+            )
+        corrected.append(Direction(direction.index, direction.name, components))
+    return corrected, audit
 
 
 def _select_components(
