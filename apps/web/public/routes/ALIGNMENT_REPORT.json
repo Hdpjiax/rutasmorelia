@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T22:12:56.238Z",
+  "generatedAt": "2026-07-01T18:29:20.176Z",
   "input": "C:\\RutasMorelia\\rutastransporte\\01_RUTAS_DE_COMBI\\4_COMBI_AMARILLA_2\\KML\\Amarilla_2.kml",
   "routes": [
     {
@@ -7,36 +7,1552 @@
       "name": "Amarilla 2",
       "variants": [
         {
-          "routeId": "amarilla-2",
-          "routeName": "Amarilla 2",
           "direction": "ida",
-          "color": "#FFC800",
-          "casingColor": "#222222",
-          "longKm": 24.0943,
-          "transportType": "Combi",
-          "name": "Ida",
-          "alignment": {
-            "method": "topology-aware-nearest-viterbi",
+          "file": "C:\\RutasMorelia\\rutastransporte\\01_RUTAS_DE_COMBI\\4_COMBI_AMARILLA_2\\KML\\Amarilla_2.kml",
+          "metrics": {
+            "method": "auto-adaptive-corridor-roundabout-hybrid",
             "sourceLengthM": 24073,
-            "alignedLengthM": 24094,
-            "lengthRatio": 1.0009
-          }
+            "alignedLengthM": 24057,
+            "lengthRatio": 0.9994,
+            "segmentCount": 96,
+            "params": {
+              "step": 12,
+              "radius": 48,
+              "candidates": 8
+            }
+          },
+          "segments": [
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 226,
+              "alignedM": 226,
+              "ratio": 1.001,
+              "p95": 3.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.022,
+              "p95": 2.8
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 650,
+              "alignedM": 650,
+              "ratio": 1,
+              "p95": 5.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 142,
+              "alignedM": 142,
+              "ratio": 1,
+              "p95": 2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.002,
+              "p95": 0.7
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 361,
+              "alignedM": 360,
+              "ratio": 0.998,
+              "p95": 2.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 427,
+              "ratio": 1,
+              "p95": 4.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 179,
+              "alignedM": 179,
+              "ratio": 1,
+              "p95": 2.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 6,
+              "alignedM": 6,
+              "ratio": 0.997,
+              "p95": 2
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 448,
+              "alignedM": 454,
+              "ratio": 1.014,
+              "p95": 4.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 430,
+              "alignedM": 430,
+              "ratio": 1.001,
+              "p95": 4.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 171,
+              "alignedM": 171,
+              "ratio": 1,
+              "p95": 4.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.002,
+              "p95": 5
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 151,
+              "alignedM": 146,
+              "ratio": 0.966,
+              "p95": 5.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 429,
+              "alignedM": 429,
+              "ratio": 1,
+              "p95": 3.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 161,
+              "alignedM": 161,
+              "ratio": 1,
+              "p95": 2.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 10,
+              "alignedM": 10,
+              "ratio": 1.007,
+              "p95": 0.3
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 174,
+              "alignedM": 173,
+              "ratio": 0.992,
+              "p95": 1.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 429,
+              "alignedM": 428,
+              "ratio": 1,
+              "p95": 2.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 370,
+              "alignedM": 370,
+              "ratio": 1,
+              "p95": 2.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.003,
+              "p95": 2.4
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 167,
+              "alignedM": 171,
+              "ratio": 1.027,
+              "p95": 4.7
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 423,
+              "alignedM": 423,
+              "ratio": 1,
+              "p95": 5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 188,
+              "alignedM": 188,
+              "ratio": 1,
+              "p95": 2.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.001,
+              "p95": 0.6
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 160,
+              "alignedM": 162,
+              "ratio": 1.014,
+              "p95": 3.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 371,
+              "alignedM": 371,
+              "ratio": 1,
+              "p95": 4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.998,
+              "p95": 2.4
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 449,
+              "alignedM": 444,
+              "ratio": 0.988,
+              "p95": 9.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 429,
+              "alignedM": 430,
+              "ratio": 1,
+              "p95": 3.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 427,
+              "ratio": 1,
+              "p95": 4.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 426,
+              "alignedM": 426,
+              "ratio": 0.999,
+              "p95": 3.5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 421,
+              "alignedM": 421,
+              "ratio": 1,
+              "p95": 2.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 428,
+              "ratio": 1.002,
+              "p95": 4.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 108,
+              "alignedM": 108,
+              "ratio": 1.002,
+              "p95": 4.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.999,
+              "p95": 2.9
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 212,
+              "alignedM": 213,
+              "ratio": 1.007,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 216,
+              "alignedM": 215,
+              "ratio": 0.998,
+              "p95": 3.5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.003,
+              "p95": 3.7
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 169,
+              "alignedM": 164,
+              "ratio": 0.975,
+              "p95": 5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 422,
+              "alignedM": 421,
+              "ratio": 0.999,
+              "p95": 4.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 307,
+              "alignedM": 307,
+              "ratio": 1,
+              "p95": 0.7
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.001,
+              "p95": 0.1
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 165,
+              "alignedM": 167,
+              "ratio": 1.012,
+              "p95": 2.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 427,
+              "ratio": 1,
+              "p95": 0.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 427,
+              "ratio": 1,
+              "p95": 1.5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 187,
+              "alignedM": 187,
+              "ratio": 1,
+              "p95": 2.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.994,
+              "p95": 0.9
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 791,
+              "alignedM": 790,
+              "ratio": 0.998,
+              "p95": 4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 430,
+              "alignedM": 430,
+              "ratio": 1,
+              "p95": 2.7
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.004,
+              "p95": 2.6
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 163,
+              "alignedM": 163,
+              "ratio": 1,
+              "p95": 2.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 331,
+              "alignedM": 331,
+              "ratio": 0.999,
+              "p95": 2.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 10,
+              "ratio": 0.995,
+              "p95": 1.8
+            },
+            {
+              "mode": "roundabout",
+              "method": "network",
+              "sourceM": 877,
+              "alignedM": 884,
+              "ratio": 1.007,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 142,
+              "alignedM": 142,
+              "ratio": 1,
+              "p95": 2.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.995,
+              "p95": 1.4
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 688,
+              "alignedM": 687,
+              "ratio": 0.998,
+              "p95": 2.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 161,
+              "alignedM": 161,
+              "ratio": 1,
+              "p95": 2.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.994,
+              "p95": 1.2
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 177,
+              "alignedM": 174,
+              "ratio": 0.984,
+              "p95": 2.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 176,
+              "alignedM": 176,
+              "ratio": 1,
+              "p95": 3.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.001,
+              "p95": 3.3
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 173,
+              "alignedM": 175,
+              "ratio": 1.009,
+              "p95": 3.7
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 116,
+              "alignedM": 116,
+              "ratio": 1,
+              "p95": 3.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.002,
+              "p95": 3.3
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 723,
+              "alignedM": 722,
+              "ratio": 0.998,
+              "p95": 7.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 422,
+              "alignedM": 418,
+              "ratio": 0.99,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 427,
+              "ratio": 1,
+              "p95": 4.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 430,
+              "alignedM": 430,
+              "ratio": 1,
+              "p95": 3.5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 429,
+              "alignedM": 428,
+              "ratio": 0.999,
+              "p95": 6.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 425,
+              "ratio": 0.995,
+              "p95": 5.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 322,
+              "alignedM": 322,
+              "ratio": 1,
+              "p95": 0.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1,
+              "p95": 1
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 1476,
+              "alignedM": 1465,
+              "ratio": 0.993,
+              "p95": 6.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 230,
+              "alignedM": 230,
+              "ratio": 1,
+              "p95": 1.5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.996,
+              "p95": 1.1
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 262,
+              "alignedM": 259,
+              "ratio": 0.989,
+              "p95": 1.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 431,
+              "alignedM": 431,
+              "ratio": 1,
+              "p95": 2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 23,
+              "alignedM": 23,
+              "ratio": 1.001,
+              "p95": 1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.997,
+              "p95": 0.9
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 394,
+              "alignedM": 393,
+              "ratio": 0.998,
+              "p95": 3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 174,
+              "alignedM": 175,
+              "ratio": 1.009,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 8,
+              "ratio": 0.743,
+              "p95": 1.5
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 449,
+              "alignedM": 448,
+              "ratio": 0.998,
+              "p95": 2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 321,
+              "alignedM": 321,
+              "ratio": 1,
+              "p95": 3.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.008,
+              "p95": 1.1
+            },
+            {
+              "mode": "roundabout",
+              "method": "network",
+              "sourceM": 192,
+              "alignedM": 191,
+              "ratio": 0.997,
+              "p95": 4.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 132,
+              "alignedM": 131,
+              "ratio": 0.995,
+              "p95": 7.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.992,
+              "p95": 3.4
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 536,
+              "alignedM": 534,
+              "ratio": 0.996,
+              "p95": 3.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 126,
+              "alignedM": 126,
+              "ratio": 1,
+              "p95": 1.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.003,
+              "p95": 1.3
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 155,
+              "alignedM": 157,
+              "ratio": 1.012,
+              "p95": 2.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 206,
+              "alignedM": 206,
+              "ratio": 1,
+              "p95": 2.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.997,
+              "p95": 1.2
+            }
+          ]
         },
         {
-          "routeId": "amarilla-2",
-          "routeName": "Amarilla 2",
           "direction": "vuelta",
-          "color": "#FFC800",
-          "casingColor": "#222222",
-          "longKm": 22.515,
-          "transportType": "Combi",
-          "name": "Vuelta",
-          "alignment": {
-            "method": "topology-aware-nearest-viterbi",
+          "file": "C:\\RutasMorelia\\rutastransporte\\01_RUTAS_DE_COMBI\\4_COMBI_AMARILLA_2\\KML\\Amarilla_2.kml",
+          "metrics": {
+            "method": "auto-adaptive-corridor-roundabout-hybrid",
             "sourceLengthM": 22505,
-            "alignedLengthM": 22515,
-            "lengthRatio": 1.0004
-          }
+            "alignedLengthM": 22456,
+            "lengthRatio": 0.9978,
+            "segmentCount": 93,
+            "params": {
+              "step": 12,
+              "radius": 48,
+              "candidates": 8
+            }
+          },
+          "segments": [
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 217,
+              "alignedM": 217,
+              "ratio": 1,
+              "p95": 2.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.992,
+              "p95": 2.7
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 154,
+              "alignedM": 156,
+              "ratio": 1.008,
+              "p95": 3.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 126,
+              "alignedM": 126,
+              "ratio": 1,
+              "p95": 1.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.986,
+              "p95": 1.3
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 536,
+              "alignedM": 533,
+              "ratio": 0.995,
+              "p95": 3.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 278,
+              "alignedM": 278,
+              "ratio": 0.998,
+              "p95": 7.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.004,
+              "p95": 1.9
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 187,
+              "alignedM": 185,
+              "ratio": 0.992,
+              "p95": 1.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 174,
+              "alignedM": 174,
+              "ratio": 1.002,
+              "p95": 2.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 10,
+              "ratio": 0.988,
+              "p95": 1
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 449,
+              "alignedM": 449,
+              "ratio": 0.999,
+              "p95": 2.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 185,
+              "alignedM": 187,
+              "ratio": 1.009,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 11,
+              "ratio": 0.985,
+              "p95": 3.6
+            },
+            {
+              "mode": "roundabout",
+              "method": "network",
+              "sourceM": 383,
+              "alignedM": 385,
+              "ratio": 1.006,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 421,
+              "alignedM": 421,
+              "ratio": 1,
+              "p95": 1.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 33,
+              "alignedM": 34,
+              "ratio": 1.007,
+              "p95": 1.7
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.003,
+              "p95": 1
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 262,
+              "alignedM": 259,
+              "ratio": 0.988,
+              "p95": 1.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 230,
+              "alignedM": 230,
+              "ratio": 1,
+              "p95": 1.5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.006,
+              "p95": 1.7
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 252,
+              "alignedM": 249,
+              "ratio": 0.988,
+              "p95": 2.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 428,
+              "ratio": 1.001,
+              "p95": 3.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 420,
+              "alignedM": 419,
+              "ratio": 0.998,
+              "p95": 4.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 428,
+              "alignedM": 427,
+              "ratio": 0.998,
+              "p95": 5.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 423,
+              "alignedM": 423,
+              "ratio": 1,
+              "p95": 2.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 429,
+              "alignedM": 429,
+              "ratio": 1,
+              "p95": 2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.992,
+              "p95": 2.1
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 475,
+              "alignedM": 476,
+              "ratio": 1.003,
+              "p95": 3.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 259,
+              "alignedM": 259,
+              "ratio": 1,
+              "p95": 1.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 12,
+              "ratio": 1.011,
+              "p95": 1.4
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 817,
+              "alignedM": 802,
+              "ratio": 0.982,
+              "p95": 6.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 116,
+              "alignedM": 116,
+              "ratio": 1,
+              "p95": 3.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.997,
+              "p95": 0.3
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 174,
+              "alignedM": 175,
+              "ratio": 1.01,
+              "p95": 3.7
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 176,
+              "alignedM": 176,
+              "ratio": 1,
+              "p95": 3.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.008,
+              "p95": 1.5
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 170,
+              "alignedM": 167,
+              "ratio": 0.983,
+              "p95": 2.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 168,
+              "alignedM": 167,
+              "ratio": 1,
+              "p95": 2.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.998,
+              "p95": 3
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 688,
+              "alignedM": 688,
+              "ratio": 0.999,
+              "p95": 2.7
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 142,
+              "alignedM": 142,
+              "ratio": 1,
+              "p95": 2.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.001,
+              "p95": 2.4
+            },
+            {
+              "mode": "roundabout",
+              "method": "network",
+              "sourceM": 876,
+              "alignedM": 883,
+              "ratio": 1.007,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 331,
+              "alignedM": 331,
+              "ratio": 0.998,
+              "p95": 4.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.014,
+              "p95": 1.7
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 200,
+              "alignedM": 198,
+              "ratio": 0.992,
+              "p95": 5.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 431,
+              "alignedM": 431,
+              "ratio": 1,
+              "p95": 2.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 121,
+              "alignedM": 121,
+              "ratio": 1,
+              "p95": 1.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.999,
+              "p95": 1.6
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 417,
+              "alignedM": 416,
+              "ratio": 0.999,
+              "p95": 5.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 426,
+              "alignedM": 426,
+              "ratio": 1,
+              "p95": 5.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 406,
+              "alignedM": 406,
+              "ratio": 1,
+              "p95": 5.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 1.005,
+              "p95": 1.3
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 176,
+              "alignedM": 176,
+              "ratio": 0.998,
+              "p95": 1.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 426,
+              "ratio": 1,
+              "p95": 2.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 271,
+              "alignedM": 271,
+              "ratio": 1,
+              "p95": 0.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.999,
+              "p95": 0.8
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 176,
+              "alignedM": 173,
+              "ratio": 0.983,
+              "p95": 3.8
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 196,
+              "alignedM": 196,
+              "ratio": 0.998,
+              "p95": 3.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.001,
+              "p95": 2.9
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 261,
+              "alignedM": 265,
+              "ratio": 1.015,
+              "p95": 4.5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 424,
+              "alignedM": 424,
+              "ratio": 1.001,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 431,
+              "alignedM": 431,
+              "ratio": 1,
+              "p95": 4.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 423,
+              "alignedM": 423,
+              "ratio": 1,
+              "p95": 4.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 430,
+              "alignedM": 430,
+              "ratio": 1,
+              "p95": 4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 427,
+              "alignedM": 427,
+              "ratio": 1,
+              "p95": 5.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 175,
+              "alignedM": 175,
+              "ratio": 1.001,
+              "p95": 4.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.995,
+              "p95": 4.2
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 147,
+              "alignedM": 149,
+              "ratio": 1.018,
+              "p95": 4.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 423,
+              "alignedM": 423,
+              "ratio": 1,
+              "p95": 3.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 175,
+              "alignedM": 176,
+              "ratio": 1,
+              "p95": 4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 1.015,
+              "p95": 3.5
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 169,
+              "alignedM": 173,
+              "ratio": 1.019,
+              "p95": 3.4
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 429,
+              "alignedM": 429,
+              "ratio": 1,
+              "p95": 2.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 152,
+              "alignedM": 152,
+              "ratio": 1.001,
+              "p95": 2.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.997,
+              "p95": 2.1
+            },
+            {
+              "mode": "turn",
+              "method": "auto-viterbi",
+              "sourceM": 169,
+              "alignedM": 168,
+              "ratio": 0.991,
+              "p95": 2.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 426,
+              "alignedM": 426,
+              "ratio": 1,
+              "p95": 2.2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 372,
+              "alignedM": 372,
+              "ratio": 1,
+              "p95": 1.7
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.998,
+              "p95": 1.9
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 257,
+              "alignedM": 256,
+              "ratio": 0.994,
+              "p95": 2.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 425,
+              "alignedM": 425,
+              "ratio": 1,
+              "p95": 3.6
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 83,
+              "alignedM": 83,
+              "ratio": 1.001,
+              "p95": 2.5
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 12,
+              "alignedM": 12,
+              "ratio": 0.992,
+              "p95": 2.5
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 672,
+              "alignedM": 663,
+              "ratio": 0.987,
+              "p95": 5.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 431,
+              "alignedM": 431,
+              "ratio": 1,
+              "p95": 4.1
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 186,
+              "alignedM": 186,
+              "ratio": 1,
+              "p95": 2.9
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 10,
+              "ratio": 0.922,
+              "p95": 2.4
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 350,
+              "alignedM": 350,
+              "ratio": 0.998,
+              "p95": 2.3
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 142,
+              "alignedM": 142,
+              "ratio": 1,
+              "p95": 2
+            },
+            {
+              "mode": "straight",
+              "method": "auto-corridor-viterbi",
+              "sourceM": 11,
+              "alignedM": 11,
+              "ratio": 0.996,
+              "p95": 1.1
+            },
+            {
+              "mode": "roundabout",
+              "method": "auto-viterbi",
+              "sourceM": 988,
+              "alignedM": 967,
+              "ratio": 0.979,
+              "p95": 6
+            }
+          ]
         }
       ]
     }
