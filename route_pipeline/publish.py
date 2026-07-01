@@ -1,0 +1,83 @@
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
+from pathlib import Path
+
+from .config import OUTPUT_ROOT, PUBLIC_ROUTES, RouteDefinition
+from .pipeline import validate_existing
+
+
+def approve(route: RouteDefinition, reviewer: str, pdf_reviewed: bool) -> Path:
+    if not pdf_reviewed:
+        raise ValueError("La aprobación requiere confirmar la revisión del PDF oficial")
+    report = validate_existing(route)
+    if not report.get("quality_pass"):
+        raise ValueError("La geometría no supera la validación automática")
+    approval = {
+        "route": route.slug,
+        "artifact_sha256": report["artifact_sha256"],
+        "reviewer": reviewer,
+        "pdf_reviewed": True,
+        "approved_at": datetime.now(timezone.utc).isoformat(),
+    }
+    target = OUTPUT_ROOT / route.slug / "approval.json"
+    target.write_text(json.dumps(approval, ensure_ascii=False, indent=2), encoding="utf-8")
+    return target
+
+
+def publish(route: RouteDefinition, skip_supabase: bool = False) -> Path:
+    output = OUTPUT_ROOT / route.slug
+    report = validate_existing(route)
+    approval_path = output / "approval.json"
+    if not approval_path.is_file():
+        raise PermissionError("Falta aprobación manual; ejecute approve después de revisar review.html")
+    approval = json.loads(approval_path.read_text(encoding="utf-8"))
+    if approval.get("artifact_sha256") != report.get("artifact_sha256"):
+        raise PermissionError("La geometría cambió después de aprobarse")
+    source = output / f"{route.code}.geojson"
+    PUBLIC_ROUTES.mkdir(parents=True, exist_ok=True)
+    temporary = PUBLIC_ROUTES / f".{route.code}.geojson.tmp"
+    shutil.copyfile(source, temporary)
+    if not skip_supabase:
+        try:
+            _publish_supabase(route, report, approval, json.loads(source.read_text(encoding="utf-8")))
+        except Exception:
+            temporary.unlink(missing_ok=True)
+            raise
+    temporary.replace(PUBLIC_ROUTES / f"{route.code}.geojson")
+    return PUBLIC_ROUTES / f"{route.code}.geojson"
+
+
+def _publish_supabase(route: RouteDefinition, report: dict, approval: dict, geojson: dict) -> None:
+    url = os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
+    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("SUPABASE_SECRET_KEY")
+    if not url or not key:
+        raise EnvironmentError("Defina SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY para publicar")
+    payload = json.dumps(
+        {
+            "p_route_code": route.code,
+            "p_artifact_sha256": report["artifact_sha256"],
+            "p_geometry": geojson,
+            "p_metrics": report,
+            "p_source_metadata": report.get("metadata", {}),
+            "p_reviewer": approval["reviewer"],
+        }
+    ).encode("utf-8")
+    request = urllib.request.Request(
+        f"{url.rstrip('/')}/rest/v1/rpc/publish_validated_route_artifact",
+        data=payload,
+        method="POST",
+        headers={"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            if response.status >= 300:
+                raise RuntimeError(f"Supabase respondió HTTP {response.status}")
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Falló la publicación en Supabase: HTTP {error.code}: {detail}") from error

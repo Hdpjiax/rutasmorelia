@@ -8,6 +8,7 @@ import {ArrowsDownUp, Car, Crosshair, Heart, List, MagnifyingGlass, MapPin, Navi
 import {ActivityIndicator, FlatList, Modal, PermissionsAndroid, Platform, Pressable, StyleSheet, Text, TextInput, useColorScheme, View} from 'react-native';
 import type {RootStackParamList} from '../../App';
 import {BrandMark} from '../components/BrandMark';
+import {MAP_STYLE_URL} from '../config/map';
 import {ROUTES, routeCollection} from '../data/demo';
 import {supabase} from '../lib/supabase';
 import {useTransitStore, type Coordinates} from '../store/transit-store';
@@ -794,7 +795,7 @@ export function MapScreen({navigation}: Props) {
 
   return (
     <View style={styles.root}>
-      <MapView style={StyleSheet.absoluteFill} mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json" logo={false} compass={false} attribution accessibilityLabel="Mapa de transporte público de Morelia">
+      <MapView style={StyleSheet.absoluteFill} mapStyle={MAP_STYLE_URL} logo={false} compass={false} attribution accessibilityLabel="Mapa de transporte público de Morelia">
         <Camera ref={camera} initialViewState={{center: [-101.194, 19.702], zoom: 13.3}} minZoom={10} maxZoom={19} />
         <Images images={{'route-arrow-icon': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAoElEQVR4Ae3BUYqEMBRFwXMk+9/ybftzHkpijAw0VvF6vQaEB22MCQ+RvvCXLCR94ZgsIH1hl4QvlUJu2LgoCUWAMGljQhKSUIQJ0hd2STijUsgg6Qu7JPSoFNIhfWGXhFEqhZzYeEASigDhQOMBKoWcaCykUkhHYwGVQgY1blAp5KLGBJUDMqFxkUohN0hfOCYLNK6ThRrj5J+E1+uXfQA38ic2CnPsfQAAAABJRU5ErkJggg=='}} />
         <GeoJSONSource id="routes" data={activeRouteGeoJSON || EMPTY_GEOJSON}>

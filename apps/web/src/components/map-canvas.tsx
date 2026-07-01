@@ -20,6 +20,14 @@ type MapCanvasProps = {
   mapCenter?: { latitude: number; longitude: number; timestamp: number } | null;
 };
 
+type RouteFeature = {
+  type: "Feature";
+  properties: Record<string, unknown> & { color?: string };
+  geometry:
+    | { type: "LineString"; coordinates: [number, number][] }
+    | { type: "MultiLineString"; coordinates: [number, number][][] };
+};
+
 export function MapCanvas({ activeRoute, mapCenter }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
@@ -36,7 +44,7 @@ export function MapCanvas({ activeRoute, mapCenter }: MapCanvasProps) {
       minZoom: 10,
       maxZoom: 19,
       attributionControl: false,
-      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      style: process.env.NEXT_PUBLIC_MAP_STYLE_URL || "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
     });
 
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
@@ -173,7 +181,7 @@ export function MapCanvas({ activeRoute, mapCenter }: MapCanvasProps) {
       try {
         const res = await fetch(`/routes/${activeRoute}.geojson`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const data = (await res.json()) as { type: "FeatureCollection"; features: RouteFeature[] };
         if (!data.features || data.features.length === 0) return;
 
         const map = mapRef.current;
@@ -181,7 +189,7 @@ export function MapCanvas({ activeRoute, mapCenter }: MapCanvasProps) {
 
         const colored = {
           ...data,
-          features: data.features.map((f: any) => ({
+          features: data.features.map((f) => ({
             ...f,
             properties: {
               ...f.properties,
@@ -197,6 +205,8 @@ export function MapCanvas({ activeRoute, mapCenter }: MapCanvasProps) {
         for (const f of colored.features) {
           if (f.geometry.type === "LineString") {
             for (const c of f.geometry.coordinates) allCoords.push(c);
+          } else if (f.geometry.type === "MultiLineString") {
+            for (const line of f.geometry.coordinates) for (const c of line) allCoords.push(c);
           }
         }
         if (allCoords.length > 0) {

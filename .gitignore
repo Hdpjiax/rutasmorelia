@@ -23,6 +23,7 @@
 # Python generated caches
 __pycache__/
 *.py[cod]
+.venv*/
 
 # Database local folders
 **/postgres_data/
@@ -43,6 +44,9 @@ public-archivedwl-*/
 geo-cache/
 tmp/
 work/
+
+# Local route-pipeline overrides.
+route-pipeline.local.json
 
 # Large SQL data dumps / dumps not meant for source control
 import_routes.sql

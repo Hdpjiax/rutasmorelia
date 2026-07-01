@@ -147,7 +147,7 @@ export function TransitApp() {
 
   const filteredRoutes = useMemo(() => {
     const query = destination.trim().toLocaleLowerCase("es-MX");
-    let filtered = query
+    const filtered = query
       ? routes.filter((r) => r.name.toLocaleLowerCase("es-MX").includes(query))
       : routes;
     // Sort: combi first, then camión

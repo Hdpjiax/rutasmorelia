@@ -9,7 +9,7 @@ export async function GET() {
     }
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Traffic API Proxy error:", error);
     // Return empty GeoJSON collection as fallback to prevent client errors
     return NextResponse.json(
