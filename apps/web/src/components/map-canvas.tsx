@@ -179,7 +179,7 @@ export function MapCanvas({ activeRoute, mapCenter }: MapCanvasProps) {
 
     async function loadRoute() {
       try {
-        const res = await fetch(`/routes/${activeRoute}.geojson`);
+        const res = await fetch(`/routes/${activeRoute}.geojson`, { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = (await res.json()) as { type: "FeatureCollection"; features: RouteFeature[] };
         if (!data.features || data.features.length === 0) return;

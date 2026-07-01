@@ -63,7 +63,7 @@ export function TransitApp() {
   useEffect(() => {
     async function loadRoutes() {
       try {
-        const res = await fetch("/routes/index.json");
+        const res = await fetch("/routes/index.json", { cache: "no-store" });
         if (!res.ok) throw new Error("No routes index found");
         const data = await res.json();
         if (data.routes && data.routes.length > 0) {
