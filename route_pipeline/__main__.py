@@ -15,10 +15,14 @@ from .publish import approve, publish
 
 
 def _route(value: str):
-    try:
+    if value in ROUTES:
         return ROUTES[value]
-    except KeyError as error:
-        raise argparse.ArgumentTypeError(f"Ruta no habilitada. Única ruta permitida: {', '.join(ROUTES)}") from error
+    for route in ROUTES.values():
+        if route.code == value:
+            return route
+    raise argparse.ArgumentTypeError(
+        f"Ruta '{value}' no encontrada. Slugs válidos: {', '.join(ROUTES)}"
+    )
 
 
 def parser() -> argparse.ArgumentParser:

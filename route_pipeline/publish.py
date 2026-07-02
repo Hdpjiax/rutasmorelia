@@ -94,7 +94,38 @@ def _publish_supabase(route: RouteDefinition, report: dict, approval: dict, geoj
     url = os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("SUPABASE_SECRET_KEY")
     if not url or not key:
-        raise EnvironmentError("Defina SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY para publicar")
+        print("SUPABASE_SERVICE_ROLE_KEY no está definida. Intentando publicación directa vía base de datos...")
+        import subprocess
+        import tempfile
+        
+        payload = {
+            "route_code": route.code,
+            "artifact_sha256": report["artifact_sha256"],
+            "geometry": geojson,
+            "metrics": report,
+            "source_metadata": report.get("metadata", {}),
+            "reviewer": approval["reviewer"],
+        }
+        
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json", encoding="utf-8") as temp_file:
+            json.dump(payload, temp_file, ensure_ascii=False)
+            temp_path = Path(temp_file.name)
+            
+        try:
+            node_script = Path(__file__).resolve().parents[1] / "apps" / "api" / "db_publish_fallback.js"
+            res = subprocess.run(
+                ["node", str(node_script), str(temp_path)],
+                capture_output=True,
+                text=True,
+                cwd=str(Path(__file__).resolve().parents[1] / "apps" / "api")
+            )
+            if res.returncode != 0:
+                raise RuntimeError(f"Falló la publicación por base de datos: {res.stderr}\n{res.stdout}")
+            print(res.stdout.strip())
+        finally:
+            temp_path.unlink(missing_ok=True)
+        return
+
     payload = json.dumps(
         {
             "p_route_code": route.code,

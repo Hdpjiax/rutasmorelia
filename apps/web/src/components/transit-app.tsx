@@ -48,6 +48,7 @@ export function TransitApp() {
   const [origin, setOrigin] = useState("Mi ubicación");
   const [destination, setDestination] = useState("");
   const [activeRoute, setActiveRoute] = useState("");
+  const [activeTab, setActiveTab] = useState<"combi" | "camion">("combi");
   const [message, setMessage] = useState<string | null>(null);
   const [originCoordinates, setOriginCoordinates] = useState<Coordinates | null>(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState<Coordinates | null>(null);
@@ -185,42 +186,58 @@ export function TransitApp() {
   }
 
   const renderedLists = (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key="routes"
-        className="route-list"
-        initial={prefersReducedMotion ? false : { opacity: 0, x: 8 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={prefersReducedMotion ? undefined : { opacity: 0, x: -8 }}
-        transition={{ duration: 0.18 }}
-        role="tabpanel"
-      >
-        {isLoadingRoutes ? (
-          Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="skeleton-row" aria-hidden="true">
-              <div className="skeleton-number" />
-              <div className="skeleton-text"><div className="skeleton-title" /><div className="skeleton-subtitle" /></div>
-              <div className="skeleton-number" style={{ width: 36, height: 16 }} />
-            </div>
-          ))
-        ) : filteredRoutes.length ? (
-          <>
-            {combiRoutes.length > 0 && (
-              <>
-                <div className="route-section-header">Rutas de Combi</div>
-                {combiRoutes.map(renderRouteButton)}
-              </>
-            )}
-            {camionRoutes.length > 0 && (
-              <>
-                <div className="route-section-header">Rutas de Autobús</div>
-                {camionRoutes.map(renderRouteButton)}
-              </>
-            )}
-          </>
-        ) : <div className="empty-state">No encontramos rutas con ese destino.</div>}
-      </motion.div>
-    </AnimatePresence>
+    <div className="flex flex-col h-full min-h-0">
+      <div className="tabs-container">
+        <button
+          type="button"
+          className={`tab-button ${activeTab === "combi" ? "active" : ""}`}
+          onClick={() => setActiveTab("combi")}
+        >
+          Combis ({isLoadingRoutes ? "..." : combiRoutes.length})
+        </button>
+        <button
+          type="button"
+          className={`tab-button ${activeTab === "camion" ? "active" : ""}`}
+          onClick={() => setActiveTab("camion")}
+        >
+          Camiones ({isLoadingRoutes ? "..." : camionRoutes.length})
+        </button>
+      </div>
+
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={activeTab}
+          className="route-list"
+          initial={prefersReducedMotion ? false : { opacity: 0, x: 8 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={prefersReducedMotion ? undefined : { opacity: 0, x: -8 }}
+          transition={{ duration: 0.18 }}
+          role="tabpanel"
+        >
+          {isLoadingRoutes ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="skeleton-row" aria-hidden="true">
+                <div className="skeleton-number" />
+                <div className="skeleton-text"><div className="skeleton-title" /><div className="skeleton-subtitle" /></div>
+                <div className="skeleton-number" style={{ width: 36, height: 16 }} />
+              </div>
+            ))
+          ) : activeTab === "combi" ? (
+            combiRoutes.length ? (
+              combiRoutes.map(renderRouteButton)
+            ) : (
+              <div className="empty-state">No encontramos combis con ese destino.</div>
+            )
+          ) : (
+            camionRoutes.length ? (
+              camionRoutes.map(renderRouteButton)
+            ) : (
+              <div className="empty-state">No encontramos camiones con ese destino.</div>
+            )
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 
   return (

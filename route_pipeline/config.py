@@ -37,6 +37,48 @@ ROUTES = {
     )
 }
 
+def _load_manifest_routes() -> None:
+    manifest_path = ROOT / "tools" / "routes_manifest.csv"
+    if not manifest_path.is_file():
+        return
+    import csv
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            code = row.get("route_id")
+            folder_name = row.get("folder_name", "")
+            if not code:
+                code = folder_name.split("_")[0] if "_" in folder_name else folder_name[:10]
+            if code == PILOT_CODE:
+                continue
+            slug = folder_name.lower().replace("_", "-").replace(" ", "-")
+            slug = "-".join(filter(None, slug.split("-")))
+            kml_rel = row.get("kml_path", "")
+            if not kml_rel:
+                continue
+            kml_path = ROOT / kml_rel
+            pdf_path = None
+            folder_path = ROOT / "rutastransporte" / row.get("category", "") / folder_name
+            if folder_path.is_dir():
+                for path in folder_path.rglob("*.pdf"):
+                    if path.is_file():
+                        pdf_path = path
+                        break
+            color = row.get("color_hex", "#FFC800")
+            if not color or not color.startswith("#"):
+                color = "#FFC800"
+            ROUTES[slug] = RouteDefinition(
+                slug=slug,
+                code=code,
+                name=row.get("route_name", folder_name),
+                color=color,
+                transport_type="combi",
+                kml=kml_path,
+                pdf=pdf_path,
+            )
+
+_load_manifest_routes()
+
 
 @dataclass(frozen=True)
 class QualityThresholds:

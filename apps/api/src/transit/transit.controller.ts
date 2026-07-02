@@ -15,7 +15,9 @@ export class TransitController {
   }
 
   @Get('traffic')
-  @ApiOperation({ summary: 'Obtiene el feed de tráfico en tiempo real en formato GeoJSON' })
+  @ApiOperation({
+    summary: 'Obtiene el feed de tráfico en tiempo real en formato GeoJSON',
+  })
   getTrafficFeed() {
     return this.transit.getTrafficFeed();
   }

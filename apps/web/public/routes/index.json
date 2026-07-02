@@ -1,8 +1,18 @@
 {
   "type": "routes-index",
-  "generatedAt": "2026-07-01T22:54:40.199786+00:00",
+  "generatedAt": "2026-07-02T01:49:32.301099+00:00",
   "algorithm": "valhalla-kml-corridor-v1",
   "routes": [
+    {
+      "id": "78",
+      "name": "Alberca (Metropolis)",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/78.geojson?v=a89f79557f04",
+      "artifactSha256": "a89f79557f04655030975d5d839d7ae88f4868c195fb612ad22b52e40ff7ce27"
+    },
     {
       "id": "79",
       "name": "Alberca Gertrudis",
@@ -10,8 +20,988 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/79.geojson?v=b357495deb2c",
-      "artifactSha256": "b357495deb2c67bde622b5a64f312975a2e6bfd29805f0feae87e696ae971f90"
+      "geojsonFile": "/routes/79.geojson?v=fcba3691ebb0",
+      "artifactSha256": "fcba3691ebb0dd7558e6d206e8f746a20e3feac6f29e75aba209dce26b3f2d21"
+    },
+    {
+      "id": "3",
+      "name": "Amarilla 1 Centro",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/3.geojson?v=e918deec9ba3",
+      "artifactSha256": "e918deec9ba361b24c0eed7f4e861875bcf41e74a86a17c82fa03b5f3298d094"
+    },
+    {
+      "id": "4",
+      "name": "Amarilla 2",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/4.geojson?v=fffd5d98b0f2",
+      "artifactSha256": "fffd5d98b0f2b597f26f64daac9cdad601e20b63fdd0b31c62834690e499d037"
+    },
+    {
+      "id": "2",
+      "name": "Amarilla Tenencia Morelos",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/2.geojson?v=b1f8a0a85c88",
+      "artifactSha256": "b1f8a0a85c881cbf712bef652afa8d60396f0c6f840e7b124dad77c7db8b6a0c"
+    },
+    {
+      "id": "F1",
+      "name": "Arcos San Pedro",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F1.geojson?v=ddf5b9e4b3c9",
+      "artifactSha256": "ddf5b9e4b3c9aeec7e9a55d9d8c5d4e05b398c6be9b01ec609480934028e26fa"
+    },
+    {
+      "id": "F2",
+      "name": "Arroyo Colorado",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F2.geojson?v=7d83aa060508",
+      "artifactSha256": "7d83aa06050824e9ead98ec80548b8c6c8bebc0413090157faf2c650e90934ab"
+    },
+    {
+      "id": "F3",
+      "name": "Atécuaro",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F3.geojson?v=caf1c39c0404",
+      "artifactSha256": "caf1c39c040436d7c58b62e56297c5cfe4d924947d259a9430b844718e6bb43b"
+    },
+    {
+      "id": "5",
+      "name": "Azul A Soriana-CBTA",
+      "color": "#004E98",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/5.geojson?v=ac169fd3cc27",
+      "artifactSha256": "ac169fd3cc277aec46af900c67d872567a551cbcf08eabf4c4520d329630afe3"
+    },
+    {
+      "id": "6",
+      "name": "Azul A Soriana-Vergel",
+      "color": "#004E98",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/6.geojson?v=6c978023e6ad",
+      "artifactSha256": "6c978023e6ad165a3cb5551027c2f6384f943d3bb0bcc0cbcbc983915e558273"
+    },
+    {
+      "id": "7",
+      "name": "Azul B Michelena",
+      "color": "#004E98",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/7.geojson?v=97795483cac2",
+      "artifactSha256": "97795483cac2d3fe7bd797a422597fe69d7897b15b1bf1ef5d7a19a0135aef76"
+    },
+    {
+      "id": "8",
+      "name": "Azul B Xangari",
+      "color": "#004E98",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/8.geojson?v=1fba52d1766e",
+      "artifactSha256": "1fba52d1766e2d0c667c08de1d6e2cfdd2d4f666d831aaafbdda9c41309623b2"
+    },
+    {
+      "id": "9",
+      "name": "Azul C",
+      "color": "#004E98",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/9.geojson?v=5e50afd62b57",
+      "artifactSha256": "5e50afd62b57fd42518ece085db007d347dbf873318e120fd824b03a11deb1aa"
+    },
+    {
+      "id": "13",
+      "name": "Café - Oro 2 (Leandro Valle)",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/13.geojson?v=be34786e3244",
+      "artifactSha256": "be34786e324421d76564a00bddb2877b30490b27ac73f7214209275686adb152"
+    },
+    {
+      "id": "10",
+      "name": "Café 1",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/10.geojson?v=7bfb6a6164ea",
+      "artifactSha256": "7bfb6a6164eaa4ee21226106aed1f0e7c044bb28ea7e17b1668530e5b2b57cfa"
+    },
+    {
+      "id": "11",
+      "name": "Café 1A",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/11.geojson?v=76286e29e2c1",
+      "artifactSha256": "76286e29e2c140a5e02182b8a62b7a45c62d2d91e45a425d4dfd3f3a888e5c46"
+    },
+    {
+      "id": "14",
+      "name": "Café Oro 2 Rafael Carrillo",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/14.geojson?v=af7635b29d10",
+      "artifactSha256": "af7635b29d1075a9dae19d4bb3c2ac3f0db22ba91eb46889b111a3cdd7b220fd"
+    },
+    {
+      "id": "15",
+      "name": "Café Oro 2A",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/15.geojson?v=cf6088016aa1",
+      "artifactSha256": "cf6088016aa1958eeddfa888cf2f9181a601aca608ff905a7625336e789d9c5b"
+    },
+    {
+      "id": "16",
+      "name": "Café Oro 2B Madero",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/16.geojson?v=2b94d19bd1d7",
+      "artifactSha256": "2b94d19bd1d7aee2ecd536462123cc14fecf277f2c4849ca3e65604c8bf34143"
+    },
+    {
+      "id": "17",
+      "name": "Café Oro 2B Michoacán",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/17.geojson?v=c76cd429a539",
+      "artifactSha256": "c76cd429a5397ab907606e85861f437409aea12fefaaa926eabf252140003f57"
+    },
+    {
+      "id": "F4",
+      "name": "Campestre (Misión del Valle)",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F4.geojson?v=805425022e2f",
+      "artifactSha256": "805425022e2f9ec6d4a58f4b220154f2c842ca3515358a3fef811a50d5125d38"
+    },
+    {
+      "id": "F5",
+      "name": "Campestre (Posta Trebol - Monarca)",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F5.geojson?v=d2a17278d710",
+      "artifactSha256": "d2a17278d710de5470c3b8fa7a829a6e14a3f61e5a49307fbff935d02708b97d"
+    },
+    {
+      "id": "F6",
+      "name": "Canteras Bachilleres (Alamos - San Bernabe)",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F6.geojson?v=0a5d702e529d",
+      "artifactSha256": "0a5d702e529d698affdeb87024501b1b3b140b239a5d6beb417542b04d5dab2b"
+    },
+    {
+      "id": "F7",
+      "name": "Capula",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F7.geojson?v=76597284c50f",
+      "artifactSha256": "76597284c50fb2f7afde8458f0727c54f0dea632987e5d0df86337c6c0ccaa67"
+    },
+    {
+      "id": "F9",
+      "name": "Centros Comerciales (Lenadro Valle)",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F9.geojson?v=21fb4bca0d94",
+      "artifactSha256": "21fb4bca0d94b295f2e7bf89d025e3be29394261d08e7c74290dea9eaa1e912b"
+    },
+    {
+      "id": "F10",
+      "name": "Centros Comerciales (Lucio Cabañas)",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F10.geojson?v=383a2cd1b857",
+      "artifactSha256": "383a2cd1b8579f0d5677ba361427c6217ac55bb8b3d3cadbb4e0647e06a1a246"
+    },
+    {
+      "id": "F11",
+      "name": "Charo",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F11.geojson?v=cc4911a1fa91",
+      "artifactSha256": "cc4911a1fa9186c50868be028ac056c6f70eb2f1fbf433c313aab747a2fb0a5e"
+    },
+    {
+      "id": "F13",
+      "name": "Charo (San Antonio Corrales)",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F13.geojson?v=4546c0d08a48",
+      "artifactSha256": "4546c0d08a489f6d67c5b78d29a0040f87489b5cb144bf54e5e942e5b33f799d"
+    },
+    {
+      "id": "F12",
+      "name": "Charo - Ind Atapaneo (ISSTE - Soledad)",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F12.geojson?v=b562965b2ed6",
+      "artifactSha256": "b562965b2ed624b30ae29ee203d2a6f9f85f5bbef23efced4b3dc86fb8e5d7db"
+    },
+    {
+      "id": "F14",
+      "name": "Chihuerio",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F14.geojson?v=6371a7100216",
+      "artifactSha256": "6371a710021618d1ac0ecfca4e9bc7586e172d7496f5d180616a27e4ed63a1ab"
+    },
+    {
+      "id": "F16",
+      "name": "Chucandiro",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F16.geojson?v=0cc7fd0a70b8",
+      "artifactSha256": "0cc7fd0a70b84aad6ebde4be517ea3371942583e3538ad536fa1ead2efa91264"
+    },
+    {
+      "id": "81",
+      "name": "Circuito Carrillo",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/81.geojson?v=e36607d39409",
+      "artifactSha256": "e36607d394095e08dbd1dfcb1a55741cf72cb3be60227773827876e62e062457"
+    },
+    {
+      "id": "F17",
+      "name": "Coeneo",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F17.geojson?v=011e7cf4a382",
+      "artifactSha256": "011e7cf4a382cd952ebf11dae9cbbb5c38a2ff5c814f813a95050f57a1b78948"
+    },
+    {
+      "id": "F18",
+      "name": "Cointzio",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/F18.geojson?v=d3b05074863c",
+      "artifactSha256": "d3b05074863cc9d2bf4d105a7c28e401838872a825608f099d6c4da37e6fa35b"
+    },
+    {
+      "id": "18",
+      "name": "Coral 1",
+      "color": "#FF6F61",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/18.geojson?v=d315836c53e5",
+      "artifactSha256": "d315836c53e562b074303461fec618ef6c1264d6a27efe5d1426ab450bd54ce1"
+    },
+    {
+      "id": "19",
+      "name": "Coral 2",
+      "color": "#FF6F61",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/19.geojson?v=3733b0bb8f1a",
+      "artifactSha256": "3733b0bb8f1ad97b15cb8fe0cebd70f8ca1770b24c317f3a7431fced0d829baa"
+    },
+    {
+      "id": "20",
+      "name": "Coral 2 A",
+      "color": "#FF6F61",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/20.geojson?v=d391eae3dd35",
+      "artifactSha256": "d391eae3dd3513197b7246311ca746993ac9cc3f3ff90cafd6e25e00d35018be"
+    },
+    {
+      "id": "21",
+      "name": "Crema 1",
+      "color": "#F9DCC4",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/21.geojson?v=45496354f684",
+      "artifactSha256": "45496354f684b9262acbdbe7805cc7b203d10d3052c35c0971d77865f72ac7e2"
+    },
+    {
+      "id": "22",
+      "name": "Crema 2",
+      "color": "#F9DCC4",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/22.geojson?v=c9757a6bebb5",
+      "artifactSha256": "c9757a6bebb5882272e3351f86cedcce3ebf5c18cd4dbf58fa952e22e3cd6eda"
+    },
+    {
+      "id": "23",
+      "name": "Crema 2A",
+      "color": "#F9DCC4",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/23.geojson?v=992d36c4a7a5",
+      "artifactSha256": "992d36c4a7a5171e32cae7c349486c7757a6a8ee2d23ecc98c67467837219d3c"
+    },
+    {
+      "id": "80",
+      "name": "Dorado (Industrial)",
+      "color": "#D1BE3C",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/80.geojson?v=30581d9ee635",
+      "artifactSha256": "30581d9ee6352a2efe604640f5d43ba53e78c2d00e31b208022c7f1f049e5cf1"
+    },
+    {
+      "id": "89",
+      "name": "Dorado (Lomas de Morelia)",
+      "color": "#D1BE3C",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/89.geojson?v=c6176ff1f11a",
+      "artifactSha256": "c6176ff1f11aa12012083e76ab61337c5f8c2859be8e176dfecf73c185eb60ee"
+    },
+    {
+      "id": "87",
+      "name": "Durazno - Santa Maria",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/87.geojson?v=8edb23c71b02",
+      "artifactSha256": "8edb23c71b02ad1ac50024190f189dc1f50768b31050261c67f2ce658b2124f3"
+    },
+    {
+      "id": "82",
+      "name": "El Pedregal",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/82.geojson?v=e3347365208d",
+      "artifactSha256": "e3347365208d83a3e2ec18704caed82bd01d3654fe306f3ee511ad9adf78d89e"
+    },
+    {
+      "id": "24",
+      "name": "Gris 1 Circuito",
+      "color": "#808080",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/24.geojson?v=1669bf0ef46b",
+      "artifactSha256": "1669bf0ef46b19d66077cb5396cadcbee373b4d78f8bfb95d79a2d3f6437961d"
+    },
+    {
+      "id": "26",
+      "name": "Gris 3 Furamo",
+      "color": "#808080",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/26.geojson?v=cfb763e3311b",
+      "artifactSha256": "cfb763e3311b1c10f46dfdb5e57c7c1af1af2acee4927469eed3a5416284d266"
+    },
+    {
+      "id": "27",
+      "name": "Gris 3 Oxxo",
+      "color": "#808080",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/27.geojson?v=3ac95f3bec2b",
+      "artifactSha256": "3ac95f3bec2b0d480e3f55f6895017b8a223d3ecb84d7795864b152c47ded0a7"
+    },
+    {
+      "id": "28",
+      "name": "Gris 4",
+      "color": "#808080",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/28.geojson?v=7c3fb0cd7602",
+      "artifactSha256": "7c3fb0cd76020ff276abfe09bbcaa9b73fb637db4c5e352576304fd1c5a7a1c9"
+    },
+    {
+      "id": "29",
+      "name": "Guinda 1 Mora",
+      "color": "#611240",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/29.geojson?v=5e924cd722d4",
+      "artifactSha256": "5e924cd722d4e98b2bb241431c7bdcbe0c89dc07e30d55143ab9c052f940868f"
+    },
+    {
+      "id": "30",
+      "name": "Guinda 1 Praderas",
+      "color": "#611240",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/30.geojson?v=f5f707e34226",
+      "artifactSha256": "f5f707e34226dc7f5b2679dcbad8196c43d99e232e6e45e4f113db5fe1573a06"
+    },
+    {
+      "id": "31",
+      "name": "Guinda 2",
+      "color": "#611240",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/31.geojson?v=77a8b3405518",
+      "artifactSha256": "77a8b34055180848416ed2b01fbc25ba444e4bfd9728aba4af32a19c8f654d01"
+    },
+    {
+      "id": "86",
+      "name": "ISSSTE - Soledad",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/86.geojson?v=e90ac613a535",
+      "artifactSha256": "e90ac613a535fa5162cb6a3fd2a672bfa53e18a2bce212038530d23a75f85658"
+    },
+    {
+      "id": "32",
+      "name": "Morada 1 Aldea",
+      "color": "#8238EA",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/32.geojson?v=cde57badf578",
+      "artifactSha256": "cde57badf578f2d8ff39535b5d31e22c8a5fe11a22d1d76dc3168da14e805cd4"
+    },
+    {
+      "id": "33",
+      "name": "Morada 1 Buenos Aires",
+      "color": "#8238EA",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/33.geojson?v=adef9ac1252a",
+      "artifactSha256": "adef9ac1252a7997524002e3eb1d85415d8e567c272f5db793a38ccb090da105"
+    },
+    {
+      "id": "34",
+      "name": "Morada 1 Misión del Valle",
+      "color": "#8238EA",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/34.geojson?v=ff0fbf46bc20",
+      "artifactSha256": "ff0fbf46bc20c20a58c1fc0d3f5ab842f93ca6dccd1a4ff8f1012949a8613373"
+    },
+    {
+      "id": "35",
+      "name": "Morada 2 Lomas de Morelia",
+      "color": "#8238EA",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/35.geojson?v=b72d58147eb3",
+      "artifactSha256": "b72d58147eb34bc39dc532adfac293bb85faaffdab347f7f27ca6f9029a20547"
+    },
+    {
+      "id": "36",
+      "name": "Morada 2 Satelite",
+      "color": "#8238EA",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/36.geojson?v=92b77ffa9472",
+      "artifactSha256": "92b77ffa9472bf41f515fb61e21d5a7e527fa9371f64a542f20e01747a6bfe3a"
+    },
+    {
+      "id": "37",
+      "name": "Morada 2A",
+      "color": "#8238EA",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/37.geojson?v=1000e567d3a7",
+      "artifactSha256": "1000e567d3a775aab6ec865a919961f940dcdd075b8f62e6ab7f481f2d6cdd3c"
+    },
+    {
+      "id": "38",
+      "name": "Naranja 1 ISSTE",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/38.geojson?v=d6ff181c01f1",
+      "artifactSha256": "d6ff181c01f106a257720f74d43ab2da96e8584e24689fd246916d36893d4996"
+    },
+    {
+      "id": "39",
+      "name": "Naranja 1 La Soledad",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/39.geojson?v=26eeb3832cd6",
+      "artifactSha256": "26eeb3832cd68aabb99b899856d7d9feeeea043fea210a4bd29abc804a965327"
+    },
+    {
+      "id": "40",
+      "name": "Naranja 2 - 3 de Agosto",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/40.geojson?v=be472abf165f",
+      "artifactSha256": "be472abf165fa3e4729567f253eb74cc33a320d7a008672ea16f35dabeb7d53f"
+    },
+    {
+      "id": "41",
+      "name": "Naranja 2 Santa Fe",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/41.geojson?v=176cb8444da7",
+      "artifactSha256": "176cb8444da74fb0ca8fd5f8fca60865355d01e59ea2fdf1b60440e897283019"
+    },
+    {
+      "id": "43",
+      "name": "Naranja 3 (Directo)",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/43.geojson?v=365d5113bca9",
+      "artifactSha256": "365d5113bca95a17fb7450584dc54d3d721ee4d9cf9745092a7b022e40ca2563"
+    },
+    {
+      "id": "42",
+      "name": "Naranja 3 Centro - Puerta del Sol",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/42.geojson?v=736874e42ef3",
+      "artifactSha256": "736874e42ef309758ebe475f907c377bca11f71fea28c3cba5ff15475410b27c"
+    },
+    {
+      "id": "44",
+      "name": "Naranja 3 Santa Maria - Erandeni",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/44.geojson?v=2a83789db10a",
+      "artifactSha256": "2a83789db10ac07def8af2d763bbb9a81eed47a498876756a80acb571ecb854b"
+    },
+    {
+      "id": "45",
+      "name": "Naranja 3 Santa Maria - ITA",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/45.geojson?v=f499f6139c0f",
+      "artifactSha256": "f499f6139c0fc5a30fd68cc7541325d0415baf9d16e57cb626c1ae9628035974"
+    },
+    {
+      "id": "46",
+      "name": "Naranja 3 Trico - Metropolis",
+      "color": "#FF5500",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/46.geojson?v=b02ddf1e0fa3",
+      "artifactSha256": "b02ddf1e0fa3edc64bd2201f0d5a09e1d0f555db88797af0b2d358c64ac973ae"
+    },
+    {
+      "id": "47",
+      "name": "Negra 1",
+      "color": "#000000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/47.geojson?v=a66e8dda3e13",
+      "artifactSha256": "a66e8dda3e13e55bddaf1956d468d4a69eec0089e35c3b06174bd8203d43ed36"
+    },
+    {
+      "id": "48",
+      "name": "Negra 2",
+      "color": "#000000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/48.geojson?v=187d191a9b47",
+      "artifactSha256": "187d191a9b470349f7bcb8ea9f3968b1b6ca89c41ccdc29d7b1bef7bbfbfb779"
+    },
+    {
+      "id": "49",
+      "name": "Oro Verde Encinos",
+      "color": "#A8A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/49.geojson?v=4352f89a6788",
+      "artifactSha256": "4352f89a678833238f685c47d2c45ddfb20c5f3397fae759b4b41132e720599c"
+    },
+    {
+      "id": "50",
+      "name": "Oro Verde Soledad",
+      "color": "#A8A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/50.geojson?v=1fd736c56af3",
+      "artifactSha256": "1fd736c56af3503df7183760ce4473ea0b16c505ce9bef189a34cce948eaf766"
+    },
+    {
+      "id": "51",
+      "name": "Oro Verde Trincheras",
+      "color": "#A8A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/51.geojson?v=78a824a632ee",
+      "artifactSha256": "78a824a632ee2452483fc3ad2a7f090ec758b5007ec84cf14e4889b95697c7b4"
+    },
+    {
+      "id": "53",
+      "name": "Paloma Azul Campina",
+      "color": "#004E98",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/53.geojson?v=2d8d236e214b",
+      "artifactSha256": "2d8d236e214bb6646c6861816342d1296f9f4b452442eeb0a9bbdfda54ce8359"
+    },
+    {
+      "id": "54",
+      "name": "Paloma Azul Zimpanio",
+      "color": "#004E98",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/54.geojson?v=39b0753c0146",
+      "artifactSha256": "39b0753c0146849df0a4b60ae76f2f962ba6e56842b59f61721e038c3e7ad0bd"
+    },
+    {
+      "id": "83",
+      "name": "Panteon",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/83.geojson?v=bf791dbed0f0",
+      "artifactSha256": "bf791dbed0f0a5982bff07a8dd06afb2ca42cca9a1cba4c64a6d3a893285a503"
+    },
+    {
+      "id": "84",
+      "name": "Prados Verdes A",
+      "color": "#70A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/84.geojson?v=231285dc255c",
+      "artifactSha256": "231285dc255cabeaa99eabadec662b04fc8c37ee54a574cc952e3a06a73feaa4"
+    },
+    {
+      "id": "85",
+      "name": "Prados Verdes B",
+      "color": "#70A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/85.geojson?v=8007e3bae84d",
+      "artifactSha256": "8007e3bae84dd6a777ae26bbb8235c5bbeee132f580f10be0a297dc4d3865ff3"
+    },
+    {
+      "id": "55",
+      "name": "Roja 1 Comercial Mexicana",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/55.geojson?v=013fa5a167d2",
+      "artifactSha256": "013fa5a167d24cdc6b4951a751a846ddc60f2aac520ccdc419eafd4321820562"
+    },
+    {
+      "id": "56",
+      "name": "Roja 1 Punhuato",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/56.geojson?v=d89887145c04",
+      "artifactSha256": "d89887145c045d1a962d1a11abe287fe4a64dc013fc635e15ec62c0916e00d00"
+    },
+    {
+      "id": "57",
+      "name": "Roja 2 Oken",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/57.geojson?v=e925ab8b2ef7",
+      "artifactSha256": "e925ab8b2ef7f82bf74e5cd23dfc961446568a7bc1fc3eb01caa0ce3cc36a82c"
+    },
+    {
+      "id": "58",
+      "name": "Roja 2 Villas del Sol",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/58.geojson?v=d7c318847b25",
+      "artifactSha256": "d7c318847b2548a66cab9fdefad81ad7dee68b6cda82f1c8f107814215adf389"
+    },
+    {
+      "id": "59",
+      "name": "Roja 3",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/59.geojson?v=6c0838f8b141",
+      "artifactSha256": "6c0838f8b141fcc0765c50f5b89f430f03ef489006d48850905b93d624406555"
+    },
+    {
+      "id": "60",
+      "name": "Roja 3A",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/60.geojson?v=3addc1ec6ace",
+      "artifactSha256": "3addc1ec6acef944d5478b3681e9edcd926d10d8734b2ba09163da8496d0e5b3"
+    },
+    {
+      "id": "61",
+      "name": "Roja 3B",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/61.geojson?v=7dda07b3f6dc",
+      "artifactSha256": "7dda07b3f6dc91c311cee90b0de6dc2880b07d391794e1ae9c91750b4805a007"
+    },
+    {
+      "id": "62",
+      "name": "Roja 4 Tinijaro",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/62.geojson?v=675007ae71bf",
+      "artifactSha256": "675007ae71bfc5b831be038d507891c96b3e7ca959266020e4113ba3baec0e94"
+    },
+    {
+      "id": "63",
+      "name": "Roja 4 Tzindurio",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/63.geojson?v=7d9592e30185",
+      "artifactSha256": "7d9592e3018523365c320d70fc08f631639460c0ffabd02455626dc5ea2495c6"
+    },
+    {
+      "id": "64",
+      "name": "Roja 4A",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/64.geojson?v=fa65202de8cc",
+      "artifactSha256": "fa65202de8cc70477b69f1d719cf47c4a5913cba00c6e82e85e2a763d24ad5ee"
+    },
+    {
+      "id": "65",
+      "name": "Roja 4M",
+      "color": "#A80000",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/65.geojson?v=600a9a636298",
+      "artifactSha256": "600a9a6362980b0245f15e2441501abe19d3966bf3ad5beb943f2820ed1b0b31"
+    },
+    {
+      "id": "66",
+      "name": "Rosa 2",
+      "color": "#FF00C5",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/66.geojson?v=c41cb8a20948",
+      "artifactSha256": "c41cb8a209480db58508def20c2a086d27ece2a0f37c0d9e7fb2b7b1d9cfcaf0"
+    },
+    {
+      "id": "67",
+      "name": "Rosa 2B",
+      "color": "#FF00C5",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/67.geojson?v=ff9fd3224fa0",
+      "artifactSha256": "ff9fd3224fa0bf5844fee468218193786f278c00fedd1a85ea165f7e6779fb8e"
+    },
+    {
+      "id": "68",
+      "name": "Rosa 3",
+      "color": "#FF00C5",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/68.geojson?v=1b16848b1fc1",
+      "artifactSha256": "1b16848b1fc1f8a8c858415be737999804e59189e968e223490d26b1642c839d"
+    },
+    {
+      "id": "69",
+      "name": "Rosa Metropolis - Estrella",
+      "color": "#FF00C5",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/69.geojson?v=9a479e7949ce",
+      "artifactSha256": "9a479e7949ce23540020c202d6b703c26ec0db91af587feb124933e64766442a"
+    },
+    {
+      "id": "70",
+      "name": "Rosa Puerta del Sol - Galaxia",
+      "color": "#FF00C5",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/70.geojson?v=7a3dd46a1fa3",
+      "artifactSha256": "7a3dd46a1fa322cd7110667d5f9b5124f3d7c7ea3979e4488fad9a3360fa1751"
+    },
+    {
+      "id": "88",
+      "name": "Trincheras",
+      "color": "#FFC800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/88.geojson?v=1c4d05740d3c",
+      "artifactSha256": "1c4d05740d3cdb9e39c0fc9918eba6e1015fe846be06bd13de4d1c824ec698d2"
+    },
+    {
+      "id": "71",
+      "name": "Verde 1",
+      "color": "#70A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/71.geojson?v=b913453beebc",
+      "artifactSha256": "b913453beebc0abe1eed592b80972cae889d924366134eff51f419ff32943dae"
+    },
+    {
+      "id": "72",
+      "name": "Verde 2",
+      "color": "#70A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/72.geojson?v=a55fa48c641e",
+      "artifactSha256": "a55fa48c641ec2d4421991f517fa94b6b998258b894158616d0e358a0bc46620"
+    },
+    {
+      "id": "73",
+      "name": "Verde 3 INDECO",
+      "color": "#70A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/73.geojson?v=1141e3b9ed5b",
+      "artifactSha256": "1141e3b9ed5b8e01e0def2467eaa2a8f5d69eb0a3a237d3556803d99453a130e"
+    },
+    {
+      "id": "74",
+      "name": "Verde 3 Lomas del Valle",
+      "color": "#70A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/74.geojson?v=4896cedd3821",
+      "artifactSha256": "4896cedd382134104d303eccae24aa2e187efb83595d8eb1932fcb51647671d5"
+    },
+    {
+      "id": "75",
+      "name": "Verde 4",
+      "color": "#70A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/75.geojson?v=dfd616b6cfdd",
+      "artifactSha256": "dfd616b6cfdd5f3b71f8dc33da55d858eb13ca7fd35ef967999c3474eb318bbf"
+    },
+    {
+      "id": "76",
+      "name": "Verde 4B",
+      "color": "#70A800",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/76.geojson?v=657835a78277",
+      "artifactSha256": "657835a7827782633ccf6e619ff82cd02a920de0b4ddad9bc566dcceb1e535a2"
     }
   ]
 }

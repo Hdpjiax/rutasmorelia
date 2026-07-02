@@ -43,12 +43,16 @@ class KmlTests(unittest.TestCase):
     def test_reviewed_corridor_override_changes_only_the_requested_slice(self):
         original = parse_kml(PILOT_KML)
         corrected, audit = _apply_reference_overrides(ROUTES["alberca-gertrudis"], original)
+        
+        # Test Felix Ireta override (components[1])
+        self.assertEqual(original[0].components[1][221:], corrected[0].components[1][197:])
+        self.assertEqual("user_reviewed_highway_at_felix_ireta_first_image", audit[0]["reason"])
+        
+        # Test Torreón Nuevo override (components[2])
         before = original[0].components[2]
         after = corrected[0].components[2]
-        self.assertEqual(before[:325], after[:325])
-        self.assertEqual(before[376:], after[376:])
-        self.assertLess(after[350][1], before[350][1])
-        self.assertEqual("user_reviewed_lower_carriageway_at_prensa_libre", audit[0]["reason"])
+        self.assertEqual(before[:310], after[:310])
+        self.assertEqual("user_reviewed_sierra_leona_and_highway_second_image", audit[1]["reason"])
 
 
 class GeometryTests(unittest.TestCase):

@@ -28,7 +28,11 @@ export class TransitService {
     const hour = now.getHours();
 
     for (const route of routes) {
-      if (!route.geometry || !route.geometry.coordinates || route.geometry.coordinates.length < 2) {
+      if (
+        !route.geometry ||
+        !route.geometry.coordinates ||
+        route.geometry.coordinates.length < 2
+      ) {
         continue;
       }
 
@@ -38,12 +42,16 @@ export class TransitService {
         const p2 = coords[i + 1];
 
         const coordSum = p1[0] + p1[1] + p2[0] + p2[1];
-        const seed = Math.floor(Math.abs(Math.sin(coordSum) * 100000)) + now.getMinutes();
+        const seed =
+          Math.floor(Math.abs(Math.sin(coordSum) * 100000)) + now.getMinutes();
 
         let trafficLevel: 'low' | 'medium' | 'heavy' = 'low';
         let speed = 45;
 
-        const isRushHour = (hour >= 8 && hour <= 9) || (hour >= 13 && hour <= 14) || (hour >= 18 && hour <= 19);
+        const isRushHour =
+          (hour >= 8 && hour <= 9) ||
+          (hour >= 13 && hour <= 14) ||
+          (hour >= 18 && hour <= 19);
         const rand = seed % 100;
 
         if (isRushHour) {
