@@ -732,7 +732,7 @@ export function TransitApp() {
                           <span className="route-color-icon vehicle-icon" style={{ background: route.color, color: contrastColor(route.color) }}>
                             {isCombi(route) ? <CarProfileIcon size={22} weight="fill" /> : <BusIcon size={22} weight="fill" />}
                           </span>
-                          <span className="route-copy"><strong>{route.name}</strong><span>{isCombi(route) ? "Combi" : "Autobús"}</span></span>
+                          <span className="route-copy"><strong>{route.name}</strong><span>{isCombi(route) ? "Combi" : "Camión"}</span></span>
                         </button>
                         <button
                           type="button"
