@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GoogleLogoIcon, SignOutIcon, UserCircleIcon } from "@phosphor-icons/react";
 import type { User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -17,10 +17,26 @@ export function AuthMenu({ onMessage }: AuthMenuProps) {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const configured = isSupabaseConfigured();
   const { register, handleSubmit, formState: { errors } } = useForm<EmailValues>({
     resolver: zodResolver(emailSchema),
   });
+
+  useEffect(() => {
+    if (!open) return;
+    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [open]);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -74,7 +90,7 @@ export function AuthMenu({ onMessage }: AuthMenuProps) {
   }
 
   return (
-    <div className="account-control">
+    <div className="account-control" ref={containerRef}>
       <button
         className="icon-button"
         type="button"

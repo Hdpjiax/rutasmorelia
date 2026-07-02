@@ -1239,12 +1239,16 @@ input:focus-visible {
   padding-bottom: 40px;
 }
 
-.toolbar-brand,
+.toolbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
 .routes-trigger { pointer-events: auto; }
 
 .toolbar-brand strong {
-    padding-bottom: 40px;
-
   color: white;
   font-size: 20px;
   letter-spacing: -0.03em;
@@ -1457,6 +1461,18 @@ input:focus-visible {
   border-radius: var(--radius-lg);
   background: var(--bg);
   box-shadow: 0 8px 24px oklch(0.12 0 0 / 0.2);
+  transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.journey-panel.collapsed {
+  max-height: 75px !important;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+
+.journey-panel.collapsed .journey-results,
+.journey-panel.collapsed .panel-footer {
+  display: none !important;
 }
 
 .journey-panel-header {
@@ -1507,4 +1523,11 @@ input:focus-visible {
   .route-modal { width: calc(100% - 20px); max-height: calc(100dvh - 84px); padding: 16px; }
   .map-controls-bottom { right: 10px; bottom: 22px; }
   .journey-panel { top: auto; right: 10px; bottom: 78px; width: calc(100% - 20px); max-height: 55dvh; }
+  .map-canvas .maplibregl-ctrl-attrib {
+    position: fixed !important;
+    bottom: 4px !important;
+    right: 4px !important;
+    z-index: 9999 !important;
+    font-size: 9px !important;
+  }
 }

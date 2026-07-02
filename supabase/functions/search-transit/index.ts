@@ -10,6 +10,18 @@ const jsonHeaders = {
   "Content-Type": "application/json",
 };
 
+function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -31,6 +43,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const query = typeof body.query === "string" ? body.query.trim() : "";
     const limit = typeof body.limit === "number" ? body.limit : 8;
+    const reqLat = typeof body.latitude === "number" ? body.latitude : null;
+    const reqLon = typeof body.longitude === "number" ? body.longitude : null;
 
     if (query.length < 2) {
       return new Response(JSON.stringify({ data: [] }), { headers: jsonHeaders });
@@ -69,7 +83,7 @@ Deno.serve(async (req) => {
     };
 
     const loadGeocodingResults = async () => {
-      const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}+Morelia&format=json&limit=5&addressdetails=1&accept-language=es`;
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}+Morelia&format=json&limit=25&addressdetails=1&accept-language=es`;
       const geoRes = await fetch(geocodeUrl, {
         headers: {
           "User-Agent": "SIMUM-Morelia-Transit-App (antogar89.b@gmail.com)",
@@ -108,7 +122,31 @@ Deno.serve(async (req) => {
     if (geocodingResult.status === "rejected") console.error("Nominatim geocoding failed:", geocodingResult.reason);
 
     // 3. Merge and return results
-    const combined = [...dbResults, ...geoResults];
+    let combined = [...dbResults, ...geoResults];
+
+    // 4. Distance sorting if latitude/longitude are provided
+    if (reqLat !== null && reqLon !== null) {
+      combined = combined.map((item) => {
+        const itemLat = item.latitude;
+        const itemLon = item.longitude;
+        const dist = (itemLat !== null && itemLon !== null && typeof itemLat === "number" && typeof itemLon === "number")
+          ? getDistance(reqLat, reqLon, itemLat, itemLon)
+          : 9999;
+        return { ...item, distance: dist };
+      });
+
+      combined.sort((a, b) => {
+        // Boost favorites to top (favorites RPC scores are >= 10)
+        const aFav = (a.score || 0) >= 10;
+        const bFav = (b.score || 0) >= 10;
+        if (aFav && !bFav) return -1;
+        if (!aFav && bFav) return 1;
+
+        // Otherwise sort by distance (closest first)
+        return a.distance - b.distance;
+      });
+    }
+
     return new Response(JSON.stringify({ data: combined }), { headers: jsonHeaders });
 
   } catch (error) {

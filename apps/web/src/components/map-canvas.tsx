@@ -424,7 +424,7 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
           markersRef.current.push(originMarker);
 
           const destMarker = new maplibregl.Marker({
-            element: createPinMarker("#ef4444", "D"),
+            element: createDestinationMarker(),
           })
             .setLngLat(destPoint)
             .addTo(map);
@@ -751,4 +751,15 @@ function getDistinctColor(hex: string): string {
   const newH = (h + 60) % 360;
   const newL = l > 50 ? Math.max(15, l - 25) : Math.min(85, l + 25);
   return hslToHex(newH, s, newL);
+}
+
+function createDestinationMarker(): HTMLDivElement {
+  const el = document.createElement("div");
+  el.innerHTML = `
+    <div style="width:26px;height:26px;background:#10b981;border:4px solid #ffffff;border-radius:50%;box-shadow:0 0 10px rgba(16,185,129,0.8);position:relative;">
+      <div style="position:absolute;top:-4px;left:-4px;width:26px;height:26px;border:4px solid #10b981;border-radius:50%;animation:dest-pulse 2.0s infinite ease-in-out;pointer-events:none;"></div>
+    </div>
+    <style>@keyframes dest-pulse{0%{transform:scale(1);opacity:0.8}100%{transform:scale(2.8);opacity:0}}</style>
+  `;
+  return el;
 }

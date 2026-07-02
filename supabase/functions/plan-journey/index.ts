@@ -111,8 +111,16 @@ Deno.serve(async (req) => {
       console.error("Journey lookup failed:", err);
     }
 
+    // Filter out transfer options that are unnecessary.
+    // A transfer option is unnecessary if either of its routes is already available as a direct option.
+    const directRouteIds = new Set(directOptions.map((opt) => String(opt.route_code || opt.route_id)));
+    const filteredTransferOptions = transferOptions.filter((opt) => {
+      return !directRouteIds.has(String(opt.route_code || opt.route_id)) &&
+             !directRouteIds.has(String(opt.second_route_code || opt.second_route_id));
+    });
+
     // Combine results: direct options first, then unique nearby options
-    const combinedOptions = [...directOptions, ...transferOptions];
+    const combinedOptions = [...directOptions, ...filteredTransferOptions];
 
 
     const rankedOptions = combinedOptions

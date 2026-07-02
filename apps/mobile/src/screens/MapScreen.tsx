@@ -706,9 +706,27 @@ export function MapScreen({navigation}: Props) {
       setLoading(false);
       const options = data?.data as any[] | undefined;
       if (!error && options && options.length > 0) {
-        setJourneyOptions(options);
-        setMessage(`${options.length} opciones encontradas.`);
-        setActiveRouteId(String(options[0].route_id));
+        // Filter out redundant transfers if direct routes are available
+        const directRouteIds = new Set(
+          options
+            .filter((opt) => Number(opt.transfers || 0) === 0)
+            .map((opt) => String(opt.route_code || opt.route_id))
+        );
+
+        const filteredOptions = options.filter((opt) => {
+          if (Number(opt.transfers || 0) > 0) {
+            const firstInDirect = directRouteIds.has(String(opt.route_code || opt.route_id));
+            const secondInDirect = opt.second_route_code ? directRouteIds.has(String(opt.second_route_code || opt.second_route_id)) : false;
+            return !firstInDirect && !secondInDirect;
+          }
+          return true;
+        });
+
+        setJourneyOptions(filteredOptions);
+        setMessage(filteredOptions.length > 0 ? `${filteredOptions.length} opciones encontradas.` : 'No encontramos rutas cercanas para este viaje.');
+        if (filteredOptions.length > 0) {
+          setActiveRouteId(String(filteredOptions[0].route_id));
+        }
       } else {
         setJourneyOptions([]);
         setMessage(error ? 'No pudimos calcular el viaje.' : 'Aún no hay una ruta directa.');

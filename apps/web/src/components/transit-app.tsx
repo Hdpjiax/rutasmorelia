@@ -58,7 +58,7 @@ type FavoriteItem = {
   place?: {
     id: string | number;
     name: string;
-    location: any;
+    location?: { type: string; coordinates: number[] } | null;
   } | null;
 };
 
@@ -155,6 +155,7 @@ export function TransitApp() {
   const [journeyOptions, setJourneyOptions] = useState<JourneyOption[]>([]);
   const [isPlanningJourney, setIsPlanningJourney] = useState(false);
   const [journeyOpen, setJourneyOpen] = useState(false);
+  const [journeyCollapsed, setJourneyCollapsed] = useState(false);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
   useEffect(() => {
@@ -316,20 +317,33 @@ export function TransitApp() {
         const client = getSupabaseBrowserClient();
         const expanded = query.replace(/\bblvd\.?\b/gi, "boulevard").replace(/\bav\.?\b/gi, "avenida");
         const variants = [...new Set([query, expanded])];
-        const responses = await Promise.all(variants.map((value) => client!.functions.invoke("search-transit", { body: { query: value, limit: 8 } })));
+        const locationParams = mapCenter ? { latitude: mapCenter.latitude, longitude: mapCenter.longitude } : {};
+        const responses = await Promise.all(variants.map((value) => client!.functions.invoke("search-transit", { body: { query: value, limit: 25, ...locationParams } })));
         let results: PlaceSuggestion[] = responses.flatMap(({ data, error }) => error || !Array.isArray(data?.data) ? [] : data.data);
         results = results.filter((item, index, list) => index === list.findIndex((other) => other.label === item.label && other.latitude === item.latitude));
         if (results.length === 0) {
-          const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(`${query} Morelia`)}&format=json&limit=6&addressdetails=1&accept-language=es`);
+          const viewboxParam = mapCenter ? `&viewbox=${mapCenter.longitude-0.15},${mapCenter.latitude+0.15},${mapCenter.longitude+0.15},${mapCenter.latitude-0.15}` : "";
+          const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(`${query} Morelia`)}&format=json&limit=25&addressdetails=1&accept-language=es${viewboxParam}`);
           if (response.ok) {
             const places = await response.json();
-            results = Array.isArray(places) ? places.map((place, index) => ({
+            const mapped = Array.isArray(places) ? places.map((place, index) => ({
               entity_id: `osm-${place.place_id ?? index}`,
               label: String(place.display_name || "").split(",")[0],
               subtitle: String(place.display_name || "").split(",").slice(1, 4).join(",").trim(),
               latitude: Number(place.lat),
               longitude: Number(place.lon),
             })) : [];
+
+            if (mapCenter) {
+              const getDist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+                return 12742 * Math.asin(Math.sqrt(a));
+              };
+              mapped.sort((a, b) => getDist(mapCenter.latitude, mapCenter.longitude, a.latitude, a.longitude) - getDist(mapCenter.latitude, mapCenter.longitude, b.latitude, b.longitude));
+            }
+            results = mapped;
           }
         }
         if (!cancelled) setSuggestions(results);
@@ -380,7 +394,7 @@ export function TransitApp() {
     return scored.map((item) => item.route);
   }, [routeQuery, routes, transportFilter, favorites]);
 
-  function requestLocation() {
+  const requestLocation = useCallback(() => {
     if (!navigator.geolocation) {
       setMessage("Tu dispositivo no permite obtener la ubicación.");
       return;
@@ -397,7 +411,14 @@ export function TransitApp() {
       () => setMessage("No pudimos acceder a tu ubicación. Revisa los permisos."),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     );
-  }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      requestLocation();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [requestLocation]);
 
   async function planJourney(originPoint: Coordinates, destinationPoint: Coordinates) {
     if (!isSupabaseConfigured()) return setMessage("El planificador no está disponible.");
@@ -408,15 +429,43 @@ export function TransitApp() {
       const client = getSupabaseBrowserClient();
       const { data, error } = await client!.functions.invoke("plan-journey", { body: { origin: originPoint, destination: destinationPoint } });
       if (error) throw error;
-      const options = Array.isArray(data?.data) ? data.data : [];
-      setJourneyOptions(options);
-      setMessage(options.length ? `${options.length} opciones encontradas.` : "No encontramos rutas cercanas para este viaje.");
+      const options = Array.isArray(data?.data) ? (data.data as JourneyOption[]) : [];
+      
+      // Filter out redundant transfers if direct routes are available
+      const directRouteIds = new Set(
+        options
+          .filter((opt) => Number(opt.transfers || 0) === 0)
+          .map((opt) => String(opt.route_code || opt.route_id))
+      );
+
+      const filteredOptions = options.filter((opt) => {
+        if (Number(opt.transfers || 0) > 0) {
+          const firstInDirect = directRouteIds.has(String(opt.route_code || opt.route_id));
+          const secondInDirect = opt.second_route_code ? directRouteIds.has(String(opt.second_route_code || opt.second_route_id)) : false;
+          return !firstInDirect && !secondInDirect;
+        }
+        return true;
+      });
+
+      setJourneyOptions(filteredOptions);
+      setMessage(filteredOptions.length ? `${filteredOptions.length} opciones encontradas.` : "No encontramos rutas cercanas para este viaje.");
     } catch {
       setMessage("No pudimos calcular el viaje. Intenta nuevamente.");
     } finally {
       setIsPlanningJourney(false);
     }
   }
+
+  const clearMap = () => {
+    setActiveRoute("");
+    setOrigin("Mi ubicación");
+    setOriginCoordinates(null);
+    setDestination("");
+    setDestinationCoordinates(null);
+    setJourneyOptions([]);
+    setJourneyOpen(false);
+    setMessage("Mapa limpiado");
+  };
 
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
@@ -472,7 +521,7 @@ export function TransitApp() {
 
   return (
     <main className="app-shell" data-theme="light">
-      <div className="map-stage">
+      <div className="map-stage" onClick={() => { setActiveSearch(null); setRoutesOpen(false); setSuggestions([]); }}>
         <MapCanvas
           activeRoute={activeRoute}
           theme="light"
@@ -490,7 +539,7 @@ export function TransitApp() {
             <strong>ViaMorelia</strong>
           </div>
           <div className="topbar-spacer" />
-          <div className="toolbar-actions" style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "flex-end", pointerEvents: "auto" }}>
+          <div className="toolbar-actions" style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "flex-end", pointerEvents: "auto", position: "absolute", top: "4px", right: "12px" }}>
             <button className="routes-trigger" type="button" onClick={() => setRoutesOpen(true)}>
               <ListBulletsIcon size={20} weight="bold" /><span>Rutas</span>
             </button>
@@ -498,7 +547,7 @@ export function TransitApp() {
           </div>
         </header>
 
-        <form className="compact-search search-dock" onSubmit={submitSearch}>
+        <form className="compact-search search-dock" onSubmit={submitSearch} style={{ pointerEvents: "auto" }}>
             <div className={`search-reveal ${activeSearch === "origin" ? "open" : ""}`}>
               <input value={origin} onChange={(event) => { setSuggestions([]); setHasSearchedPlaces(false); setOrigin(event.target.value); }} placeholder="Origen" aria-label="Origen" autoComplete="off" />
             </div>
@@ -636,6 +685,9 @@ export function TransitApp() {
                     );
                   }) : <div className="empty-state">No encontramos rutas con ese nombre.</div>}
                 </div>
+                <div className="modal-footer" style={{ padding: "12px", borderTop: "1px solid var(--line)", textAlign: "center", fontSize: "11px", color: "var(--muted)" }}>
+                  © 2026 ViaMorelia. Todos los derechos reservados.
+                </div>
               </motion.section>
             </>
           )}
@@ -643,10 +695,50 @@ export function TransitApp() {
 
         <AnimatePresence>
           {journeyOpen && (
-            <motion.aside className="journey-panel" aria-label="Opciones de viaje" initial={reducedMotion ? false : { opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 14 }}>
-              <div className="journey-panel-header">
-                <div><h2>Rutas para tu viaje</h2><p>Caminata y transbordos estimados</p></div>
-                <button className="toolbar-icon" type="button" onClick={() => setJourneyOpen(false)} aria-label="Cerrar opciones"><XIcon size={19} /></button>
+            <motion.aside
+              className={`journey-panel ${journeyCollapsed ? "collapsed" : ""}`}
+              aria-label="Opciones de viaje"
+              initial={reducedMotion ? false : { opacity: 0, x: 14 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 14 }}
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={{ top: 0.1, bottom: 0.8 }}
+              onDragEnd={(event, info) => {
+                if (info.offset.y > 60) {
+                  setJourneyCollapsed(true);
+                } else if (info.offset.y < -60) {
+                  setJourneyCollapsed(false);
+                }
+              }}
+            >
+              <div 
+                className="journey-drawer-handle" 
+                onClick={() => setJourneyCollapsed(!journeyCollapsed)}
+                style={{
+                  width: "40px",
+                  height: "4px",
+                  background: "#d1d5db",
+                  borderRadius: "2px",
+                  margin: "0 auto 8px",
+                  cursor: "pointer"
+                }} 
+              />
+              <div 
+                className="journey-panel-header" 
+                onClick={() => setJourneyCollapsed(!journeyCollapsed)}
+                style={{ cursor: "pointer", userSelect: "none" }}
+              >
+                <div>
+                  <h2 style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    Rutas para tu viaje
+                    <span style={{ fontSize: "12px", color: "var(--muted)" }}>{journeyCollapsed ? "▲" : "▼"}</span>
+                  </h2>
+                  <p>Caminata y transbordos estimados</p>
+                </div>
+                <button className="toolbar-icon" type="button" onClick={(e) => { e.stopPropagation(); setJourneyOpen(false); }} aria-label="Cerrar opciones">
+                  <XIcon size={19} />
+                </button>
               </div>
               <div className="journey-results">
                 {isPlanningJourney ? <div className="suggestion-state">Buscando rutas cercanas…</div> : journeyOptions.length ? journeyOptions.map((option, index) => {
@@ -693,6 +785,9 @@ export function TransitApp() {
                   );
                 }) : <div className="empty-state">No encontramos rutas dentro del rango caminable.</div>}
               </div>
+              <div className="panel-footer" style={{ padding: "12px", borderTop: "1px solid var(--line)", textAlign: "center", fontSize: "11px", color: "var(--muted)" }}>
+                © 2026 ViaMorelia. Todos los derechos reservados.
+              </div>
             </motion.aside>
           )}
         </AnimatePresence>
@@ -702,6 +797,41 @@ export function TransitApp() {
           <button className="map-control-button zoom-symbol" type="button" onClick={() => setZoomCommand({ delta: -1, timestamp: Date.now() })} aria-label="Alejar mapa">−</button>
           <button className="map-control-button" type="button" onClick={requestLocation} aria-label="Centrar mapa en mi ubicación"><CrosshairIcon size={21} weight="bold" /></button>
         </div>
+
+        {(activeRoute || destinationCoordinates) && (
+          <div style={{
+            position: "absolute",
+            bottom: "24px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 10,
+            pointerEvents: "auto"
+          }}>
+            <button
+              type="button"
+              onClick={clearMap}
+              style={{
+                background: "#ffffff",
+                color: "#1f2937",
+                border: "1px solid #d1d5db",
+                padding: "8px 18px",
+                borderRadius: "99px",
+                fontSize: "13px",
+                fontWeight: "600",
+                boxShadow: "0 4px 14px rgba(0, 0, 0, 0.16)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                transition: "all 0.2s ease"
+              }}
+              className="clear-map-btn"
+            >
+              <span style={{ fontSize: "14px" }}>🧹</span>
+              <span>Limpiar mapa</span>
+            </button>
+          </div>
+        )}
 
         <AnimatePresence>{message && <motion.div className="toast" role="status" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>{message}</motion.div>}</AnimatePresence>
       </div>
