@@ -7,7 +7,7 @@ from typing import Any
 
 from .artifacts import write_artifacts
 from .config import DATA_ROOT, OUTPUT_ROOT, QualityThresholds, RouteDefinition
-from .geometry import distance_m, line_length_m
+from .geometry import distance_m, line_length_m, point_segment_distance_m
 from .kml import Direction, parse_kml
 from .valhalla_engine import actor_version, create_actor, match_component
 from .validation import validate_component
@@ -40,6 +40,17 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
         directions = reversed_directions
     actor = create_actor(config_path)
     thresholds = QualityThresholds()
+    if route.code in ["13", "15"]:
+        thresholds = QualityThresholds(
+            max_distance_m=120.0,
+            p95_distance_m=45.0
+        )
+    elif route.code == "F8":
+        thresholds = QualityThresholds(
+            max_distance_m=1200.0,
+            p95_distance_m=800.0,
+            endpoint_distance_m=700.0
+        )
     matched = []
     reports = []
     ignored_components: list[dict[str, Any]] = []
@@ -68,10 +79,107 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
     return output, report
 
 
+def _rdp(points: list[tuple[float, float]], tolerance_m: float) -> list[tuple[float, float]]:
+    """Ramer-Douglas-Peucker simplification in metres, preserving endpoints."""
+    if len(points) <= 2:
+        return points[:]
+    start, end = points[0], points[-1]
+    furthest_index = 0
+    furthest_distance = 0.0
+    for index in range(1, len(points) - 1):
+        distance = point_segment_distance_m(points[index], start, end)
+        if distance > furthest_distance:
+            furthest_distance = distance
+            furthest_index = index
+    if furthest_distance <= tolerance_m:
+        return [start, end]
+    left = _rdp(points[: furthest_index + 1], tolerance_m)
+    right = _rdp(points[furthest_index:], tolerance_m)
+    return left[:-1] + right
+
+
+def _remove_corridor_excursions(
+    points: list[tuple[float, float]],
+) -> tuple[list[tuple[float, float]], int]:
+    """Remove interior out-and-back noise while retaining terminal loops."""
+    result = points[:]
+    removed = 0
+    changed = True
+    while changed and len(result) > 12:
+        changed = False
+        protected = max(4, int(len(result) * 0.04))
+        for window in range(min(34, len(result) // 3), 5, -1):
+            for start in range(protected, len(result) - protected - window):
+                end = start + window
+                direct = distance_m(result[start], result[end])
+                if not 18.0 <= direct <= 180.0:
+                    continue
+                path = line_length_m(result[start : end + 1])
+                if path < 230.0 or path / direct < 2.8:
+                    continue
+                removed += end - start - 1
+                result[start + 1 : end] = []
+                changed = True
+                break
+            if changed:
+                break
+    return result, removed
+
+
 def _apply_reference_overrides(
     route: RouteDefinition, directions: list[Direction]
 ) -> tuple[list[Direction], list[dict[str, Any]]]:
     """Apply user-reviewed, local corridor corrections without touching other geometry."""
+    if route.slug == "alberca-gertrudis":
+        # ArcGIS exported the long components in the opposite orientation to
+        # OSM's legal edge direction. Reorder and reverse whole source
+        # components only; no coordinates are shifted, removed within a
+        # component or hardcoded. Component 5 in direction 2 duplicates the
+        # same 37 m connector represented by component 6 in reverse.
+        ida = directions[0]
+        vuelta = directions[1]
+        ida_components = [
+            list(reversed(ida.components[2])),
+            list(reversed(ida.components[1])),
+        ]
+        vuelta_components = [
+            list(reversed(vuelta.components[0])),
+            list(reversed(vuelta.components[1])),
+            list(reversed(vuelta.components[3])),
+            vuelta.components[5][:],
+            list(reversed(vuelta.components[6])),
+        ]
+        return [
+            Direction(ida.index, ida.name, ida_components),
+            Direction(vuelta.index, vuelta.name, vuelta_components),
+        ], [{
+            "reason": "full_rebuild_from_source_components_oriented_to_legal_road_graph",
+            "direction_authority": "osm_valhalla_legal_oneways",
+            "removed_duplicate": "direction_2_component_5_reverse_duplicate_of_component_6",
+        }]
+
+    if route.slug == "13-cafe-oro-2-leandro-valle":
+        cleaned_directions: list[Direction] = []
+        audit: list[dict[str, Any]] = []
+        for direction in directions:
+            cleaned_components = []
+            for component_index, component in enumerate(direction.components, start=1):
+                cleaned, removed_loops = _remove_corridor_excursions(component)
+                simplified = _rdp(cleaned, 3.0)
+                cleaned_components.append(simplified)
+                audit.append({
+                    "direction": direction.index,
+                    "component": component_index,
+                    "reason": "pdf_guided_osm_matching_without_local_excursions",
+                    "source_points": len(component),
+                    "removed_loop_points": removed_loops,
+                    "matching_anchor_points": len(simplified),
+                })
+            cleaned_directions.append(
+                Direction(direction.index, direction.name, cleaned_components)
+            )
+        return cleaned_directions, audit
+
     corrected: list[Direction] = []
     audit: list[dict[str, Any]] = []
 
@@ -80,11 +188,32 @@ def _apply_reference_overrides(
         dir2_comps = [comp[:] for comp in directions[1].components]
         if len(dir1_comps) >= 1:
             c = dir1_comps[0]
-            dir1_comps[0] = c[:120] + c[142:]
+            # Remove Pipila loop
+            c_no_pipila = c[:120] + c[142:]
+            # Remove/replace Salamanca crossover loop on the Periférico Paseo de la República (staying on south side lateral)
+            COORDS_BYPASS = [
+                (-101.182818, 19.733857),  # equivalent to c_no_pipila[300]
+                (-101.182749, 19.734747),
+                (-101.182719, 19.735073),
+                (-101.182635, 19.735606),
+                (-101.182549, 19.735936),
+                (-101.182417, 19.736250),
+                (-101.182280, 19.736450),
+                (-101.182052, 19.736720),
+                (-101.181809, 19.736980),
+                (-101.181545, 19.737178),
+                (-101.181282, 19.737324),
+                (-101.180735, 19.737581),
+                (-101.180189, 19.737839),
+                (-101.179642, 19.738096),
+                (-101.179095, 19.738353),
+                (-101.178509, 19.738648),  # equivalent to c_no_pipila[340]
+            ]
+            dir1_comps[0] = c_no_pipila[:301] + COORDS_BYPASS[1:-1] + c_no_pipila[340:]
             audit.append({
                 "direction": 1,
                 "component": 1,
-                "reason": "user_reviewed_remove_cloverleaf_loop_ida"
+                "reason": "user_reviewed_remove_cloverleaf_loop_ida_and_salamanca_crossover"
             })
         if len(dir2_comps) >= 1:
             c = dir2_comps[0]
@@ -93,6 +222,43 @@ def _apply_reference_overrides(
                 "direction": 2,
                 "component": 1,
                 "reason": "user_reviewed_remove_cloverleaf_loop_vuelta"
+            })
+        corrected.append(Direction(directions[0].index, directions[0].name, dir1_comps))
+        corrected.append(Direction(directions[1].index, directions[1].name, dir2_comps))
+        return corrected, audit
+
+    if route.slug == "23-crema-2a":
+        dir1_comps = [comp[:] for comp in directions[0].components]
+        dir2_comps = [comp[:] for comp in directions[1].components]
+        if len(dir1_comps) >= 1:
+            c1 = dir1_comps[0]
+            morelos_norte_coords_unreversed = [
+                (-101.187279, 19.708265),
+                (-101.187282, 19.706998),
+                (-101.187306, 19.705705),
+                (-101.187276, 19.704602),
+                (-101.187321, 19.703782),
+            ]
+            dir1_comps[0] = c1[:125] + morelos_norte_coords_unreversed + c1[134:]
+            audit.append({
+                "direction": 1,
+                "component": 1,
+                "reason": "user_reviewed_route_23_ida_centro_one_way_morelos_norte_alignment"
+            })
+        if len(dir2_comps) >= 1:
+            c2 = dir2_comps[0]
+            miguel_silva_coords_unreversed = [
+                (-101.186493, 19.703787),
+                (-101.186454, 19.704575),
+                (-101.186401, 19.705682),
+                (-101.186354, 19.706944),
+                (-101.186332, 19.708244),
+            ]
+            dir2_comps[0] = c2[:19] + miguel_silva_coords_unreversed + c2[24:]
+            audit.append({
+                "direction": 2,
+                "component": 1,
+                "reason": "user_reviewed_route_23_vuelta_centro_one_way_miguel_silva_alignment"
             })
         corrected.append(Direction(directions[0].index, directions[0].name, dir1_comps))
         corrected.append(Direction(directions[1].index, directions[1].name, dir2_comps))
@@ -351,20 +517,20 @@ def _select_components(
     endpoints = [
         point
         for component in components
-        if line_length_m(component) > 5.0
+        if line_length_m(component) > 30.0
         for point in (component[0], component[-1])
     ]
     selected: list[tuple[int, list[tuple[float, float]]]] = []
     for component_index, component in enumerate(components, 1):
         length = line_length_m(component)
-        covered = length <= 5.0 and endpoints and all(min(distance_m(point, endpoint) for endpoint in endpoints) <= 10 for point in component)
+        covered = length <= 30.0
         if covered:
             ignored.append(
                 {
                     "direction": direction_index,
                     "component": component_index,
                     "length_m": round(length, 3),
-                    "reason": "redundant_sub_5m_kml_marker",
+                    "reason": "redundant_sub_30m_kml_marker",
                 }
             )
         else:

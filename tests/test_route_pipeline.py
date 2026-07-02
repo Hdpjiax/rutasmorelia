@@ -40,19 +40,18 @@ class KmlTests(unittest.TestCase):
         self.assertIn(5, [index for index, _ in return_selected])
         self.assertIn(6, [index for index, _ in return_selected])
 
-    def test_reviewed_corridor_override_changes_only_the_requested_slice(self):
+    def test_pilot_rebuild_orients_whole_components_without_coordinate_edits(self):
         original = parse_kml(PILOT_KML)
         corrected, audit = _apply_reference_overrides(ROUTES["alberca-gertrudis"], original)
         
-        # Test Felix Ireta override (components[1])
-        self.assertEqual(original[0].components[1][221:], corrected[0].components[1][197:])
-        self.assertEqual("user_reviewed_highway_at_felix_ireta_first_image", audit[0]["reason"])
+        self.assertEqual(list(reversed(original[0].components[2])), corrected[0].components[0])
+        self.assertEqual(list(reversed(original[0].components[1])), corrected[0].components[1])
+        self.assertEqual(list(reversed(original[1].components[0])), corrected[1].components[0])
         
         # Test Torreón Nuevo override (components[2])
-        before = original[0].components[2]
-        after = corrected[0].components[2]
-        self.assertEqual(before[:310], after[:310])
-        self.assertEqual("user_reviewed_sierra_leona_and_highway_second_image", audit[1]["reason"])
+        self.assertEqual(original[1].components[5], corrected[1].components[3])
+        self.assertEqual(list(reversed(original[1].components[6])), corrected[1].components[4])
+        self.assertEqual("full_rebuild_from_source_components_oriented_to_legal_road_graph", audit[0]["reason"])
 
 
 class GeometryTests(unittest.TestCase):
@@ -75,8 +74,8 @@ class GeometryTests(unittest.TestCase):
     def test_request_is_directional_map_snap_with_bounded_radius(self):
         request = _trace_request([(-101.2, 19.7), (-101.19, 19.7)], 30, QualityThresholds())
         self.assertEqual("map_snap", request["shape_match"])
-        self.assertEqual("bus", request["costing"])
-        self.assertTrue(request["costing_options"]["bus"]["ignore_oneways"])
+        self.assertEqual("auto", request["costing"])
+        self.assertFalse(request["costing_options"]["auto"]["ignore_oneways"])
         self.assertEqual(30, request["trace_options"]["search_radius"])
 
 

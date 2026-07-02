@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from .config import QualityThresholds
-from .geometry import Coordinate, deduplicate, densify, distance_m, structural_anchors
+import math
+from .geometry import Coordinate, deduplicate, densify, distance_m, interpolate, structural_anchors
 
 
 class TraceActor(Protocol):
@@ -48,8 +49,8 @@ def _trace_request(points: list[Coordinate], radius_m: int, thresholds: QualityT
         # a one-way orientation that conflicts with that trace; strict bus
         # costing then invents kilometre-long detours. Keep bus-accessible road
         # edges while allowing the matcher to follow the KML orientation.
-        "costing": "bus",
-        "costing_options": {"bus": {"ignore_oneways": True}},
+        "costing": "auto",
+        "costing_options": {"auto": {"ignore_oneways": False}},
         "shape_match": "map_snap",
         "trace_options": {
             "search_radius": radius_m,
@@ -127,8 +128,52 @@ def _stitch(left: MatchedComponent, right: MatchedComponent) -> MatchedComponent
     )
 
 
+def smart_densify(actor: TraceActor, points: list[Coordinate], spacing_m: float, max_offroad_m: float = 25.0) -> list[Coordinate]:
+    if len(points) < 2:
+        return points[:]
+        
+    long_segments = []
+    for idx, (start, end) in enumerate(zip(points, points[1:])):
+        length = distance_m(start, end)
+        if length > 60.0:
+            long_segments.append((idx, interpolate(start, end, 0.5)))
+            
+    offroad_indices = set()
+    if long_segments:
+        req = {
+            "locations": [{"lon": pt[0], "lat": pt[1]} for _, pt in long_segments],
+            "costing": "bus"
+        }
+        try:
+            response = actor.locate(req)
+            if isinstance(response, str):
+                response = json.loads(response)
+            for i, (idx, pt) in enumerate(long_segments):
+                edges = response[i].get("edges", [])
+                midpoint_dist = float("inf")
+                for edge in edges:
+                    d = distance_m(pt, (edge["correlated_lon"], edge["correlated_lat"]))
+                    if d < midpoint_dist:
+                        midpoint_dist = d
+                if midpoint_dist > max_offroad_m:
+                    offroad_indices.add(idx)
+        except Exception:
+            pass
+            
+    result = [points[0]]
+    for idx, (start, end) in enumerate(zip(points, points[1:])):
+        if idx in offroad_indices:
+            result.append(end)
+        else:
+            length = distance_m(start, end)
+            count = max(1, math.ceil(length / spacing_m))
+            result.extend(interpolate(start, end, i / count) for i in range(1, count + 1))
+            
+    return deduplicate(result)
+
+
 def match_component(actor: TraceActor, source: list[Coordinate], thresholds: QualityThresholds) -> MatchedComponent:
-    observations = densify(source, thresholds.densify_m)
+    observations = smart_densify(actor, source, thresholds.densify_m)
     matched_chunks: list[MatchedComponent] = []
     for chunk in _chunks(observations, thresholds):
         last_error: Exception | None = None

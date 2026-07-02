@@ -35,9 +35,11 @@ docker compose up --build
 npm run check
 ```
 
-## Mapas móviles
+## Mapas web y móviles
 
-MapLibre React Native contiene código nativo. La aplicación móvil requiere un development build de Expo y no funciona dentro de Expo Go. El estilo `demotiles.maplibre.org` es solamente para desarrollo; producción deberá servir un estilo propio o contratar un proveedor de mosaicos compatible.
+Web y Android usan MapLibre con el estilo vectorial abierto de OpenFreeMap. No se requiere token de Mapbox ni existe una cuota mensual configurada en la aplicación. La URL se centraliza en `NEXT_PUBLIC_MAP_STYLE_URL` para web y `apps/mobile/src/config/map.ts` para Android. El estilo incluye la atribución obligatoria a OpenStreetMap/OpenMapTiles.
+
+MapLibre React Native contiene código nativo, por lo que Android requiere un build nativo y no funciona en Expo Go. Si se despliega un PMTiles propio posteriormente, basta con reemplazar la URL centralizada; las geometrías de transporte no dependen del proveedor del mapa base.
 
 ## Estado actual
 

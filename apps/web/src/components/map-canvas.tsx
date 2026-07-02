@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import maplibregl, { type Map } from "maplibre-gl";
+import mapboxgl, { type Map } from "maplibre-gl";
 
 function getContrastCasingColor(hexColor: string): string {
   if (!hexColor) return "#ffffff";
@@ -21,6 +21,7 @@ type MapCanvasProps = {
   zoomCommand?: { delta: number; timestamp: number } | null;
   originCoordinates?: { latitude: number; longitude: number } | null;
   destinationCoordinates?: { latitude: number; longitude: number } | null;
+  showTraffic?: boolean;
 };
 
 type RouteFeature = {
@@ -31,27 +32,59 @@ type RouteFeature = {
     | { type: "MultiLineString"; coordinates: [number, number][][] };
 };
 
-export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinates, destinationCoordinates }: MapCanvasProps) {
+export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinates, destinationCoordinates, showTraffic }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
-  const userMarkerRef = useRef<maplibregl.Marker | null>(null);
-  const markersRef = useRef<maplibregl.Marker[]>([]);
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [styleVersion, setStyleVersion] = useState(0);
+  const routeCoordsRef = useRef<[number, number][]>([]);
+  const fallbackAppliedRef = useRef(false);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    const map = new maplibregl.Map({
+    const map = new mapboxgl.Map({
       container: containerRef.current,
       center: [-101.194, 19.702],
       zoom: 13.3,
       minZoom: 10,
       maxZoom: 19,
       attributionControl: false,
-      style: process.env.NEXT_PUBLIC_MAP_STYLE_URL || "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      style: process.env.NEXT_PUBLIC_MAP_STYLE_URL || "https://tiles.openfreemap.org/styles/liberty",
     });
 
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    // Some OpenMapTiles POI classes reference optional sprite icons. Missing
+    // decorative icons must not generate repeated browser errors.
+    map.on("styleimagemissing", ({ id }) => {
+      if (!map.hasImage(id)) {
+        map.addImage(id, {
+          width: 1,
+          height: 1,
+          data: new Uint8Array([0, 0, 0, 0]),
+        });
+      }
+    });
+
+    map.on("error", (event) => {
+      const message = event.error?.message || "";
+      const styleAuthorizationError = /401|unauthori[sz]ed|invalid token/i.test(message);
+      if (styleAuthorizationError && !fallbackAppliedRef.current) {
+        fallbackAppliedRef.current = true;
+        console.warn("El estilo principal no está disponible; usando el estilo abierto de respaldo.");
+        map.setStyle("https://tiles.openfreemap.org/styles/positron");
+      }
+    });
+
+    map.on("style.load", () => {
+      try {
+        // OpenFreeMap has no proprietary basemap configuration API.
+      } catch (e) {
+        console.warn("Could not set showTraffic configuration:", e);
+      }
+    });
+
+    map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
 
     function loadArrowImage(callback: () => void) {
       if (map.hasImage("route-arrow-icon")) { callback(); return; }
@@ -96,6 +129,12 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
           18,
           ["case", ["has", "service"], 0.8, 3.5]
         ]);
+        m.setPaintProperty("rail", "line-opacity", [
+          "case",
+          ["has", "service"],
+          0.12,
+          0.38
+        ]);
       }
       if (m.getLayer("rail_dash")) {
         m.setPaintProperty("rail_dash", "line-color", "#ffffff");
@@ -111,6 +150,7 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
           ["case", ["has", "service"], 0.0, 2.5]
         ]);
         m.setPaintProperty("rail_dash", "line-dasharray", [3, 3]);
+        m.setPaintProperty("rail_dash", "line-opacity", 0.3);
       }
 
       // 4. Periferico Paseo de la Republica destacado completo
@@ -127,14 +167,40 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
 
       trunkFills.forEach((lid) => {
         if (m.getLayer(lid)) {
-          m.setPaintProperty(lid, "line-color", "#fed7aa"); // Warm peach fill
+          m.setPaintProperty(lid, "line-color", [
+            "case",
+            [
+              "in",
+              ["coalesce", ["get", "name"], ""],
+              ["literal", [
+                "Periférico Paseo de la República",
+                "Circuito Periférico Paseo de la República",
+                "Libramiento Paseo de la República"
+              ]]
+            ],
+            "#e9ad82",
+            "#f8fafc"
+          ]);
         }
       });
 
       trunkCasings.forEach((lid) => {
         if (m.getLayer(lid)) {
-          m.setPaintProperty(lid, "line-color", "#f97316"); // Orange-red outline
-          m.setPaintProperty(lid, "line-opacity", 0.9);
+          m.setPaintProperty(lid, "line-color", [
+            "case",
+            [
+              "in",
+              ["coalesce", ["get", "name"], ""],
+              ["literal", [
+                "Periférico Paseo de la República",
+                "Circuito Periférico Paseo de la República",
+                "Libramiento Paseo de la República"
+              ]]
+            ],
+            "#c97846",
+            "#cbd5e1"
+          ]);
+          m.setPaintProperty(lid, "line-opacity", 0.68);
         }
       });
 
@@ -185,6 +251,44 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
           m.setPaintProperty(lid, "text-halo-width", 1.8);
         }
       });
+
+      // OpenFreeMap/Liberty does not use the same fixed road layer IDs as the
+      // previous style. Neutralize every actual road/bridge/tunnel line layer
+      // dynamically. Only the named Periférico keeps a muted orange accent.
+      const peripheralNames = [
+        "Periférico Paseo de la República",
+        "Circuito Periférico Paseo de la República",
+        "Libramiento Paseo de la República",
+      ];
+      const peripheralMatch = [
+        "in",
+        ["coalesce", ["get", "name"], ""],
+        ["literal", peripheralNames],
+      ];
+
+      for (const layer of m.getStyle().layers ?? []) {
+        const id = layer.id.toLowerCase();
+        const isRoadLine = layer.type === "line" && (
+          id.includes("road") ||
+          id.includes("highway") ||
+          id.includes("motorway") ||
+          id.includes("street") ||
+          id.includes("bridge") ||
+          id.includes("tunnel") ||
+          id.includes("transportation")
+        );
+        const isRail = id.includes("rail") || id.includes("train");
+        if (!isRoadLine || isRail) continue;
+
+        const isCasing = id.includes("case") || id.includes("casing") || id.includes("outline");
+        m.setPaintProperty(layer.id, "line-color", [
+          "case",
+          peripheralMatch,
+          isCasing ? "#c97846" : "#e9ad82",
+          isCasing ? "#cbd0d8" : "#ffffff",
+        ]);
+        m.setPaintProperty(layer.id, "line-opacity", isCasing ? 0.72 : 1);
+      }
     }
 
     function setupLayers() {
@@ -262,12 +366,18 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
             },
           });
         }
+        syncTrafficLayer(map, !!showTraffic, routeCoordsRef.current);
       });
     }
 
     map.on("load", () => { setupLayers(); setStyleVersion((v) => v + 1); });
     map.on("styledata", () => {
       if (map.isStyleLoaded()) { setupLayers(); setStyleVersion((v) => v + 1); }
+    });
+    map.on("sourcedata", (e) => {
+      if (e.sourceId === "legacy-traffic-source" && map.isStyleLoaded()) {
+        updateTrafficFilter(map, routeCoordsRef.current);
+      }
     });
 
     mapRef.current = map;
@@ -289,12 +399,19 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
       const el = document.createElement("div");
       el.innerHTML = `<div style="width:26px;height:26px;background:#2563eb;border:4px solid #ffffff;border-radius:50%;box-shadow:0 0 10px rgba(37,99,235,0.8);position:relative;"><div style="position:absolute;top:-4px;left:-4px;width:26px;height:26px;border:4px solid #2563eb;border-radius:50%;animation:location-pulse 2.0s infinite ease-in-out;pointer-events:none;"></div></div>
       <style>@keyframes location-pulse{0%{transform:scale(1);opacity:0.8}100%{transform:scale(2.8);opacity:0}}</style>`;
-      const marker = new maplibregl.Marker({ element: el })
+      const marker = new mapboxgl.Marker({ element: el })
         .setLngLat([mapCenter.longitude, mapCenter.latitude])
         .addTo(map);
       userMarkerRef.current = marker;
     }
   }, [mapCenter]);
+
+  // Handle dynamic traffic toggling
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    syncTrafficLayer(map, !!showTraffic, routeCoordsRef.current);
+  }, [showTraffic]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -314,13 +431,15 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
     }
 
     // Clear old walks
-    const walksSource = map.getSource("journey-walks") as maplibregl.GeoJSONSource;
+    const walksSource = map.getSource("journey-walks") as mapboxgl.GeoJSONSource;
     if (walksSource) walksSource.setData({ type: "FeatureCollection", features: [] });
 
     // If no route selected, clear the map
     if (!activeRoute) {
-      const source = map.getSource("routes") as maplibregl.GeoJSONSource;
+      const source = map.getSource("routes") as mapboxgl.GeoJSONSource;
       if (source) source.setData({ type: "FeatureCollection", features: [] });
+      routeCoordsRef.current = [];
+      updateTrafficFilter(map, []);
       return;
     }
 
@@ -383,8 +502,8 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
           })),
         };
 
-        const source = map.getSource("routes") as maplibregl.GeoJSONSource;
-        if (source) source.setData(colored as Parameters<maplibregl.GeoJSONSource["setData"]>[0]);
+        const source = map.getSource("routes") as mapboxgl.GeoJSONSource;
+        if (source) source.setData(colored as Parameters<mapboxgl.GeoJSONSource["setData"]>[0]);
 
         // Fit map bounds to show route
         const allCoords: [number, number][] = [];
@@ -397,11 +516,13 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
         }
         if (allCoords.length > 0) {
           const bounds = allCoords.reduce(
-            (acc: maplibregl.LngLatBounds, coord: [number, number]) => acc.extend(coord),
-            new maplibregl.LngLatBounds(allCoords[0], allCoords[0])
+            (acc: mapboxgl.LngLatBounds, coord: [number, number]) => acc.extend(coord),
+            new mapboxgl.LngLatBounds(allCoords[0], allCoords[0])
           );
           map.fitBounds(bounds, { padding: 40, maxZoom: 15 });
         }
+        routeCoordsRef.current = allCoords;
+        updateTrafficFilter(map, allCoords);
         // Draw walking lines and markers if origin & destination coordinates are provided
         if (originCoordinates && destinationCoordinates) {
           const originPoint: [number, number] = [originCoordinates.longitude, originCoordinates.latitude];
@@ -416,14 +537,14 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
           let pAlight: [number, number];
 
           // Add origin and destination pin markers
-          const originMarker = new maplibregl.Marker({
+          const originMarker = new mapboxgl.Marker({
             element: createPinMarker("#2563eb", "O"),
           })
             .setLngLat(originPoint)
             .addTo(map);
           markersRef.current.push(originMarker);
 
-          const destMarker = new maplibregl.Marker({
+          const destMarker = new mapboxgl.Marker({
             element: createDestinationMarker(),
           })
             .setLngLat(destPoint)
@@ -437,14 +558,14 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
             const walkDistBoard = getDistance(originPoint, pBoard);
 
             // Add boarding and alighting markers
-            const mBoard = new maplibregl.Marker({
+            const mBoard = new mapboxgl.Marker({
               element: createStopMarker("board", `Sube aquí (${Math.round(walkDistBoard)} m)`),
             })
               .setLngLat(pBoard)
               .addTo(map);
             markersRef.current.push(mBoard);
 
-            const mAlight = new maplibregl.Marker({
+            const mAlight = new mapboxgl.Marker({
               element: createStopMarker("alight", "Bájate aquí"),
             })
               .setLngLat(pAlight)
@@ -476,14 +597,14 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
             const isOverlap = transferDist < 30;
 
             // Add markers
-            const mBoard = new maplibregl.Marker({
+            const mBoard = new mapboxgl.Marker({
               element: createStopMarker("board", `Sube aquí (${Math.round(walkDistBoard)} m)`),
             })
               .setLngLat(pBoard)
               .addTo(map);
             markersRef.current.push(mBoard);
 
-            const mTransferA = new maplibregl.Marker({
+            const mTransferA = new mapboxgl.Marker({
               element: createStopMarker("transfer-alight", "Bájate aquí"),
               offset: isOverlap ? [-72, 0] : [0, 0]
             })
@@ -491,7 +612,7 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
               .addTo(map);
             markersRef.current.push(mTransferA);
 
-            const mTransferB = new maplibregl.Marker({
+            const mTransferB = new mapboxgl.Marker({
               element: createStopMarker("transfer-board", `Sube aquí (${Math.round(transferDist)} m)`),
               offset: isOverlap ? [72, 0] : [0, 0]
             })
@@ -499,7 +620,7 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
               .addTo(map);
             markersRef.current.push(mTransferB);
 
-            const mAlight = new maplibregl.Marker({
+            const mAlight = new mapboxgl.Marker({
               element: createStopMarker("alight", "Bájate aquí"),
             })
               .setLngLat(pAlight)
@@ -525,11 +646,11 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
           }
 
           const walksGeoJSON = { type: "FeatureCollection", features: walkFeatures };
-          const wSource = map.getSource("journey-walks") as maplibregl.GeoJSONSource;
+          const wSource = map.getSource("journey-walks") as mapboxgl.GeoJSONSource;
           if (wSource) {
-            wSource.setData(walksGeoJSON as Parameters<maplibregl.GeoJSONSource["setData"]>[0]);
+            wSource.setData(walksGeoJSON as Parameters<mapboxgl.GeoJSONSource["setData"]>[0]);
           } else {
-            map.addSource("journey-walks", { type: "geojson", data: walksGeoJSON as Parameters<maplibregl.GeoJSONSource["setData"]>[0] });
+            map.addSource("journey-walks", { type: "geojson", data: walksGeoJSON as Parameters<mapboxgl.GeoJSONSource["setData"]>[0] });
             map.addLayer({
               id: "journey-walks-layer",
               type: "line",
@@ -831,4 +952,149 @@ function createDestinationMarker(): HTMLDivElement {
     </div>
   `;
   return el;
+}
+
+function syncTrafficLayer(map: mapboxgl.Map, showTraffic: boolean, routeCoords: [number, number][]) {
+  // No traffic source is bundled with the open basemap. Keep the control
+  // inert until a municipal/open traffic feed is configured.
+  void map;
+  void showTraffic;
+  void routeCoords;
+  return;
+  /* istanbul ignore next -- legacy implementation retained for feed migration */
+  if (!map.isStyleLoaded()) return;
+  const layerId = "legacy-traffic-layer";
+  const sourceId = "legacy-traffic-source";
+
+  if (showTraffic) {
+    if (!map.getSource(sourceId)) {
+      map.addSource(sourceId, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] }
+      });
+    }
+
+    if (!map.getLayer(layerId)) {
+      const layers = map.getStyle().layers;
+      let beforeId: string | undefined;
+      if (layers) {
+        const targetLayer = layers.find((l) => l.id.includes("label") || l.type === "symbol" || l.id.includes("route"));
+        beforeId = targetLayer?.id;
+      }
+
+      map.addLayer(
+        {
+          id: layerId,
+          type: "line",
+          source: sourceId,
+          "source-layer": "traffic",
+          paint: {
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              10, 2.0,
+              14, 4.0,
+              18, 6.0
+            ],
+            "line-color": [
+              "match",
+              ["get", "congestion"],
+              "low", "#10b981",       // Green
+              "moderate", "#f97316",  // Orange
+              "heavy", "#ef4444",     // Red
+              "severe", "#7f1d1d",    // Dark Red
+              "#10b981"               // Default Green
+            ],
+            "line-opacity": 0.85
+          },
+          layout: {
+            "line-cap": "round",
+            "line-join": "round",
+            "visibility": "visible"
+          }
+        },
+        beforeId
+      );
+    } else {
+      map.setLayoutProperty(layerId, "visibility", "visible");
+    }
+    updateTrafficFilter(map, routeCoords);
+  } else {
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, "visibility", "none");
+    }
+  }
+}
+
+function updateTrafficFilter(map: mapboxgl.Map, routeCoords: [number, number][]) {
+  if (!map.getLayer("legacy-traffic-layer")) return;
+
+  if (!routeCoords || routeCoords.length === 0) {
+    map.setFilter("legacy-traffic-layer", ["==", "1", "0"]); // Hide all
+    return;
+  }
+
+  // Fast coordinate distance check (in degrees squared)
+  const getDistSq = (p1: [number, number], p2: [number, number]) => {
+    const dx = p1[0] - p2[0];
+    const dy = p1[1] - p2[1];
+    return dx * dx + dy * dy;
+  };
+
+  const features = map.querySourceFeatures("legacy-traffic-source", {
+    sourceLayer: "traffic"
+  });
+
+  const matchedStreets = new Set<string>();
+  const threshold = 0.0003 * 0.0003; // Approx 30 meters threshold
+
+  for (const f of features) {
+    const streetName = f.properties?.street_name;
+    if (!streetName) continue;
+
+    const geom = f.geometry;
+    let isClose = false;
+
+    if (geom.type === "LineString") {
+      const coords = geom.coordinates as [number, number][];
+      for (const c of coords) {
+        for (const rc of routeCoords) {
+          if (getDistSq(c, rc) < threshold) {
+            isClose = true;
+            break;
+          }
+        }
+        if (isClose) break;
+      }
+    } else if (geom.type === "MultiLineString") {
+      const lines = geom.coordinates as [number, number][][];
+      for (const line of lines) {
+        for (const c of line) {
+          for (const rc of routeCoords) {
+            if (getDistSq(c, rc) < threshold) {
+              isClose = true;
+              break;
+            }
+          }
+          if (isClose) break;
+        }
+        if (isClose) break;
+      }
+    }
+
+    if (isClose) {
+      matchedStreets.add(streetName);
+    }
+  }
+
+  if (matchedStreets.size > 0) {
+    map.setFilter("legacy-traffic-layer", [
+      "in",
+      ["get", "street_name"],
+      ["literal", Array.from(matchedStreets)]
+    ]);
+  } else {
+    map.setFilter("legacy-traffic-layer", ["==", "1", "0"]);
+  }
 }
