@@ -41,16 +41,25 @@ Deno.serve(async (req) => {
     // Run independent spatial lookups concurrently. They previously executed
     // sequentially, making every request pay three network/database round trips.
     let directOptions: any[] = [];
+    let transferOptions: any[] = [];
     let originRoutes: any[] = [];
     let destRoutes: any[] = [];
     try {
-      const [directResult, originResult, destinationResult] = await Promise.all([
+      const [directResult, transferResult, originResult, destinationResult] = await Promise.all([
         supabase.rpc("direct_journey_options", {
         p_origin_latitude: body.origin.latitude,
         p_origin_longitude: body.origin.longitude,
         p_destination_latitude: body.destination.latitude,
         p_destination_longitude: body.destination.longitude,
         p_max_walk_meters: 1500,
+        }),
+        supabase.rpc("transfer_journey_options", {
+          p_origin_latitude: body.origin.latitude,
+          p_origin_longitude: body.origin.longitude,
+          p_destination_latitude: body.destination.latitude,
+          p_destination_longitude: body.destination.longitude,
+          p_max_walk_meters: 1500,
+          p_max_transfer_meters: 300,
         }),
         supabase.rpc("nearby_routes", {
           p_lat: body.origin.latitude,
@@ -75,6 +84,24 @@ Deno.serve(async (req) => {
           ),
         }));
       }
+      if (!transferResult.error && transferResult.data) {
+        transferOptions = transferResult.data.map((option: any) => ({
+          route_id: option.first_route_id,
+          route_code: option.first_route_code,
+          route_name: `${option.first_route_name} → ${option.second_route_name}`,
+          route_color: option.first_route_color,
+          second_route_id: option.second_route_id,
+          second_route_code: option.second_route_code,
+          second_route_name: option.second_route_name,
+          second_route_color: option.second_route_color,
+          origin_walk_meters: option.origin_walk_meters,
+          destination_walk_meters: option.destination_walk_meters,
+          transfer_walk_meters: option.transfer_walk_meters,
+          transfers: 1,
+          type: "transfer",
+          estimatedMinutes: Math.max(18, Math.round((option.origin_walk_meters + option.destination_walk_meters + option.transfer_walk_meters) / 75 + 16)),
+        }));
+      }
       if (!originResult.error && originResult.data) originRoutes = originResult.data;
       if (!destinationResult.error && destinationResult.data) destRoutes = destinationResult.data;
       if (directResult.error) console.error("Direct journey options query failed:", directResult.error);
@@ -85,45 +112,8 @@ Deno.serve(async (req) => {
     }
 
     // Combine results: direct options first, then unique nearby options
-    const directRouteIds = new Set(directOptions.map((o) => o.route_id));
-    const combinedOptions = [...directOptions];
+    const combinedOptions = [...directOptions, ...transferOptions];
 
-    // Add unique routes near origin
-    for (const r of originRoutes) {
-      if (!directRouteIds.has(r.route_id)) {
-        combinedOptions.push({
-          route_id: r.route_id,
-          route_name: r.route_name,
-          route_code: r.route_code,
-          route_color: r.route_color,
-          origin_walk_meters: r.distance_meters,
-          destination_walk_meters: 2200, // generic longer distance
-          stops_count: 5,
-          transfers: 1,
-          type: "nearby_origin",
-          estimatedMinutes: Math.max(12, Math.round(r.distance_meters / 75 + 10)),
-        });
-      }
-    }
-
-    // Add unique routes near destination
-    for (const r of destRoutes) {
-      const alreadyAdded = combinedOptions.some((o) => o.route_id === r.route_id);
-      if (!alreadyAdded) {
-        combinedOptions.push({
-          route_id: r.route_id,
-          route_name: r.route_name,
-          route_code: r.route_code,
-          route_color: r.route_color,
-          origin_walk_meters: 2200, // generic longer distance
-          destination_walk_meters: r.distance_meters,
-          stops_count: 5,
-          transfers: 1,
-          type: "nearby_destination",
-          estimatedMinutes: Math.max(12, Math.round(r.distance_meters / 75 + 10)),
-        });
-      }
-    }
 
     const rankedOptions = combinedOptions
       .sort((a, b) => Number(a.transfers) - Number(b.transfers) || Number(a.estimatedMinutes) - Number(b.estimatedMinutes))

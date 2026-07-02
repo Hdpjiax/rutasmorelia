@@ -75,6 +75,29 @@ def _apply_reference_overrides(
     corrected: list[Direction] = []
     audit: list[dict[str, Any]] = []
 
+    if route.slug == "46-naranja-3-trico-metropolis":
+        dir1_comps = [comp[:] for comp in directions[0].components]
+        dir2_comps = [comp[:] for comp in directions[1].components]
+        if len(dir1_comps) >= 1:
+            c = dir1_comps[0]
+            dir1_comps[0] = c[:120] + c[142:]
+            audit.append({
+                "direction": 1,
+                "component": 1,
+                "reason": "user_reviewed_remove_cloverleaf_loop_ida"
+            })
+        if len(dir2_comps) >= 1:
+            c = dir2_comps[0]
+            dir2_comps[0] = c[:482] + c[507:]
+            audit.append({
+                "direction": 2,
+                "component": 1,
+                "reason": "user_reviewed_remove_cloverleaf_loop_vuelta"
+            })
+        corrected.append(Direction(directions[0].index, directions[0].name, dir1_comps))
+        corrected.append(Direction(directions[1].index, directions[1].name, dir2_comps))
+        return corrected, audit
+
     if route.slug == "13-cafe-oro-2-leandro-valle":
         dir1_comps = [comp[:] for comp in directions[0].components]
         dir2_comps = [comp[:] for comp in directions[1].components]
