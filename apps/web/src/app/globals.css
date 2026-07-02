@@ -1236,12 +1236,15 @@ input:focus-visible {
 .toolbar-brand {
   flex: 0 0 auto;
   gap: 8px;
+  padding-bottom: 40px;
 }
 
 .toolbar-brand,
 .routes-trigger { pointer-events: auto; }
 
 .toolbar-brand strong {
+    padding-bottom: 40px;
+
   color: white;
   font-size: 20px;
   letter-spacing: -0.03em;
