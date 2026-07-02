@@ -1531,3 +1531,50 @@ input:focus-visible {
     font-size: 9px !important;
   }
 }
+
+/* Floating traffic mini-map styling */
+.traffic-mini-map {
+  position: fixed;
+  z-index: 15;
+  bottom: 80px;
+  left: 16px;
+  width: 340px;
+  height: 260px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px oklch(0 0 0 / 0.18);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  transition: all 0.2s ease;
+}
+
+.traffic-mini-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.traffic-mini-map-header strong {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.traffic-mini-map iframe {
+  flex: 1;
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  .traffic-mini-map {
+    bottom: 80px;
+    left: 10px;
+    width: calc(100% - 20px);
+    height: 190px;
+  }
+}

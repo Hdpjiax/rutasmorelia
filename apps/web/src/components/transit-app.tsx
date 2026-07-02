@@ -280,6 +280,26 @@ export function TransitApp() {
     }
   }, [favorites]);
 
+  const query = (activeSearch === "origin" ? origin : destination).trim();
+  const matchingFavs = useMemo(() => {
+    if (query.length < 2) return [];
+    return favorites
+      .filter((f) => f.place_id || f.latitude || f.custom_name)
+      .map((fav) => {
+        const label = fav.custom_name || (fav.place && fav.place.name) || "Lugar favorito";
+        const lat = fav.latitude || (fav.place && fav.place.location?.coordinates?.[1]) || 0;
+        const lon = fav.longitude || (fav.place && fav.place.location?.coordinates?.[0]) || 0;
+        return {
+          entity_id: fav.id,
+          label,
+          subtitle: "Dirección favorita guardada",
+          latitude: lat,
+          longitude: lon,
+        };
+      })
+      .filter((fav) => fav.label.toLowerCase().includes(query.toLowerCase()));
+  }, [favorites, query]);
+
   useEffect(() => {
     fetch("/routes/index.json", { cache: "no-store" })
       .then((response) => {
@@ -323,16 +343,32 @@ export function TransitApp() {
         results = results.filter((item, index, list) => index === list.findIndex((other) => other.label === item.label && other.latitude === item.latitude));
         if (results.length === 0) {
           const viewboxParam = mapCenter ? `&viewbox=${mapCenter.longitude-0.15},${mapCenter.latitude+0.15},${mapCenter.longitude+0.15},${mapCenter.latitude-0.15}` : "";
-          const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(`${query} Morelia`)}&format=json&limit=25&addressdetails=1&accept-language=es${viewboxParam}`);
+          const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ", Morelia")}&format=json&limit=25&addressdetails=1&accept-language=es${viewboxParam}`);
           if (response.ok) {
             const places = await response.json();
-            const mapped = Array.isArray(places) ? places.map((place, index) => ({
-              entity_id: `osm-${place.place_id ?? index}`,
-              label: String(place.display_name || "").split(",")[0],
-              subtitle: String(place.display_name || "").split(",").slice(1, 4).join(",").trim(),
-              latitude: Number(place.lat),
-              longitude: Number(place.lon),
-            })) : [];
+            const numberMatch = query.match(/\b\d+\b/);
+            const queryNumber = numberMatch ? numberMatch[0] : null;
+
+            const mapped = Array.isArray(places) ? places.map((place, index) => {
+              let label = String(place.display_name || "").split(",")[0].trim();
+              const subtitle = String(place.display_name || "").split(",").slice(1, 4).join(",").trim();
+
+              if (queryNumber && !label.includes(queryNumber)) {
+                const cleanLabel = label.toLowerCase();
+                const cleanQuery = query.toLowerCase();
+                if (cleanQuery.includes(cleanLabel) || cleanLabel.includes(cleanQuery.replace(queryNumber, "").trim())) {
+                  label = `${label} ${queryNumber}`;
+                }
+              }
+
+              return {
+                entity_id: `osm-${place.place_id ?? index}`,
+                label,
+                subtitle,
+                latitude: Number(place.lat),
+                longitude: Number(place.lon),
+              };
+            }) : [];
 
             if (mapCenter) {
               const getDist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -549,13 +585,13 @@ export function TransitApp() {
 
         <form className="compact-search search-dock" onSubmit={submitSearch} style={{ pointerEvents: "auto" }}>
             <div className={`search-reveal ${activeSearch === "origin" ? "open" : ""}`}>
-              <input value={origin} onChange={(event) => { setSuggestions([]); setHasSearchedPlaces(false); setOrigin(event.target.value); }} placeholder="Origen" aria-label="Origen" autoComplete="off" />
+              <input value={origin} onFocus={() => { setActiveSearch("origin"); }} onChange={(event) => { setSuggestions([]); setHasSearchedPlaces(false); setOrigin(event.target.value); }} placeholder="Origen" aria-label="Origen" autoComplete="off" />
             </div>
             <button className="toolbar-icon" type="button" onClick={() => { setSuggestions([]); setActiveSearch(activeSearch === "origin" ? null : "origin"); }} aria-label="Buscar origen">
               <MagnifyingGlassIcon size={20} />
             </button>
             <div className={`search-reveal ${activeSearch === "destination" ? "open" : ""}`}>
-              <input value={destination} onChange={(event) => { setSuggestions([]); setHasSearchedPlaces(false); setDestination(event.target.value); }} placeholder="Destino" aria-label="Destino" autoComplete="off" />
+              <input value={destination} onFocus={() => { setActiveSearch("destination"); }} onChange={(event) => { setSuggestions([]); setHasSearchedPlaces(false); setDestination(event.target.value); }} placeholder="Destino" aria-label="Destino" autoComplete="off" />
             </div>
             <button className="toolbar-icon" type="button" onClick={() => { setSuggestions([]); setActiveSearch(activeSearch === "destination" ? null : "destination"); }} aria-label="Buscar destino">
               <MagnifyingGlassIcon size={20} />
@@ -574,7 +610,7 @@ export function TransitApp() {
                         const lon = fav.longitude || (fav.place && fav.place.location?.coordinates?.[0]) || 0;
                         return (
                           <div key={`fav-place-${fav.id}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
-                            <button type="button" className="suggestion-row" style={{ flex: 1, borderBottom: 0 }} onClick={() => selectSuggestion({ entity_id: fav.id, label, latitude: lat, longitude: lon })}>
+                            <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion({ entity_id: fav.id, label, latitude: lat, longitude: lon })}>
                               <MagnifyingGlassIcon size={17} style={{ color: "var(--accent)" }} />
                               <span><strong>{label}</strong><small>Lugar favorito</small></span>
                             </button>
@@ -587,8 +623,9 @@ export function TransitApp() {
                                 background: "transparent",
                                 border: 0,
                                 cursor: "pointer",
-                                fontSize: "18px",
-                                color: "var(--accent)"
+                                fontSize: "22px",
+                                color: "var(--accent)",
+                                flexShrink: 0
                               }}
                               title="Eliminar de favoritos"
                             >
@@ -603,34 +640,66 @@ export function TransitApp() {
                   )
                 ) : isSearchingPlaces ? (
                   <div className="suggestion-state">Buscando direcciones…</div>
-                ) : suggestions.length ? (
-                  suggestions.map((suggestion) => {
-                    const isFav = favorites.some((f) => f.custom_name === suggestion.label || (f.place && f.place.name === suggestion.label));
-                    return (
-                      <div key={`${suggestion.entity_id}-${suggestion.latitude}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
-                        <button type="button" className="suggestion-row" style={{ flex: 1, borderBottom: 0 }} onClick={() => selectSuggestion(suggestion)}>
-                          <MagnifyingGlassIcon size={17} />
-                          <span><strong>{suggestion.label}</strong><small>{suggestion.subtitle || "Morelia, Michoacán"}</small></span>
-                        </button>
-                        <button
-                          type="button"
-                          className="suggestion-fav-btn"
-                          onClick={(e) => { e.stopPropagation(); togglePlaceFavorite(suggestion.label, suggestion.latitude, suggestion.longitude); }}
-                          style={{
-                            padding: "10px 14px",
-                            background: "transparent",
-                            border: 0,
-                            cursor: "pointer",
-                            fontSize: "18px",
-                            color: isFav ? "var(--accent)" : "#cbd5e1"
-                          }}
-                          title={isFav ? "Eliminar de favoritos" : "Marcar como favorito"}
-                        >
-                          {isFav ? "★" : "☆"}
-                        </button>
-                      </div>
-                    );
-                  })
+                ) : (suggestions.length || matchingFavs.length) ? (
+                  <>
+                    {matchingFavs.map((suggestion) => {
+                      return (
+                        <div key={`fav-match-${suggestion.entity_id}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
+                          <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion(suggestion)}>
+                            <MagnifyingGlassIcon size={17} style={{ color: "var(--accent)" }} />
+                            <span><strong>★ {suggestion.label}</strong><small>{suggestion.subtitle}</small></span>
+                          </button>
+                          <button
+                            type="button"
+                            className="suggestion-fav-btn"
+                            onClick={(e) => { e.stopPropagation(); togglePlaceFavorite(suggestion.label, suggestion.latitude, suggestion.longitude); }}
+                            style={{
+                              padding: "10px 14px",
+                              background: "transparent",
+                              border: 0,
+                              cursor: "pointer",
+                              fontSize: "22px",
+                              color: "var(--accent)",
+                              flexShrink: 0
+                            }}
+                            title="Eliminar de favoritos"
+                          >
+                            ★
+                          </button>
+                        </div>
+                      );
+                    })}
+                    {suggestions
+                      .filter((suggestion) => !matchingFavs.some((f) => f.label.toLowerCase() === suggestion.label.toLowerCase() || (Math.abs(f.latitude - suggestion.latitude) < 0.0001 && Math.abs(f.longitude - suggestion.longitude) < 0.0001)))
+                      .map((suggestion) => {
+                        const isFav = favorites.some((f) => f.custom_name === suggestion.label || (f.place && f.place.name === suggestion.label));
+                        return (
+                          <div key={`${suggestion.entity_id}-${suggestion.latitude}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
+                            <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion(suggestion)}>
+                              <MagnifyingGlassIcon size={17} />
+                              <span><strong>{suggestion.label}</strong><small>{suggestion.subtitle || "Morelia, Michoacán"}</small></span>
+                            </button>
+                            <button
+                              type="button"
+                              className="suggestion-fav-btn"
+                              onClick={(e) => { e.stopPropagation(); togglePlaceFavorite(suggestion.label, suggestion.latitude, suggestion.longitude); }}
+                              style={{
+                                padding: "10px 14px",
+                                background: "transparent",
+                                border: 0,
+                                cursor: "pointer",
+                                fontSize: "22px",
+                                color: isFav ? "var(--accent)" : "#94a3b8",
+                                flexShrink: 0
+                              }}
+                              title={isFav ? "Eliminar de favoritos" : "Marcar como favorito"}
+                            >
+                              {isFav ? "★" : "☆"}
+                            </button>
+                          </div>
+                        );
+                      })}
+                  </>
                 ) : hasSearchedPlaces ? (
                   <div className="suggestion-state">No encontramos esa dirección en Morelia.</div>
                 ) : null}

@@ -417,7 +417,7 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
 
           // Add origin and destination pin markers
           const originMarker = new maplibregl.Marker({
-            element: createPinMarker("#10b981", "O"),
+            element: createPinMarker("#2563eb", "O"),
           })
             .setLngLat(originPoint)
             .addTo(map);
@@ -676,22 +676,53 @@ function createPinMarker(color: string, label: string): HTMLDivElement {
   const el = document.createElement("div");
   el.innerHTML = `
     <div style="
-      background: ${color};
-      color: white;
-      font-family: system-ui, sans-serif;
-      font-size: 12px;
-      font-weight: bold;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 2px solid white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      width: 130px;
+      height: 130px;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     ">
-      ${label}
+      <!-- Large translucent outer orbit -->
+      <div style="
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        background-color: ${color};
+        opacity: 0.15;
+        border: 2px solid ${color};
+        border-radius: 50%;
+        animation: marker-pulse-glow 3s infinite ease-in-out;
+        z-index: 1;
+      "></div>
+      <!-- Small inner solid orb -->
+      <div style="
+        position: relative;
+        background: radial-gradient(circle, ${color} 0%, ${color}dd 100%);
+        color: white;
+        font-family: system-ui, sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+      ">
+        ${label}
+      </div>
     </div>
+    <style>
+      @keyframes marker-pulse-glow {
+        0% { transform: scale(0.85); opacity: 0.12; }
+        50% { transform: scale(1.1); opacity: 0.28; }
+        100% { transform: scale(0.85); opacity: 0.12; }
+      }
+    </style>
   `;
   return el;
 }
@@ -754,12 +785,50 @@ function getDistinctColor(hex: string): string {
 }
 
 function createDestinationMarker(): HTMLDivElement {
+  const color = "#ef4444"; // Vibrant red for destination
   const el = document.createElement("div");
   el.innerHTML = `
-    <div style="width:26px;height:26px;background:#10b981;border:4px solid #ffffff;border-radius:50%;box-shadow:0 0 10px rgba(16,185,129,0.8);position:relative;">
-      <div style="position:absolute;top:-4px;left:-4px;width:26px;height:26px;border:4px solid #10b981;border-radius:50%;animation:dest-pulse 2.0s infinite ease-in-out;pointer-events:none;"></div>
+    <div style="
+      width: 130px;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    ">
+      <!-- Large translucent outer orbit -->
+      <div style="
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        background-color: ${color};
+        opacity: 0.15;
+        border: 2px solid ${color};
+        border-radius: 50%;
+        animation: marker-pulse-glow 3s infinite ease-in-out;
+        z-index: 1;
+      "></div>
+      <!-- Small inner solid orb -->
+      <div style="
+        position: relative;
+        background: radial-gradient(circle, ${color} 0%, ${color}dd 100%);
+        color: white;
+        font-family: system-ui, sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+      ">
+        D
+      </div>
     </div>
-    <style>@keyframes dest-pulse{0%{transform:scale(1);opacity:0.8}100%{transform:scale(2.8);opacity:0}}</style>
   `;
   return el;
 }

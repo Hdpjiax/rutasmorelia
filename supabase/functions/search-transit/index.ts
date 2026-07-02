@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     };
 
     const loadGeocodingResults = async () => {
-      const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}+Morelia&format=json&limit=25&addressdetails=1&accept-language=es`;
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ", Morelia")}&format=json&limit=25&addressdetails=1&accept-language=es`;
       const geoRes = await fetch(geocodeUrl, {
         headers: {
           "User-Agent": "SIMUM-Morelia-Transit-App (antogar89.b@gmail.com)",
@@ -94,10 +94,22 @@ Deno.serve(async (req) => {
       if (geoRes.ok) {
         const geoData = await geoRes.json();
         if (Array.isArray(geoData)) {
+          const numberMatch = query.match(/\b\d+\b/);
+          const queryNumber = numberMatch ? numberMatch[0] : null;
+
           return geoData.map((item: any, idx: number) => {
             const parts = item.display_name.split(",");
-            const label = parts[0].trim();
+            let label = parts[0].trim();
             const subtitle = parts.slice(1, 4).join(",").trim();
+
+            if (queryNumber && !label.includes(queryNumber)) {
+              const cleanLabel = label.toLowerCase();
+              const cleanQuery = query.toLowerCase();
+              if (cleanQuery.includes(cleanLabel) || cleanLabel.includes(cleanQuery.replace(queryNumber, "").trim())) {
+                label = `${label} ${queryNumber}`;
+              }
+            }
+
             return {
               entity_type: "place",
               entity_id: 900000 + idx,
