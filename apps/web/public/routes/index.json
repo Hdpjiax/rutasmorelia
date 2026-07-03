@@ -1,6 +1,6 @@
 {
   "type": "routes-index",
-  "generatedAt": "2026-07-02T11:08:21.476731+00:00",
+  "generatedAt": "2026-07-03T18:51:20.886410+00:00",
   "algorithm": "valhalla-kml-corridor-v1",
   "routes": [
     {
@@ -146,6 +146,16 @@
       "artifactSha256": "fd352e0412e6d8fdc2a73a1a7ab3ddb02cf2eb132a6091090727e64198a25e4f"
     },
     {
+      "id": "13",
+      "name": "Café - Oro 2 (Leandro Valle)",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/13.geojson?v=616487c0f60b",
+      "artifactSha256": "616487c0f60b610d34405d85252d793b394957951f37c884d13f7c36bbf89881"
+    },
+    {
       "id": "10",
       "name": "Café 1",
       "color": "#8B4513",
@@ -154,6 +164,16 @@
       "colorLetter": "C",
       "geojsonFile": "/routes/10.geojson?v=7b82378ba8b3",
       "artifactSha256": "7b82378ba8b34efb30faa5840c8bb4a56f2dfe67cc7fceb09db20aaf66af119e"
+    },
+    {
+      "id": "12",
+      "name": "Café 1 Lago",
+      "color": "#8B4513",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/12.geojson?v=6430b8fff316",
+      "artifactSha256": "6430b8fff3168040c6af232d1f1a163ef3632149aab07aa4f4200bee8eb87149"
     },
     {
       "id": "11",
@@ -304,6 +324,16 @@
       "colorLetter": "C",
       "geojsonFile": "/routes/F14.geojson?v=911a9bde33b9",
       "artifactSha256": "911a9bde33b98b723d029c81b4e9fe6b0ae53e51a38e630e5eba7451481afcf7"
+    },
+    {
+      "id": "F15",
+      "name": "Chiquimitio (Por Torreon Nuevo)",
+      "color": "#FFC800",
+      "transportType": "Camión",
+      "colorName": "Amarillo",
+      "colorLetter": "A",
+      "geojsonFile": "/routes/F15.geojson?v=db95b7d42a6e",
+      "artifactSha256": "db95b7d42a6e9dd6b0041364cb1d8e799a31b98c7f85c2682e8bee9bddfeff83"
     },
     {
       "id": "F16",
@@ -457,6 +487,16 @@
       "artifactSha256": "efac16e96d1910202eb00cba4fd6b9364cf2f8180a7cb1173446541ab5b3a1d7"
     },
     {
+      "id": "25",
+      "name": "Gris 2",
+      "color": "#808080",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/25.geojson?v=9bacd58c545d",
+      "artifactSha256": "9bacd58c545df64ca71da2bd0c9eeb6eb6afa5ac50aeca3dce0b3ccd4b2d69b7"
+    },
+    {
       "id": "26",
       "name": "Gris 3 Furamo",
       "color": "#808080",
@@ -525,6 +565,16 @@
       "colorLetter": "C",
       "geojsonFile": "/routes/86.geojson?v=06d95b00bb3d",
       "artifactSha256": "06d95b00bb3d1c782f2475dca3fd97c044a78f9fd052363c48aa6342d2fe668a"
+    },
+    {
+      "id": "F19",
+      "name": "Jesús del Monte",
+      "color": "#FFC800",
+      "transportType": "Camión",
+      "colorName": "Amarillo",
+      "colorLetter": "A",
+      "geojsonFile": "/routes/F19.geojson?v=8247e41544bf",
+      "artifactSha256": "8247e41544bf4f6789467ca29755bdf06377618f8731eb79c47d2a1149073fe3"
     },
     {
       "id": "32",
@@ -945,6 +995,16 @@
       "colorLetter": "C",
       "geojsonFile": "/routes/70.geojson?v=c7ab1e02d5f2",
       "artifactSha256": "c7ab1e02d5f2f37baac9c5c7a00ed220f504a334e3cc89c37ff195b4636959d1"
+    },
+    {
+      "id": "77",
+      "name": "Ruta 2 (Contra Reloj)",
+      "color": "#EBCF00",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/77.geojson?v=792da3ed4582",
+      "artifactSha256": "792da3ed458255ae244a0eee7508c3f8acdf6ef06feb1e767c5a25c9ffc7de38"
     },
     {
       "id": "88",

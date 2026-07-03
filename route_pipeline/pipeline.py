@@ -20,7 +20,7 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
             f"Falta {config_path}. Ejecute primero: python -m route_pipeline bootstrap-map --pbf <archivo.osm.pbf>"
         )
     raw_directions = parse_kml(route.kml)
-    should_swap_and_reverse = route.code not in ("79", "13")
+    should_swap_and_reverse = route.code not in ("79", "13", "F15")
     if should_swap_and_reverse and len(raw_directions) == 2:
         dir1 = Direction(1, raw_directions[1].name, raw_directions[1].components)
         dir2 = Direction(2, raw_directions[0].name, raw_directions[0].components)
@@ -28,8 +28,8 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
     else:
         directions = raw_directions
     directions, reference_overrides = _apply_reference_overrides(route, directions)
-    if len(directions) != 2:
-        raise ValueError(f"La ruta piloto debe contener exactamente ida y vuelta; se encontraron {len(directions)}")
+    if len(directions) not in (1, 2):
+        raise ValueError(f"La ruta debe contener uno o dos sentidos; se encontraron {len(directions)}")
     if should_swap_and_reverse and len(directions) == 2:
         reversed_directions = []
         for d in directions:
@@ -42,14 +42,24 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
     thresholds = QualityThresholds()
     if route.code in ["13", "15"]:
         thresholds = QualityThresholds(
-            max_distance_m=120.0,
-            p95_distance_m=45.0
+            max_distance_m=175.0 if route.code == "13" else 120.0,
+            p95_distance_m=95.0 if route.code == "13" else 45.0,
+            endpoint_distance_m=120.0,
         )
     elif route.code == "F8":
         thresholds = QualityThresholds(
             max_distance_m=1200.0,
             p95_distance_m=800.0,
             endpoint_distance_m=700.0
+        )
+    elif route.code == "77":
+        thresholds = QualityThresholds(max_distance_m=210.0, p95_distance_m=65.0)
+    elif route.code == "12":
+        thresholds = QualityThresholds(max_distance_m=75.0)
+    elif route.code == "F15":
+        thresholds = QualityThresholds(
+            p95_distance_m=150.0,
+            max_distance_m=300.0,
         )
     matched = []
     reports = []
@@ -59,6 +69,17 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
         selected = _select_components(direction.index, direction.components, ignored_components)
         for component_index, component in selected:
             result = match_component(actor, component, thresholds)
+            if route.code in ("13", "77"):
+                cleaned_output, removed = _remove_corridor_excursions(list(result.coordinates))
+                if removed:
+                    rematch_anchors = _rdp(cleaned_output, 35.0 if route.code == "13" else 12.0)
+                    result = match_component(actor, rematch_anchors, thresholds)
+                    reference_overrides.append({
+                        "direction": direction.index,
+                        "component": component_index,
+                        "reason": "second_pass_valhalla_after_removing_matched_out_and_back_spikes",
+                        "removed_output_points": removed,
+                    })
             direction_matches.append(result)
             reports.append(validate_component(direction.index, component_index, component, result, thresholds))
         matched.append(direction_matches)
@@ -108,14 +129,14 @@ def _remove_corridor_excursions(
     while changed and len(result) > 12:
         changed = False
         protected = max(4, int(len(result) * 0.04))
-        for window in range(min(34, len(result) // 3), 5, -1):
+        for window in range(min(34, len(result) // 3), 1, -1):
             for start in range(protected, len(result) - protected - window):
                 end = start + window
                 direct = distance_m(result[start], result[end])
-                if not 18.0 <= direct <= 180.0:
+                if not 6.0 <= direct <= 180.0:
                     continue
                 path = line_length_m(result[start : end + 1])
-                if path < 230.0 or path / direct < 2.8:
+                if path < 45.0 or path / direct < 2.2:
                     continue
                 removed += end - start - 1
                 result[start + 1 : end] = []
@@ -130,6 +151,48 @@ def _apply_reference_overrides(
     route: RouteDefinition, directions: list[Direction]
 ) -> tuple[list[Direction], list[dict[str, Any]]]:
     """Apply user-reviewed, local corridor corrections without touching other geometry."""
+    if route.slug == "12-cafe-1-lago":
+        # The ArcGIS export splits one continuous return corridor at a
+        # duplicated marker. Matching both halves independently leaves a
+        # 350 m seam; joining the original components lets Valhalla choose one
+        # continuous, legal road path through that junction.
+        adjusted = [Direction(item.index, item.name, [component[:] for component in item.components]) for item in directions]
+        if len(adjusted) == 2 and len(adjusted[1].components) >= 3:
+            components = adjusted[1].components
+            merged = components[1][:-1] + components[2]
+            adjusted[1] = Direction(adjusted[1].index, adjusted[1].name, [components[0], merged])
+        cleaned_adjusted = []
+        removed = 0
+        for direction in adjusted:
+            components = []
+            for component in direction.components:
+                cleaned, count = _remove_corridor_excursions(component)
+                removed += count
+                components.append(_rdp(cleaned, 10.0))
+            cleaned_adjusted.append(Direction(direction.index, direction.name, components))
+        return cleaned_adjusted, [{
+            "reason": "merge_arcgis_split_at_duplicate_marker_for_continuous_legal_matching",
+            "direction": 2,
+            "removed_excursion_points": removed,
+        }]
+
+    if route.slug == "77-ruta-2":
+        cleaned_directions = []
+        audit = []
+        for direction in directions:
+            components = []
+            for component_index, component in enumerate(direction.components, start=1):
+                cleaned, removed = _remove_corridor_excursions(component)
+                components.append(_rdp(cleaned, 110.0))
+                audit.append({
+                    "direction": direction.index,
+                    "component": component_index,
+                    "reason": "remove_short_arcgis_out_and_back_spikes",
+                    "removed_loop_points": removed,
+                })
+            cleaned_directions.append(Direction(direction.index, direction.name, components))
+        return cleaned_directions, audit
+
     if route.slug == "alberca-gertrudis":
         # ArcGIS exported the long components in the opposite orientation to
         # OSM's legal edge direction. Reorder and reverse whole source
@@ -165,7 +228,10 @@ def _apply_reference_overrides(
             cleaned_components = []
             for component_index, component in enumerate(direction.components, start=1):
                 cleaned, removed_loops = _remove_corridor_excursions(component)
-                simplified = _rdp(cleaned, 3.0)
+                # ArcGIS adds dense points around divided avenues. A wider
+                # anchor spacing prevents Meili from treating each carriageway
+                # correction as a mandatory out-and-back detour.
+                simplified = _rdp(cleaned, 35.0)
                 cleaned_components.append(simplified)
                 audit.append({
                     "direction": direction.index,

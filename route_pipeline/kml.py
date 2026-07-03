@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import xml.etree.ElementTree as ET
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -44,7 +45,14 @@ def _coordinates(text: str | None) -> list[Coordinate]:
 
 
 def parse_kml(path: Path) -> list[Direction]:
-    text = path.read_text(encoding="utf-8-sig")
+    if path.suffix.lower() == ".kmz":
+        with zipfile.ZipFile(path) as archive:
+            names = [name for name in archive.namelist() if name.lower().endswith(".kml")]
+            if not names:
+                raise ValueError(f"El KMZ no contiene un archivo KML: {path}")
+            text = archive.read(names[0]).decode("utf-8-sig")
+    else:
+        text = path.read_text(encoding="utf-8-sig")
     if "xsi:" in text and "xmlns:xsi=" not in text:
         text = re.sub(r"(<kml\b[^>]*)(>)", rf'\1 xmlns:xsi="{XSI_NS}"\2', text, count=1)
     root = ET.fromstring(text)
@@ -62,4 +70,3 @@ def parse_kml(path: Path) -> list[Direction]:
     if not directions:
         raise ValueError(f"El KML no contiene LineString válidos: {path}")
     return directions
-

@@ -51,3 +51,6 @@ route-pipeline.local.json
 # Large SQL data dumps / dumps not meant for source control
 import_routes.sql
 update_routes_kml.sql
+
+.vercel
+.env*

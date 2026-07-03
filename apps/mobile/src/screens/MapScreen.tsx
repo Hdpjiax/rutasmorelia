@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Camera, type CameraRef, GeoJSONSource, Layer, Map as MapView, Images} from '@maplibre/maplibre-react-native';
+import {Camera, type CameraRef, GeoJSONSource, Layer, Map as MapView} from '@maplibre/maplibre-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -16,16 +16,52 @@ import {dark, light} from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Map'>;
 type Suggestion = {entity_type: string; entity_id: number | string; label: string; subtitle: string | null; latitude: number | null; longitude: number | null; saved_place_id?: number};
-type RouteItem = {id: string; number: string; name: string; detail: string; time: string; color: string};
+type RouteItem = {id: string; geometryId?: string; number: string; name: string; detail: string; time: string; color: string};
 type RouteGeometry = GeoJSON.LineString | GeoJSON.MultiLineString;
 type CachedGeometry = {geojson: GeoJSON.FeatureCollection; bounds: [number, number, number, number]};
 type DrawerItem = RouteItem & {kind?: 'route' | 'stop'; secondaryTime?: string; listKey?: string};
 type RouteFavorite = {id: number; route_id: number};
 type SavedPlace = {id: number; label: string; address: string | null; kind: string; location: {type?: string; coordinates?: [number, number]} | null};
 
-const ROUTES_CACHE_KEY = '@viamorelia/routes-v1';
+const ROUTES_CACHE_KEY = '@viamorelia/routes-v2';
 const ROUTES_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
 const EMPTY_GEOJSON: GeoJSON.FeatureCollection = {type: 'FeatureCollection', features: []};
+const PUBLISHED_ROUTES_BASE_URL = 'https://www.viamorelia.org/routes';
+const WHITE_ROAD_LAYERS = new Set([
+  'tunnel_motorway_link', 'tunnel_service_track', 'tunnel_link', 'tunnel_minor', 'tunnel_secondary_tertiary', 'tunnel_trunk_primary', 'tunnel_motorway',
+  'road_motorway_link', 'road_service_track', 'road_link', 'road_minor', 'road_secondary_tertiary', 'road_trunk_primary', 'road_motorway',
+  'bridge_path_pedestrian', 'bridge_motorway_link', 'bridge_service_track', 'bridge_link', 'bridge_street', 'bridge_secondary_tertiary', 'bridge_trunk_primary', 'bridge_motorway',
+  'road_pier', 'highway_path', 'highway_minor', 'highway_major_inner',
+  'highway_motorway_inner', 'highway_motorway_bridge_inner', 'tunnel_motorway_inner',
+  'road_minor_fill', 'road_service_fill', 'road_sec_fill_noramp', 'road_pri_fill_noramp',
+  'road_trunk_fill_noramp', 'road_mot_fill_noramp', 'road_trunk_fill_ramp', 'road_mot_fill_ramp',
+  'bridge_minor_fill', 'bridge_service_fill', 'bridge_sec_fill', 'bridge_pri_fill',
+  'bridge_trunk_fill', 'bridge_mot_fill', 'tunnel_minor_fill', 'tunnel_service_fill',
+  'tunnel_sec_fill', 'tunnel_pri_fill', 'tunnel_trunk_fill', 'tunnel_mot_fill',
+]);
+const ROAD_CASING_LAYERS = new Set([
+  'tunnel_motorway_link_casing', 'tunnel_service_track_casing', 'tunnel_link_casing', 'tunnel_street_casing', 'tunnel_secondary_tertiary_casing', 'tunnel_trunk_primary_casing', 'tunnel_motorway_casing',
+  'road_motorway_link_casing', 'road_service_track_casing', 'road_link_casing', 'road_minor_casing', 'road_secondary_tertiary_casing', 'road_trunk_primary_casing', 'road_motorway_casing',
+  'bridge_motorway_link_casing', 'bridge_service_track_casing', 'bridge_link_casing', 'bridge_street_casing', 'bridge_path_pedestrian_casing', 'bridge_secondary_tertiary_casing', 'bridge_trunk_primary_casing', 'bridge_motorway_casing',
+  'highway_major_casing', 'highway_motorway_casing', 'highway_motorway_bridge_casing',
+  'tunnel_motorway_casing',
+  'road_minor_case', 'road_service_case', 'road_sec_case_noramp', 'road_pri_case_noramp',
+  'road_trunk_case_noramp', 'road_mot_case_noramp', 'road_trunk_case_ramp', 'road_mot_case_ramp',
+  'bridge_minor_case', 'bridge_service_case', 'bridge_sec_case', 'bridge_pri_case',
+  'bridge_trunk_case', 'bridge_mot_case', 'tunnel_minor_case', 'tunnel_service_case',
+  'tunnel_sec_case', 'tunnel_pri_case', 'tunnel_trunk_case', 'tunnel_mot_case',
+]);
+const PERIFERICO_FILL_LAYERS = new Set([
+  'tunnel_trunk_primary', 'tunnel_motorway', 'road_trunk_primary', 'road_motorway', 'bridge_trunk_primary', 'bridge_motorway',
+  'road_trunk_fill_noramp', 'road_mot_fill_noramp', 'road_trunk_fill_ramp', 'road_mot_fill_ramp',
+  'bridge_trunk_fill', 'bridge_mot_fill', 'tunnel_trunk_fill', 'tunnel_mot_fill',
+]);
+const PERIFERICO_CASING_LAYERS = new Set([
+  'tunnel_trunk_primary_casing', 'tunnel_motorway_casing', 'road_trunk_primary_casing', 'road_motorway_casing', 'bridge_trunk_primary_casing', 'bridge_motorway_casing',
+  'road_trunk_case_noramp', 'road_mot_case_noramp', 'road_trunk_case_ramp', 'road_mot_case_ramp',
+  'bridge_trunk_case', 'bridge_mot_case', 'tunnel_trunk_case', 'tunnel_mot_case',
+]);
+const PERIFERICO_NAMES = ['Periférico Paseo de la República', 'Circuito Periférico Paseo de la República', 'Libramiento Paseo de la República'];
 
 function getGeometryBounds(geometry: RouteGeometry): [number, number, number, number] | null {
   const coordinates = geometry.type === 'MultiLineString' ? geometry.coordinates.flat() : geometry.coordinates;
@@ -190,6 +226,21 @@ export function MapScreen({navigation}: Props) {
                 ...layer,
                 paint: { ...layer.paint, 'fill-color': '#bbf7d0', 'fill-opacity': 0.95 }
               };
+            }
+            if (layer.type === 'background') {
+              return {...layer, paint: {...layer.paint, 'background-color': '#f8fafc'}};
+            }
+            if (PERIFERICO_FILL_LAYERS.has(layer.id)) {
+              return {...layer, paint: {...layer.paint, 'line-color': ['case', ['in', ['coalesce', ['get', 'name'], ''], ['literal', PERIFERICO_NAMES]], '#e9ad82', '#f8fafc']}};
+            }
+            if (PERIFERICO_CASING_LAYERS.has(layer.id)) {
+              return {...layer, paint: {...layer.paint, 'line-color': ['case', ['in', ['coalesce', ['get', 'name'], ''], ['literal', PERIFERICO_NAMES]], '#c97846', '#cbd5e1'], 'line-opacity': 0.68}};
+            }
+            if (WHITE_ROAD_LAYERS.has(layer.id)) {
+              return {...layer, paint: {...layer.paint, 'line-color': '#ffffff'}};
+            }
+            if (ROAD_CASING_LAYERS.has(layer.id)) {
+              return {...layer, paint: {...layer.paint, 'line-color': '#cbd5e1', 'line-opacity': 0.68}};
             }
             if (layer.id === 'rail') {
               return {
@@ -431,6 +482,9 @@ export function MapScreen({navigation}: Props) {
 
     async function loadRoutes() {
       const cachedRoutesPromise = AsyncStorage.getItem(ROUTES_CACHE_KEY).catch(() => null);
+      const publishedRoutesPromise = fetch(`${PUBLISHED_ROUTES_BASE_URL}/index.json`)
+        .then(response => response.ok ? response.json() : null)
+        .catch(() => null);
       const networkRoutesPromise = client
         ? client
             .from('routes')
@@ -450,11 +504,28 @@ export function MapScreen({navigation}: Props) {
         }
       }
 
-      if (!networkRoutesPromise) return;
+      const publishedIndex = await publishedRoutesPromise as {
+        routes?: Array<{id: string; name: string; color?: string; transportType?: string}>;
+      } | null;
+      const publishedRoutes: RouteItem[] = (publishedIndex?.routes || []).map(route => ({
+        id: `published:${route.id}`,
+        geometryId: route.id,
+        number: `${route.transportType === 'Combi' ? 'C' : 'A'}${route.id.replace(/\D/g, '') || route.id}`,
+        name: route.name,
+        detail: route.transportType || 'Transporte público',
+        time: 'Ver recorrido',
+        color: route.color || '#FFA500',
+      }));
+
+      if (!networkRoutesPromise) {
+        if (publishedRoutes.length) applyRoutes(publishedRoutes);
+        return;
+      }
       try {
         const {data, error} = await networkRoutesPromise;
         if (error) {
           console.warn('Failed to query routes from Supabase:', error);
+          if (publishedRoutes.length) applyRoutes(publishedRoutes);
           return;
         }
         if (data?.length) {
@@ -464,6 +535,7 @@ export function MapScreen({navigation}: Props) {
             if (match) number += match[0];
             return {
               id: String(route.id),
+              geometryId: route.code,
               number,
               name: route.name,
               detail: route.description || (route.transport_type === 'combi' ? 'Ruta de combi' : 'Ruta de camión'),
@@ -471,11 +543,16 @@ export function MapScreen({navigation}: Props) {
               color: route.color || '#FFA500',
             };
           });
-          applyRoutes(mapped);
-          AsyncStorage.setItem(ROUTES_CACHE_KEY, JSON.stringify({savedAt: Date.now(), routes: mapped})).catch(() => undefined);
+          const knownGeometry = new Set(mapped.map(route => route.geometryId));
+          const merged = [...mapped, ...publishedRoutes.filter(route => !knownGeometry.has(route.geometryId))];
+          applyRoutes(merged);
+          AsyncStorage.setItem(ROUTES_CACHE_KEY, JSON.stringify({savedAt: Date.now(), routes: merged})).catch(() => undefined);
+        } else if (publishedRoutes.length) {
+          applyRoutes(publishedRoutes);
         }
       } catch (error) {
         if (!cancelled) console.warn('Failed to query routes from Supabase:', error);
+        if (publishedRoutes.length) applyRoutes(publishedRoutes);
       }
     }
 
@@ -494,9 +571,45 @@ export function MapScreen({navigation}: Props) {
     function showGeometry(cached: CachedGeometry, duration: number) {
       setActiveRouteGeoJSON(cached.geojson);
       camera.current?.fitBounds(cached.bounds, {
-        padding: {top: 72, right: 32, bottom: 48, left: 32},
+        padding: {top: 132, right: 32, bottom: 72, left: 32},
         duration,
       });
+    }
+
+    async function loadPublishedFallback(): Promise<boolean> {
+      const selected = routesList.find(route => route.id === activeRouteId);
+      if (!selected?.geometryId) return false;
+      try {
+        const response = await fetch(`${PUBLISHED_ROUTES_BASE_URL}/${encodeURIComponent(selected.geometryId)}.geojson`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) return false;
+        const geojson = await response.json() as GeoJSON.FeatureCollection;
+        const geometryBounds = geojson.features
+          .map(feature => feature.geometry)
+          .filter((geometry): geometry is RouteGeometry => geometry.type === 'LineString' || geometry.type === 'MultiLineString')
+          .map(getGeometryBounds)
+          .filter((value): value is [number, number, number, number] => Boolean(value));
+        if (!geometryBounds.length) return false;
+        const bounds = geometryBounds.reduce<[number, number, number, number]>((acc, value) => [
+          Math.min(acc[0], value[0]), Math.min(acc[1], value[1]),
+          Math.max(acc[2], value[2]), Math.max(acc[3], value[3]),
+        ], [Infinity, Infinity, -Infinity, -Infinity]);
+        const normalized: GeoJSON.FeatureCollection = {
+          ...geojson,
+          features: geojson.features.map(feature => ({
+            ...feature,
+            properties: {...feature.properties, id: activeRouteId, color: feature.properties?.color || selected.color},
+          })),
+        };
+        const nextCached = {geojson: normalized, bounds};
+        routeGeometryCache.current.set(activeRouteId, nextCached);
+        showGeometry(nextCached, 380);
+        return true;
+      } catch (error) {
+        if (!controller.signal.aborted) console.warn('Failed loading published route fallback:', error);
+        return false;
+      }
     }
 
     const cached = routeGeometryCache.current.get(activeRouteId);
@@ -518,26 +631,34 @@ export function MapScreen({navigation}: Props) {
           showGeometry({geojson, bounds}, 280);
         }
       }
-      return;
+      loadPublishedFallback().then(loaded => {
+        if (!loaded && !controller.signal.aborted) setRouteError('Esta ruta todavía no tiene un recorrido disponible.');
+      });
+      return () => controller.abort();
     }
     const activeClient = client;
 
     async function loadRouteGeometry() {
       setRouteLoading(true);
       setRouteError(null);
+      setActiveRouteGeoJSON(null);
       try {
+        // The published artifact is the same complete GeoJSON rendered by the
+        // web app (both directions, reviewed properties and exact geometry).
+        // Supabase remains a fallback for routes not yet in the web catalogue.
+        if (await loadPublishedFallback()) return;
         const {data, error} = await activeClient
           .rpc('get_route_geometry', {p_route_id: Number(activeRouteId), p_tolerance: 0.000003})
           .abortSignal(controller.signal);
         if (controller.signal.aborted) return;
         if (error) {
           console.warn('Failed loading route geometry:', error);
-          setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
+          if (!(await loadPublishedFallback())) setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
           return;
         }
         const variant = data?.[0] as {route_id: number; variant_name: string | null; color: string; geometry: RouteGeometry} | undefined;
         if (!variant?.geometry) {
-          setRouteError('Esta ruta todavía no tiene un recorrido disponible.');
+          if (!(await loadPublishedFallback())) setRouteError('Esta ruta todavía no tiene un recorrido disponible.');
           return;
         }
 
@@ -564,7 +685,7 @@ export function MapScreen({navigation}: Props) {
       } catch (error) {
         if (!controller.signal.aborted) {
           console.warn('Failed loading route geometry:', error);
-          setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
+          if (!(await loadPublishedFallback())) setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
         }
       } finally {
         if (!controller.signal.aborted) setRouteLoading(false);
@@ -572,7 +693,7 @@ export function MapScreen({navigation}: Props) {
     }
     loadRouteGeometry();
     return () => controller.abort();
-  }, [activeRouteId, routeRequestVersion]);
+  }, [activeRouteId, routeRequestVersion, routesList]);
 
   // Dual autocomplete effect (origin or destination suggestions)
   useEffect(() => {
@@ -947,11 +1068,11 @@ export function MapScreen({navigation}: Props) {
     <View style={styles.root}>
       <MapView style={StyleSheet.absoluteFill} mapStyle={customMapStyle ? JSON.stringify(customMapStyle) : MAP_STYLE_URL} logo={false} compass={false} attribution accessibilityLabel="Mapa de transporte público de Morelia">
         <Camera ref={camera} initialViewState={{center: [-101.194, 19.702], zoom: 13.3}} minZoom={10} maxZoom={19} />
-        <Images images={{'route-arrow-icon': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAoElEQVR4Ae3BUYqEMBRFwXMk+9/ybftzHkpijAw0VvF6vQaEB22MCQ+RvvCXLCR94ZgsIH1hl4QvlUJu2LgoCUWAMGljQhKSUIQJ0hd2STijUsgg6Qu7JPSoFNIhfWGXhFEqhZzYeEASigDhQOMBKoWcaCykUkhHYwGVQgY1blAp5KLGBJUDMqFxkUohN0hfOCYLNK6ThRrj5J+E1+uXfQA38ic2CnPsfQAAAABJRU5ErkJggg=='}} />
         <GeoJSONSource id="routes" data={activeRouteGeoJSON || EMPTY_GEOJSON}>
-          <Layer id="route-lines-casing" type="line" paint={{'line-color': '#FFFFFF', 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 2.2, 14, 4.0, 18, 5.0], 'line-opacity': 0.9}} layout={{'line-cap': 'round', 'line-join': 'round'}} />
-          <Layer id="route-lines" type="line" paint={{'line-color': ['get', 'color'], 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 1.2, 14, 2.2, 18, 3.2], 'line-opacity': 1.0}} layout={{'line-cap': 'round', 'line-join': 'round'}} />
-          <Layer id="route-arrows" type="symbol" layout={{symbolPlacement: 'line', symbolSpacing: ['interpolate', ['linear'], ['zoom'], 10, 150, 15, 60], iconImage: 'route-arrow-icon', iconSize: ['interpolate', ['linear'], ['zoom'], 10, 0.28, 16, 0.45], iconRotationAlignment: 'map', iconAllowOverlap: false, iconIgnorePlacement: false} as any} />
+          <Layer id="route-lines-casing" type="line" paint={{'line-color': '#111827', 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 2.0, 14, 3.4, 18, 4.6], 'line-opacity': 0.95}} layout={{'line-cap': 'round', 'line-join': 'round'}} />
+          <Layer id="route-lines" type="line" paint={{'line-color': ['get', 'color'], 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 1.0, 14, 1.8, 18, 2.8], 'line-opacity': 1.0}} layout={{'line-cap': 'round', 'line-join': 'round'}} />
+          <Layer id="route-arrows" type="symbol" layout={{symbolPlacement: 'line', symbolSpacing: ['interpolate', ['linear'], ['zoom'], 10, 90, 14, 130, 18, 180], textField: '▶', textSize: ['interpolate', ['linear'], ['zoom'], 10, 11, 14, 15, 18, 20], textRotationAlignment: 'map', textKeepUpright: false, textAllowOverlap: false, textIgnorePlacement: false, textPadding: 10} as any} paint={{'text-color': '#ffffff', 'text-halo-color': '#111827', 'text-halo-width': 2}} />
+          <Layer id="route-text-labels" type="symbol" layout={{symbolPlacement: 'line', symbolSpacing: ['interpolate', ['linear'], ['zoom'], 10, 180, 14, 240, 18, 320], textField: ['get', 'name'], textSize: ['interpolate', ['linear'], ['zoom'], 10, 8.5, 14, 10.5, 18, 12.5], textKeepUpright: true, textAllowOverlap: false, textIgnorePlacement: false} as any} paint={{'text-color': ['get', 'color'], 'text-halo-color': '#111827', 'text-halo-width': 1.5}} />
         </GeoJSONSource>
         <GeoJSONSource id="traffic" data={trafficGeoJSON || EMPTY_GEOJSON}>
           <Layer

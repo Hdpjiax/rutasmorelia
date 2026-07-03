@@ -72,7 +72,7 @@ def _load_manifest_routes() -> None:
                 code=code,
                 name=row.get("route_name", folder_name),
                 color=color,
-                transport_type="combi",
+                transport_type="bus" if row.get("category") == "02_RUTAS_DE_AUTOBUSES_FORANEOS" else "combi",
                 kml=kml_path,
                 pdf=pdf_path,
             )
