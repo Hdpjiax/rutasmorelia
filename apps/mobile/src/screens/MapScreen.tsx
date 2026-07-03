@@ -15,7 +15,7 @@ import {useTransitStore, type Coordinates} from '../store/transit-store';
 import {dark, light} from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Map'>;
-type Suggestion = {entity_type: string; entity_id: number; label: string; subtitle: string | null; latitude: number | null; longitude: number | null; saved_place_id?: number};
+type Suggestion = {entity_type: string; entity_id: number | string; label: string; subtitle: string | null; latitude: number | null; longitude: number | null; saved_place_id?: number};
 type RouteItem = {id: string; number: string; name: string; detail: string; time: string; color: string};
 type RouteGeometry = GeoJSON.LineString | GeoJSON.MultiLineString;
 type CachedGeometry = {geojson: GeoJSON.FeatureCollection; bounds: [number, number, number, number]};
@@ -612,14 +612,55 @@ export function MapScreen({navigation}: Props) {
 
         const {data, error} = await remoteRequest;
         if (cancelled) return;
-        const nextSuggestions = error ? [] : ((data?.data ?? []) as Suggestion[]);
-        setSuggestions(nextSuggestions);
-        if (!error) {
-          suggestionCache.current.set(cacheKey, nextSuggestions);
-          if (suggestionCache.current.size > 20) {
-            const oldestKey = suggestionCache.current.keys().next().value;
-            if (oldestKey) suggestionCache.current.delete(oldestKey);
+        let nextSuggestions = error ? [] : ((data?.data ?? []) as Suggestion[]);
+
+        if (nextSuggestions.length === 0) {
+          try {
+            const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lat=19.702&lon=-101.194&limit=10`);
+            if (response.ok) {
+              const places = await response.json();
+              nextSuggestions = Array.isArray(places.features) ? places.features.map((feature: any, index: number) => {
+                const p = feature.properties;
+                const name = p.name || "";
+                const street = p.street || "";
+                const housenumber = p.housenumber || "";
+                const city = p.city || "Morelia";
+                const state = p.state || "Michoacán";
+
+                let label = name;
+                if (housenumber && !label.includes(housenumber)) {
+                  label = `${label} ${housenumber}`;
+                }
+
+                let subtitleParts = [];
+                if (street && street !== name) {
+                  subtitleParts.push(street);
+                }
+                subtitleParts.push(city);
+                subtitleParts.push(state);
+                const subtitle = subtitleParts.join(", ").trim();
+
+                return {
+                  entity_type: 'place',
+                  entity_id: `photon-${p.osm_type}-${p.osm_id ?? index}`,
+                  label,
+                  subtitle,
+                  latitude: Number(feature.geometry.coordinates[1]),
+                  longitude: Number(feature.geometry.coordinates[0]),
+                };
+              }) : [];
+            }
+          } catch (fetchErr) {
+            console.warn('Photon autocomplete query failed:', fetchErr);
           }
+        }
+
+        if (cancelled) return;
+        setSuggestions(nextSuggestions);
+        suggestionCache.current.set(cacheKey, nextSuggestions);
+        if (suggestionCache.current.size > 20) {
+          const oldestKey = suggestionCache.current.keys().next().value;
+          if (oldestKey) suggestionCache.current.delete(oldestKey);
         }
       } catch (err) {
         console.warn('Autocomplete query failed:', err);

@@ -342,31 +342,36 @@ export function TransitApp() {
         let results: PlaceSuggestion[] = responses.flatMap(({ data, error }) => error || !Array.isArray(data?.data) ? [] : data.data);
         results = results.filter((item, index, list) => index === list.findIndex((other) => other.label === item.label && other.latitude === item.latitude));
         if (results.length === 0) {
-          const viewboxParam = mapCenter ? `&viewbox=${mapCenter.longitude-0.15},${mapCenter.latitude+0.15},${mapCenter.longitude+0.15},${mapCenter.latitude-0.15}` : "";
-          const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ", Morelia")}&format=json&limit=25&addressdetails=1&accept-language=es${viewboxParam}`);
+          const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lat=19.702&lon=-101.194&limit=25`);
           if (response.ok) {
             const places = await response.json();
-            const numberMatch = query.match(/\b\d+\b/);
-            const queryNumber = numberMatch ? numberMatch[0] : null;
+            const mapped = Array.isArray(places.features) ? places.features.map((feature: any, index: number) => {
+              const p = feature.properties;
+              const name = p.name || "";
+              const street = p.street || "";
+              const housenumber = p.housenumber || "";
+              const city = p.city || "Morelia";
+              const state = p.state || "Michoacán";
 
-            const mapped = Array.isArray(places) ? places.map((place, index) => {
-              let label = String(place.display_name || "").split(",")[0].trim();
-              const subtitle = String(place.display_name || "").split(",").slice(1, 4).join(",").trim();
-
-              if (queryNumber && !label.includes(queryNumber)) {
-                const cleanLabel = label.toLowerCase();
-                const cleanQuery = query.toLowerCase();
-                if (cleanQuery.includes(cleanLabel) || cleanLabel.includes(cleanQuery.replace(queryNumber, "").trim())) {
-                  label = `${label} ${queryNumber}`;
-                }
+              let label = name;
+              if (housenumber && !label.includes(housenumber)) {
+                label = `${label} ${housenumber}`;
               }
 
+              let subtitleParts = [];
+              if (street && street !== name) {
+                subtitleParts.push(street);
+              }
+              subtitleParts.push(city);
+              subtitleParts.push(state);
+              const subtitle = subtitleParts.join(", ").trim();
+
               return {
-                entity_id: `osm-${place.place_id ?? index}`,
+                entity_id: `photon-${p.osm_type}-${p.osm_id ?? index}`,
                 label,
                 subtitle,
-                latitude: Number(place.lat),
-                longitude: Number(place.lon),
+                latitude: Number(feature.geometry.coordinates[1]),
+                longitude: Number(feature.geometry.coordinates[0]),
               };
             }) : [];
 
@@ -377,7 +382,7 @@ export function TransitApp() {
                 const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
                 return 12742 * Math.asin(Math.sqrt(a));
               };
-              mapped.sort((a, b) => getDist(mapCenter.latitude, mapCenter.longitude, a.latitude, a.longitude) - getDist(mapCenter.latitude, mapCenter.longitude, b.latitude, b.longitude));
+              mapped.sort((a: any, b: any) => getDist(mapCenter.latitude, mapCenter.longitude, a.latitude, a.longitude) - getDist(mapCenter.latitude, mapCenter.longitude, b.latitude, b.longitude));
             }
             results = mapped;
           }
