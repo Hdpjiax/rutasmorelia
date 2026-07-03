@@ -180,6 +180,7 @@ export function TransitApp() {
   const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
   const [hasSearchedPlaces, setHasSearchedPlaces] = useState(false);
   const [journeyOptions, setJourneyOptions] = useState<JourneyOption[]>([]);
+  const [journeyTab, setJourneyTab] = useState<"direct" | "transfer">("direct");
   const [isPlanningJourney, setIsPlanningJourney] = useState(false);
   const [journeyOpen, setJourneyOpen] = useState(false);
   const [journeyCollapsed, setJourneyCollapsed] = useState(false);
@@ -491,6 +492,7 @@ export function TransitApp() {
     if (!isSupabaseConfigured()) return setMessage("El planificador no está disponible.");
     setIsPlanningJourney(true);
     setJourneyOpen(true);
+    setJourneyTab("direct");
     setJourneyOptions([]);
     try {
       const client = getSupabaseBrowserClient();
@@ -498,30 +500,24 @@ export function TransitApp() {
       if (error) throw error;
       const options = Array.isArray(data?.data) ? (data.data as JourneyOption[]) : [];
       
-      // Filter out redundant transfers if direct routes are available
-      const directRouteIds = new Set(
-        options
-          .filter((opt) => Number(opt.transfers || 0) === 0)
-          .map((opt) => String(opt.route_code || opt.route_id))
-      );
-
-      const filteredOptions = options.filter((opt) => {
-        if (Number(opt.transfers || 0) > 0) {
-          const firstInDirect = directRouteIds.has(String(opt.route_code || opt.route_id));
-          const secondInDirect = opt.second_route_code ? directRouteIds.has(String(opt.second_route_code || opt.second_route_id)) : false;
-          return !firstInDirect && !secondInDirect;
-        }
-        return true;
-      });
-
-      setJourneyOptions(filteredOptions);
-      setMessage(filteredOptions.length ? `${filteredOptions.length} opciones encontradas.` : "No encontramos rutas cercanas para este viaje.");
+      setJourneyOptions(options);
+      setMessage(options.length ? `${options.length} opciones encontradas.` : "No encontramos rutas cercanas para este viaje.");
     } catch {
       setMessage("No pudimos calcular el viaje. Intenta nuevamente.");
     } finally {
       setIsPlanningJourney(false);
     }
   }
+
+  const directJourneyOptions = useMemo(
+    () => journeyOptions.filter(option => Number(option.transfers || 0) === 0),
+    [journeyOptions],
+  );
+  const transferJourneyOptions = useMemo(
+    () => journeyOptions.filter(option => Number(option.transfers || 0) > 0),
+    [journeyOptions],
+  );
+  const visibleJourneyOptions = journeyTab === "direct" ? directJourneyOptions : transferJourneyOptions;
 
   const clearMap = () => {
     setActiveRoute("");
@@ -839,8 +835,18 @@ export function TransitApp() {
                   <XIcon size={19} />
                 </button>
               </div>
+              {journeyOptions.length > 0 && (
+                <div className="journey-tabs" role="tablist" aria-label="Tipo de recorrido">
+                  <button type="button" role="tab" aria-selected={journeyTab === "direct"} onClick={() => setJourneyTab("direct")}>
+                    Directos <span>{directJourneyOptions.length}</span>
+                  </button>
+                  <button type="button" role="tab" aria-selected={journeyTab === "transfer"} onClick={() => setJourneyTab("transfer")}>
+                    Transbordos <span>{transferJourneyOptions.length}</span>
+                  </button>
+                </div>
+              )}
               <div className="journey-results">
-                {isPlanningJourney ? <div className="suggestion-state">Buscando rutas cercanas…</div> : journeyOptions.length ? journeyOptions.map((option, index) => {
+                {isPlanningJourney ? <div className="suggestion-state">Buscando rutas cercanas…</div> : visibleJourneyOptions.length ? visibleJourneyOptions.map((option, index) => {
                   const rCode = option.route_code || option.route_id;
                   const isFav = favorites.some((f) => String(f.route_id) === String(rCode));
                   return (
@@ -882,7 +888,7 @@ export function TransitApp() {
                       </button>
                     </div>
                   );
-                }) : <div className="empty-state">No encontramos rutas dentro del rango caminable.</div>}
+                }) : <div className="empty-state">{journeyTab === "direct" ? "No encontramos rutas directas dentro del rango caminable." : "No necesitas un transbordo que reduzca significativamente la caminata."}</div>}
               </div>
               <div className="panel-footer" style={{ padding: "12px", borderTop: "1px solid var(--line)", textAlign: "center", fontSize: "11px", color: "var(--muted)" }}>
                 © 2026 ViaMorelia. Todos los derechos reservados.

@@ -219,6 +219,7 @@ export function MapScreen({navigation}: Props) {
   const [routesList, setRoutesList] = useState<RouteItem[]>(() => ROUTES.map(route => ({...route})));
   const [activeRouteGeoJSON, setActiveRouteGeoJSON] = useState<GeoJSON.FeatureCollection | null>(null);
   const [journeyOptions, setJourneyOptions] = useState<any[]>([]);
+  const [journeyTab, setJourneyTab] = useState<'direct' | 'transfer'>('direct');
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [routeRequestVersion, setRouteRequestVersion] = useState(0);
@@ -869,12 +870,17 @@ export function MapScreen({navigation}: Props) {
       baseRoutes = visibleRoutes.filter(r => favorites.some(f => String(f.route_id) === String(r.id)));
     }
     if (journeyOptions.length > 0 && !showOnlyFavorites) {
-      return journeyOptions.map((option, index) => ({
+      const optionsForTab = journeyOptions.filter(option =>
+        journeyTab === 'direct' ? Number(option.transfers || 0) === 0 : Number(option.transfers || 0) > 0,
+      );
+      return optionsForTab.map((option, index) => ({
         kind: 'route',
         id: String(option.route_id),
         number: option.route_code ? (option.route_code.split('_')[1] || option.route_code[0]) : 'R',
         name: option.route_name,
-        detail: `Subir: ${option.boarding_stop_name || 'Parada cercana'}\nBajar: ${option.alighting_stop_name || 'Destino'}`,
+        detail: Number(option.transfers || 0) > 0
+          ? `Transbordo a ${option.second_route_name} · camina ${Math.round(Number(option.transfer_walk_meters || 0))} m`
+          : `Directa · ${Math.round(Number(option.destination_walk_meters || 0))} m caminando al destino`,
         time: `${option.estimatedMinutes} min`,
         secondaryTime: `$${option.fare || '11.00'}`,
         color: option.route_color || '#FFA500',
@@ -882,7 +888,7 @@ export function MapScreen({navigation}: Props) {
       }));
     }
     return baseRoutes.map(route => ({...route, kind: 'route'}));
-  }, [journeyOptions, visibleRoutes, showOnlyFavorites, favorites]);
+  }, [journeyOptions, journeyTab, visibleRoutes, showOnlyFavorites, favorites]);
 
   const selectDrawerItem = useCallback((item: DrawerItem) => {
     setActiveRouteId(item.id);
@@ -964,32 +970,17 @@ export function MapScreen({navigation}: Props) {
     setIsMenuOpen(true);
     if (!supabase || !origin || !destination) return setMessage(`Mostrando rutas relacionadas con ${destinationLabel}.`);
     setLoading(true);
+    setJourneyTab('direct');
     setJourneyOptions([]);
     try {
       const {data, error} = await supabase.functions.invoke('plan-journey', {body: {origin, destination}});
       setLoading(false);
       const options = data?.data as any[] | undefined;
       if (!error && options && options.length > 0) {
-        // Filter out redundant transfers if direct routes are available
-        const directRouteIds = new Set(
-          options
-            .filter((opt) => Number(opt.transfers || 0) === 0)
-            .map((opt) => String(opt.route_code || opt.route_id))
-        );
-
-        const filteredOptions = options.filter((opt) => {
-          if (Number(opt.transfers || 0) > 0) {
-            const firstInDirect = directRouteIds.has(String(opt.route_code || opt.route_id));
-            const secondInDirect = opt.second_route_code ? directRouteIds.has(String(opt.second_route_code || opt.second_route_id)) : false;
-            return !firstInDirect && !secondInDirect;
-          }
-          return true;
-        });
-
-        setJourneyOptions(filteredOptions);
-        setMessage(filteredOptions.length > 0 ? `${filteredOptions.length} opciones encontradas.` : 'No encontramos rutas cercanas para este viaje.');
-        if (filteredOptions.length > 0) {
-          setActiveRouteId(String(filteredOptions[0].route_id));
+        setJourneyOptions(options);
+        setMessage(options.length > 0 ? `${options.length} opciones encontradas.` : 'No encontramos rutas cercanas para este viaje.');
+        if (options.length > 0) {
+          setActiveRouteId(String(options[0].route_id));
         }
       } else {
         setJourneyOptions([]);
@@ -1277,6 +1268,27 @@ export function MapScreen({navigation}: Props) {
                  </Pressable>
                </View>
 
+              {journeyOptions.length > 0 && !showOnlyFavorites ? (
+                <View style={[styles.journeyTabs, {backgroundColor: colors.surface}]} accessibilityRole="tablist">
+                  {(['direct', 'transfer'] as const).map(tabValue => {
+                    const selected = journeyTab === tabValue;
+                    const count = journeyOptions.filter(option => tabValue === 'direct' ? Number(option.transfers || 0) === 0 : Number(option.transfers || 0) > 0).length;
+                    return (
+                      <Pressable
+                        key={tabValue}
+                        accessibilityRole="tab"
+                        accessibilityState={{selected}}
+                        onPress={() => setJourneyTab(tabValue)}
+                        style={[styles.journeyTab, selected && {backgroundColor: colors.bg}]}
+                      >
+                        <Text style={[styles.journeyTabLabel, {color: selected ? colors.ink : colors.muted}]}>{tabValue === 'direct' ? 'Directos' : 'Transbordos'}</Text>
+                        <View style={[styles.journeyTabCount, {backgroundColor: colors.surface}]}><Text style={[styles.journeyTabCountText, {color: colors.ink}]}>{count}</Text></View>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              ) : null}
+
               <FlatList
                 data={drawerItems}
                 renderItem={renderDrawerItem}
@@ -1290,7 +1302,7 @@ export function MapScreen({navigation}: Props) {
                 updateCellsBatchingPeriod={40}
                 windowSize={5}
                 removeClippedSubviews={Platform.OS === 'android'}
-                ListEmptyComponent={<Text style={[styles.empty, {color: colors.muted}]}>No encontramos rutas. Prueba con una colonia o punto conocido.</Text>}
+                ListEmptyComponent={<Text style={[styles.empty, {color: colors.muted}]}>{journeyOptions.length > 0 && journeyTab === 'transfer' ? 'No necesitas un transbordo que reduzca significativamente la caminata.' : 'No encontramos rutas. Prueba con una colonia o punto conocido.'}</Text>}
               />
             </View>
           </View>
@@ -1460,6 +1472,11 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
+  journeyTabs: {flexDirection: 'row', gap: 4, marginHorizontal: 14, marginBottom: 10, padding: 4, borderRadius: 12},
+  journeyTab: {flex: 1, minHeight: 40, paddingHorizontal: 8, borderRadius: 9, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5},
+  journeyTabLabel: {fontSize: 12, fontWeight: '700'},
+  journeyTabCount: {minWidth: 20, height: 20, paddingHorizontal: 5, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
+  journeyTabCountText: {fontSize: 10, fontWeight: '800'},
   drawerActionRow: {
     height: 44,
     width: 44,

@@ -111,12 +111,22 @@ Deno.serve(async (req) => {
       console.error("Journey lookup failed:", err);
     }
 
-    // Filter out transfer options that are unnecessary.
-    // A transfer option is unnecessary if either of its routes is already available as a direct option.
-    const directRouteIds = new Set(directOptions.map((opt) => String(opt.route_code || opt.route_id)));
+    // Keep transfers only when they materially reduce walking. A transfer is
+    // useful even when a direct route exists if it saves at least 250 metres
+    // overall, or substantially shortens a long final walk.
+    const bestDirectTotalWalk = directOptions.length
+      ? Math.min(...directOptions.map((opt) => Number(opt.origin_walk_meters || 0) + Number(opt.destination_walk_meters || 0)))
+      : Number.POSITIVE_INFINITY;
+    const bestDirectDestinationWalk = directOptions.length
+      ? Math.min(...directOptions.map((opt) => Number(opt.destination_walk_meters || 0)))
+      : Number.POSITIVE_INFINITY;
     const filteredTransferOptions = transferOptions.filter((opt) => {
-      return !directRouteIds.has(String(opt.route_code || opt.route_id)) &&
-             !directRouteIds.has(String(opt.second_route_code || opt.second_route_id));
+      if (!directOptions.length) return true;
+      const transferTotalWalk = Number(opt.origin_walk_meters || 0) +
+        Number(opt.transfer_walk_meters || 0) + Number(opt.destination_walk_meters || 0);
+      const destinationWalk = Number(opt.destination_walk_meters || 0);
+      return transferTotalWalk + 250 < bestDirectTotalWalk ||
+        (bestDirectDestinationWalk > 500 && destinationWalk + 200 < bestDirectDestinationWalk);
     });
 
     // Combine results: direct options first, then unique nearby options

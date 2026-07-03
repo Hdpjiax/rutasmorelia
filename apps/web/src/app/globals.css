@@ -1485,6 +1485,40 @@ input:focus-visible {
 
 .journey-panel-header h2 { margin: 0; font-size: 18px; }
 .journey-panel-header p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+.journey-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 4px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.journey-tabs button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.journey-tabs button[aria-selected="true"] {
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 0 1px 4px oklch(0.19 0.018 110 / 0.1);
+}
+.journey-tabs span {
+  display: inline-grid;
+  min-width: 20px;
+  min-height: 20px;
+  margin-left: 4px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  font-size: 11px;
+}
 .journey-results { display: grid; min-height: 0; overflow-y: auto; gap: 7px; }
 
 .journey-result {
