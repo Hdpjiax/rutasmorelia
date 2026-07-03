@@ -152,8 +152,9 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/13.geojson?v=616487c0f60b",
-      "artifactSha256": "616487c0f60b610d34405d85252d793b394957951f37c884d13f7c36bbf89881"
+      "geojsonFile": "/routes/13.geojson?v=9ad95ed9dfc0",
+      "artifactSha256": "9ad95ed9dfc0905ec0307f68f588b612e9845b83a89cc8fa2a817dd3c537dab6",
+      "algorithm": "official-kml-explicit-coordinates"
     },
     {
       "id": "10",

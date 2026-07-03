@@ -72,24 +72,20 @@ def correct_coral_1(index: dict) -> None:
 
 
 def restore_cafe_oro_2(index: dict) -> None:
-    source = ROOT / "work/route-pipeline/13-cafe-oro-2-leandro-valle/13.geojson"
-    report = json.loads(
-        (source.parent / "validation.json").read_text(encoding="utf-8")
-    )
-    if not report.get("quality_pass"):
-        raise RuntimeError("Route 13 clean rebuild did not pass validation")
-    document = json.loads(source.read_text(encoding="utf-8"))
-    removed = 0
-    for feature in document["features"]:
-        lines = feature["geometry"]["coordinates"]
-        for line_index, line in enumerate(lines):
-            cleaned, count = remove_short_detours(line)
-            lines[line_index] = cleaned
-            removed += count
-    for feature in document["features"]:
-        feature["properties"]["reviewedCorrection"] = "global-short-detour-and-spike-removal"
-        feature["properties"]["removedDetours"] = removed
-    write_route("13", document, "reviewed-cafe-oro-2-global-clean-v2", index)
+    # Rebuild directly from KML coordinates as they are authoritative and clean
+    from scripts.build_route_13_from_kml import KML_DIR, feature
+    from route_pipeline.kml import parse_kml
+    
+    kml = next(KML_DIR.glob("*.kml"))
+    directions = parse_kml(kml)
+    if len(directions) != 2 or any(len(item.components) != 2 for item in directions):
+        raise RuntimeError("Route 13 KML must contain two directions with two components each")
+
+    document = {
+        "type": "FeatureCollection",
+        "features": [feature(index, item.components) for index, item in enumerate(directions)],
+    }
+    write_route("13", document, "official-kml-explicit-coordinates", index)
 
 
 def distance_m(a: list[float], b: list[float]) -> float:

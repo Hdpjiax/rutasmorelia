@@ -22,6 +22,8 @@ type MapCanvasProps = {
   originCoordinates?: { latitude: number; longitude: number } | null;
   destinationCoordinates?: { latitude: number; longitude: number } | null;
   showTraffic?: boolean;
+  onOriginChange?: (latitude: number, longitude: number) => void;
+  onDestinationChange?: (latitude: number, longitude: number) => void;
 };
 
 type RouteFeature = {
@@ -32,7 +34,7 @@ type RouteFeature = {
     | { type: "MultiLineString"; coordinates: [number, number][][] };
 };
 
-export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinates, destinationCoordinates, showTraffic }: MapCanvasProps) {
+export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinates, destinationCoordinates, showTraffic, onOriginChange, onDestinationChange }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -523,8 +525,40 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
         }
         routeCoordsRef.current = allCoords;
         updateTrafficFilter(map, allCoords);
-        // Draw walking lines and markers if origin & destination coordinates are provided
-        if (originCoordinates && destinationCoordinates) {
+        // Add origin pin marker if originCoordinates is provided
+        if (originCoordinates) {
+          const originPoint: [number, number] = [originCoordinates.longitude, originCoordinates.latitude];
+          const originMarker = new mapboxgl.Marker({
+            element: createPinMarker("#2563eb", "O"),
+            draggable: true,
+          })
+            .setLngLat(originPoint)
+            .addTo(map);
+          originMarker.on("dragend", () => {
+            const lngLat = originMarker.getLngLat();
+            onOriginChange?.(lngLat.lat, lngLat.lng);
+          });
+          markersRef.current.push(originMarker);
+        }
+
+        // Add destination pin marker if destinationCoordinates is provided
+        if (destinationCoordinates) {
+          const destPoint: [number, number] = [destinationCoordinates.longitude, destinationCoordinates.latitude];
+          const destMarker = new mapboxgl.Marker({
+            element: createDestinationMarker(),
+            draggable: true,
+          })
+            .setLngLat(destPoint)
+            .addTo(map);
+          destMarker.on("dragend", () => {
+            const lngLat = destMarker.getLngLat();
+            onDestinationChange?.(lngLat.lat, lngLat.lng);
+          });
+          markersRef.current.push(destMarker);
+        }
+
+        // Draw walking lines and stops if BOTH origin & destination coordinates are provided AND route is loaded
+        if (originCoordinates && destinationCoordinates && finalFeatures.length > 0) {
           const originPoint: [number, number] = [originCoordinates.longitude, originCoordinates.latitude];
           const destPoint: [number, number] = [destinationCoordinates.longitude, destinationCoordinates.latitude];
           const walkFeatures: {
@@ -535,21 +569,6 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
 
           let pBoard: [number, number];
           let pAlight: [number, number];
-
-          // Add origin and destination pin markers
-          const originMarker = new mapboxgl.Marker({
-            element: createPinMarker("#2563eb", "O"),
-          })
-            .setLngLat(originPoint)
-            .addTo(map);
-          markersRef.current.push(originMarker);
-
-          const destMarker = new mapboxgl.Marker({
-            element: createDestinationMarker(),
-          })
-            .setLngLat(destPoint)
-            .addTo(map);
-          markersRef.current.push(destMarker);
 
           if (routeCodes.length === 1) {
             pBoard = findClosestPoint(finalFeatures, originPoint);
@@ -669,7 +688,7 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
       }
     }
     loadRoute();
-  }, [activeRoute, styleVersion, originCoordinates, destinationCoordinates]);
+  }, [activeRoute, styleVersion, originCoordinates, destinationCoordinates, onOriginChange, onDestinationChange]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>

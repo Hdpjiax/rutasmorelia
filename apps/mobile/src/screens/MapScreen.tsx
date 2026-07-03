@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Camera, type CameraRef, GeoJSONSource, Layer, Map as MapView} from '@maplibre/maplibre-react-native';
+import {Camera, type CameraRef, GeoJSONSource, Layer, Map as MapView, ViewAnnotation} from '@maplibre/maplibre-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -27,6 +27,7 @@ const ROUTES_CACHE_KEY = '@viamorelia/routes-v2';
 const ROUTES_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
 const EMPTY_GEOJSON: GeoJSON.FeatureCollection = {type: 'FeatureCollection', features: []};
 const PUBLISHED_ROUTES_BASE_URL = 'https://www.viamorelia.org/routes';
+const LOCAL_ROUTES_BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:3000/routes' : 'http://localhost:3000/routes';
 const WHITE_ROAD_LAYERS = new Set([
   'tunnel_motorway_link', 'tunnel_service_track', 'tunnel_link', 'tunnel_minor', 'tunnel_secondary_tertiary', 'tunnel_trunk_primary', 'tunnel_motorway',
   'road_motorway_link', 'road_service_track', 'road_link', 'road_minor', 'road_secondary_tertiary', 'road_trunk_primary', 'road_motorway',
@@ -90,7 +91,7 @@ function getAccurateNativePosition(maxWaitMs = 18000, requiredAccuracyM = 80): P
       settled = true;
       if (watchId >= 0) Geolocation.clearWatch(watchId);
       clearTimeout(timer);
-      if (position && Number(position.coords.accuracy) <= requiredAccuracyM) resolve(position);
+      if (position && (Number(position.coords.accuracy) <= requiredAccuracyM || error === undefined)) resolve(position);
       else reject(error || new Error('La señal GPS no tiene suficiente precisión'));
     };
     const timer = setTimeout(() => finish(best), maxWaitMs);
@@ -494,9 +495,13 @@ export function MapScreen({navigation}: Props) {
     loadFavorites();
   }, []);
 
-  // Hydrate the catalogue from disk while refreshing it from Supabase in parallel.
+  // Automatically search user location on mount
   useEffect(() => {
-    const client = supabase;
+    locate();
+  }, []);
+
+  // Load routes index from local server (Next.js public routes index.json) or production fallback
+  useEffect(() => {
     let cancelled = false;
 
     function applyRoutes(routes: RouteItem[]) {
@@ -508,77 +513,45 @@ export function MapScreen({navigation}: Props) {
 
     async function loadRoutes() {
       const cachedRoutesPromise = AsyncStorage.getItem(ROUTES_CACHE_KEY).catch(() => null);
-      const publishedRoutesPromise = fetch(`${PUBLISHED_ROUTES_BASE_URL}/index.json`)
-        .then(response => response.ok ? response.json() : null)
-        .catch(() => null);
-      const networkRoutesPromise = client
-        ? client
-            .from('routes')
-            .select('id, name, code, color, transport_type, description')
-            .eq('is_active', true)
-            .eq('validation_status', 'validated')
-            .order('name', {ascending: true})
-        : null;
 
-      const cachedValue = await cachedRoutesPromise;
-      if (cachedValue) {
-        try {
-          const cached = JSON.parse(cachedValue) as {savedAt: number; routes: RouteItem[]};
-          if (Date.now() - cached.savedAt < ROUTES_CACHE_MAX_AGE) applyRoutes(cached.routes);
-        } catch {
-          AsyncStorage.removeItem(ROUTES_CACHE_KEY).catch(() => undefined);
-        }
-      }
+      const fetchRoutesFromBase = async (base: string) => {
+        const response = await fetch(`${base}/index.json`);
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        return data.routes ?? [];
+      };
 
-      const publishedIndex = await publishedRoutesPromise as {
-        routes?: Array<{id: string; name: string; color?: string; transportType?: string}>;
-      } | null;
-      const publishedRoutes: RouteItem[] = (publishedIndex?.routes || []).map(route => ({
-        id: `published:${route.id}`,
-        geometryId: route.id,
-        number: `${route.transportType === 'Combi' ? 'C' : 'A'}${route.id.replace(/\D/g, '') || route.id}`,
-        name: route.name,
-        detail: route.transportType || 'Transporte público',
-        time: 'Ver recorrido',
-        color: route.color || '#FFA500',
-      }));
-
-      if (!networkRoutesPromise) {
-        if (publishedRoutes.length) applyRoutes(publishedRoutes);
-        return;
-      }
+      let routesData: any[] = [];
       try {
-        const {data, error} = await networkRoutesPromise;
-        if (error) {
-          console.warn('Failed to query routes from Supabase:', error);
-          if (publishedRoutes.length) applyRoutes(publishedRoutes);
-          return;
+        routesData = await fetchRoutesFromBase(LOCAL_ROUTES_BASE_URL);
+      } catch (err) {
+        try {
+          routesData = await fetchRoutesFromBase(PUBLISHED_ROUTES_BASE_URL);
+        } catch (err2) {
+          // If both fail, we will fallback to cached routes
         }
-        if (data?.length) {
-          const mapped: RouteItem[] = data.map(route => {
-            let number = route.transport_type === 'combi' ? 'C' : 'A';
-            const match = route.code.match(/\d+/);
-            if (match) number += match[0];
-            return {
-              id: String(route.id),
-              geometryId: route.code,
-              number,
-              name: route.name,
-              detail: route.description || (route.transport_type === 'combi' ? 'Ruta de combi' : 'Ruta de camión'),
-              time: route.transport_type === 'combi' ? 'Combi' : 'Camión',
-              color: route.color || '#FFA500',
-            };
-          });
-          const knownGeometry = new Set(mapped.map(route => route.geometryId));
-          const merged = [...mapped, ...publishedRoutes.filter(route => !knownGeometry.has(route.geometryId))];
-          applyRoutes(merged);
-          AsyncStorage.setItem(ROUTES_CACHE_KEY, JSON.stringify({savedAt: Date.now(), routes: merged})).catch(() => undefined);
-        } else if (publishedRoutes.length) {
-          applyRoutes(publishedRoutes);
+      }
+
+      if (routesData.length > 0) {
+        const mapped: RouteItem[] = routesData.map(route => ({
+          id: String(route.id),
+          geometryId: String(route.id),
+          number: `${route.transportType === 'Combi' || route.transportType === 'combi' ? 'C' : 'A'}${String(route.id).replace(/\D/g, '') || String(route.id)}`,
+          name: route.name,
+          detail: route.transportType === 'Combi' || route.transportType === 'combi' ? 'Combi' : 'Camión',
+          time: 'Ver recorrido',
+          color: route.color || '#FFA500',
+        }));
+        applyRoutes(mapped);
+        AsyncStorage.setItem(ROUTES_CACHE_KEY, JSON.stringify({savedAt: Date.now(), routes: mapped})).catch(() => undefined);
+      } else {
+        const cachedValue = await cachedRoutesPromise;
+        if (cachedValue) {
+          try {
+            const cached = JSON.parse(cachedValue) as {savedAt: number; routes: RouteItem[]};
+            applyRoutes(cached.routes);
+          } catch {}
         }
-      } catch (error) {
-        if (!cancelled) console.warn('Failed to query routes from Supabase:', error);
-        if (publishedRoutes.length) applyRoutes(publishedRoutes);
       }
     }
 
@@ -590,7 +563,6 @@ export function MapScreen({navigation}: Props) {
 
   // Load selected geometry with cancellation and an in-memory LRU-style cache.
   useEffect(() => {
-    const client = supabase;
     if (!activeRouteId) return;
     const controller = new AbortController();
 
@@ -602,39 +574,69 @@ export function MapScreen({navigation}: Props) {
       });
     }
 
-    async function loadPublishedFallback(): Promise<boolean> {
+    async function loadRouteGeometry() {
+      setRouteLoading(true);
+      setRouteError(null);
+      setActiveRouteGeoJSON(null);
+
       const selected = routesList.find(route => route.id === activeRouteId);
-      if (!selected?.geometryId) return false;
-      try {
-        const response = await fetch(`${PUBLISHED_ROUTES_BASE_URL}/${encodeURIComponent(selected.geometryId)}.geojson`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) return false;
-        const geojson = await response.json() as GeoJSON.FeatureCollection;
-        const geometryBounds = geojson.features
-          .map(feature => feature.geometry)
-          .filter((geometry): geometry is RouteGeometry => geometry.type === 'LineString' || geometry.type === 'MultiLineString')
-          .map(getGeometryBounds)
-          .filter((value): value is [number, number, number, number] => Boolean(value));
-        if (!geometryBounds.length) return false;
-        const bounds = geometryBounds.reduce<[number, number, number, number]>((acc, value) => [
-          Math.min(acc[0], value[0]), Math.min(acc[1], value[1]),
-          Math.max(acc[2], value[2]), Math.max(acc[3], value[3]),
-        ], [Infinity, Infinity, -Infinity, -Infinity]);
-        const normalized: GeoJSON.FeatureCollection = {
-          ...geojson,
-          features: geojson.features.map(feature => ({
-            ...feature,
-            properties: {...feature.properties, id: activeRouteId, color: feature.properties?.color || selected.color},
-          })),
-        };
-        const nextCached = {geojson: normalized, bounds};
-        routeGeometryCache.current.set(activeRouteId, nextCached);
-        showGeometry(nextCached, 380);
-        return true;
-      } catch (error) {
-        if (!controller.signal.aborted) console.warn('Failed loading published route fallback:', error);
-        return false;
+      if (!selected?.geometryId) {
+        setRouteError('Esta ruta no tiene un recorrido disponible.');
+        setRouteLoading(false);
+        return;
+      }
+
+      // Try local web server first, then fallback to public website
+      const bases = [LOCAL_ROUTES_BASE_URL, PUBLISHED_ROUTES_BASE_URL];
+      let loaded = false;
+
+      for (const base of bases) {
+        try {
+          const response = await fetch(`${base}/${encodeURIComponent(selected.geometryId)}.geojson`, {
+            signal: controller.signal,
+          });
+          if (response.ok) {
+            const geojson = await response.json() as GeoJSON.FeatureCollection;
+            const geometryBounds = geojson.features
+              .map(feature => feature.geometry)
+              .filter((geometry): geometry is RouteGeometry => geometry.type === 'LineString' || geometry.type === 'MultiLineString')
+              .map(getGeometryBounds)
+              .filter((value): value is [number, number, number, number] => Boolean(value));
+            
+            if (geometryBounds.length) {
+              const bounds = geometryBounds.reduce<[number, number, number, number]>((acc, value) => [
+                Math.min(acc[0], value[0]), Math.min(acc[1], value[1]),
+                Math.max(acc[2], value[2]), Math.max(acc[3], value[3]),
+              ], [Infinity, Infinity, -Infinity, -Infinity]);
+
+              const normalized: GeoJSON.FeatureCollection = {
+                ...geojson,
+                features: geojson.features.map(feature => ({
+                  ...feature,
+                  properties: {...feature.properties, id: activeRouteId, color: feature.properties?.color || selected.color},
+                })),
+              };
+
+              const nextCached = {geojson: normalized, bounds};
+              routeGeometryCache.current.set(activeRouteId, nextCached);
+              if (routeGeometryCache.current.size > 12) {
+                const oldestKey = routeGeometryCache.current.keys().next().value;
+                if (oldestKey) routeGeometryCache.current.delete(oldestKey);
+              }
+
+              showGeometry(nextCached, 380);
+              loaded = true;
+              break;
+            }
+          }
+        } catch (error) {
+          // Silent catch to try next base
+        }
+      }
+
+      setRouteLoading(false);
+      if (!loaded && !controller.signal.aborted) {
+        setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
       }
     }
 
@@ -648,75 +650,6 @@ export function MapScreen({navigation}: Props) {
       return;
     }
 
-    if (!client) {
-      const fallback = routeCollection.features.find(feature => feature.properties?.id === activeRouteId);
-      if (fallback && (fallback.geometry.type === 'LineString' || fallback.geometry.type === 'MultiLineString')) {
-        const bounds = getGeometryBounds(fallback.geometry);
-        if (bounds) {
-          const geojson: GeoJSON.FeatureCollection = {type: 'FeatureCollection', features: [fallback]};
-          showGeometry({geojson, bounds}, 280);
-        }
-      }
-      loadPublishedFallback().then(loaded => {
-        if (!loaded && !controller.signal.aborted) setRouteError('Esta ruta todavía no tiene un recorrido disponible.');
-      });
-      return () => controller.abort();
-    }
-    const activeClient = client;
-
-    async function loadRouteGeometry() {
-      setRouteLoading(true);
-      setRouteError(null);
-      setActiveRouteGeoJSON(null);
-      try {
-        // The published artifact is the same complete GeoJSON rendered by the
-        // web app (both directions, reviewed properties and exact geometry).
-        // Supabase remains a fallback for routes not yet in the web catalogue.
-        if (await loadPublishedFallback()) return;
-        const {data, error} = await activeClient
-          .rpc('get_route_geometry', {p_route_id: Number(activeRouteId), p_tolerance: 0.000003})
-          .abortSignal(controller.signal);
-        if (controller.signal.aborted) return;
-        if (error) {
-          console.warn('Failed loading route geometry:', error);
-          if (!(await loadPublishedFallback())) setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
-          return;
-        }
-        const variant = data?.[0] as {route_id: number; variant_name: string | null; color: string; geometry: RouteGeometry} | undefined;
-        if (!variant?.geometry) {
-          if (!(await loadPublishedFallback())) setRouteError('Esta ruta todavía no tiene un recorrido disponible.');
-          return;
-        }
-
-        const bounds = getGeometryBounds(variant.geometry);
-        if (!bounds) {
-          setRouteError('El recorrido de esta ruta no contiene coordenadas válidas.');
-          return;
-        }
-        const geojson: GeoJSON.FeatureCollection = {
-          type: 'FeatureCollection',
-          features: [{
-            type: 'Feature',
-            properties: {id: activeRouteId, color: variant.color || '#FFA500', name: variant.variant_name || 'Principal'},
-            geometry: variant.geometry,
-          }],
-        };
-        const nextCached = {geojson, bounds};
-        routeGeometryCache.current.set(activeRouteId, nextCached);
-        if (routeGeometryCache.current.size > 12) {
-          const oldestKey = routeGeometryCache.current.keys().next().value;
-          if (oldestKey) routeGeometryCache.current.delete(oldestKey);
-        }
-        showGeometry(nextCached, 380);
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.warn('Failed loading route geometry:', error);
-          if (!(await loadPublishedFallback())) setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
-        }
-      } finally {
-        if (!controller.signal.aborted) setRouteLoading(false);
-      }
-    }
     loadRouteGeometry();
     return () => controller.abort();
   }, [activeRouteId, routeRequestVersion, routesList]);
@@ -951,6 +884,9 @@ export function MapScreen({navigation}: Props) {
         return;
       }
     }
+    if (origin) {
+      camera.current?.flyTo({center: [origin.longitude, origin.latitude], zoom: 16, duration: 700});
+    }
     setMessage('Buscando tu ubicación…');
     
     try {
@@ -961,19 +897,24 @@ export function MapScreen({navigation}: Props) {
       setMessage(`Ubicación actualizada (precisión ±${Math.round(position.coords.accuracy)} m)`);
     } catch (error) {
       console.warn('No precise GPS location available:', error);
-      setMessage('La señal GPS no tiene suficiente precisión. Activa Ubicación precisa e inténtalo de nuevo.');
+      if (origin) {
+        camera.current?.flyTo({center: [origin.longitude, origin.latitude], zoom: 16, duration: 700});
+        setMessage('Mostrando última ubicación conocida.');
+      } else {
+        setMessage('La señal GPS no tiene suficiente precisión. Activa Ubicación precisa e inténtalo de nuevo.');
+      }
     }
   }
 
-  async function planJourney() {
+  async function planJourneyWithCoords(customOrigin = origin, customDestination = destination) {
     if (!destinationLabel.trim()) return setMessage('Escribe un destino para buscar rutas.');
     setIsMenuOpen(true);
-    if (!supabase || !origin || !destination) return setMessage(`Mostrando rutas relacionadas con ${destinationLabel}.`);
+    if (!supabase || !customOrigin || !customDestination) return setMessage(`Mostrando rutas relacionadas con ${destinationLabel}.`);
     setLoading(true);
     setJourneyTab('direct');
     setJourneyOptions([]);
     try {
-      const {data, error} = await supabase.functions.invoke('plan-journey', {body: {origin, destination}});
+      const {data, error} = await supabase.functions.invoke('plan-journey', {body: {origin: customOrigin, destination: customDestination}});
       setLoading(false);
       const options = data?.data as any[] | undefined;
       if (!error && options && options.length > 0) {
@@ -991,6 +932,10 @@ export function MapScreen({navigation}: Props) {
       setJourneyOptions([]);
       setMessage('Error de red al calcular el viaje.');
     }
+  }
+
+  async function planJourney() {
+    await planJourneyWithCoords(origin, destination);
   }
 
   async function selectSuggestion(suggestion: Suggestion) {
@@ -1096,6 +1041,74 @@ export function MapScreen({navigation}: Props) {
         <GeoJSONSource id="stops" data={EMPTY_GEOJSON}>
           <Layer id="stops-layer" type="circle" paint={{'circle-radius': 7, 'circle-color': colors.primary, 'circle-stroke-color': '#FFFFFF', 'circle-stroke-width': 3}} />
         </GeoJSONSource>
+        {origin && (
+          <ViewAnnotation
+            id="origin-marker"
+            lngLat={[origin.longitude, origin.latitude]}
+            draggable={true}
+            onDragEnd={(e: any) => {
+              const coords = e.nativeEvent.lngLat;
+              if (coords && coords.length >= 2) {
+                const newCoords = { latitude: coords[1], longitude: coords[0] };
+                setOrigin("Ubicación en el mapa", newCoords);
+                if (destination) {
+                  void planJourneyWithCoords(newCoords, destination);
+                }
+              }
+            }}
+          >
+            <View style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: '#2563eb',
+              borderWidth: 2,
+              borderColor: '#ffffff',
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#000000',
+              shadowOpacity: 0.3,
+              shadowRadius: 3,
+              elevation: 4
+            }}>
+              <Text style={{color: '#ffffff', fontSize: 10, fontWeight: '800'}}>O</Text>
+            </View>
+          </ViewAnnotation>
+        )}
+        {destination && (
+          <ViewAnnotation
+            id="destination-marker"
+            lngLat={[destination.longitude, destination.latitude]}
+            draggable={true}
+            onDragEnd={(e: any) => {
+              const coords = e.nativeEvent.lngLat;
+              if (coords && coords.length >= 2) {
+                const newCoords = { latitude: coords[1], longitude: coords[0] };
+                setDestination("Ubicación en el mapa", newCoords);
+                if (origin) {
+                  void planJourneyWithCoords(origin, newCoords);
+                }
+              }
+            }}
+          >
+            <View style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: '#ef4444',
+              borderWidth: 2,
+              borderColor: '#ffffff',
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#000000',
+              shadowOpacity: 0.3,
+              shadowRadius: 3,
+              elevation: 4
+            }}>
+              <Text style={{color: '#ffffff', fontSize: 10, fontWeight: '800'}}>D</Text>
+            </View>
+          </ViewAnnotation>
+        )}
       </MapView>
 
       <View pointerEvents="box-none" style={[styles.overlay, {paddingTop: insets.top + 4}]}>

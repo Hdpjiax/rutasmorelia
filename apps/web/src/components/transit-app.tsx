@@ -60,7 +60,7 @@ function getAccuratePosition(maxWaitMs = 15000, requiredAccuracyM = 80): Promise
       settled = true;
       navigator.geolocation.clearWatch(watchId);
       window.clearTimeout(timer);
-      if (position && position.coords.accuracy <= requiredAccuracyM) resolve(position);
+      if (position && (position.coords.accuracy <= requiredAccuracyM || error === undefined)) resolve(position);
       else reject(error || new Error('La señal GPS no tiene suficiente precisión'));
     };
     const timer = window.setTimeout(() => finish(best || undefined), maxWaitMs);
@@ -74,6 +74,7 @@ function getAccuratePosition(maxWaitMs = 15000, requiredAccuracyM = 80): Promise
     );
   });
 }
+
 
 type FavoriteItem = {
   id: string | number;
@@ -468,6 +469,9 @@ export function TransitApp() {
       setMessage("Tu dispositivo no permite obtener la ubicación.");
       return;
     }
+    if (originCoordinates) {
+      setMapCenter({ ...originCoordinates, timestamp: Date.now() });
+    }
     setMessage("Buscando tu ubicación…");
     try {
       const {coords} = await getAccuratePosition();
@@ -477,16 +481,22 @@ export function TransitApp() {
       setMapCenter({...point, timestamp: Date.now()});
       setMessage(`Ubicación actualizada (precisión ±${Math.round(coords.accuracy)} m).`);
     } catch {
-      setMessage("No obtuvimos una ubicación precisa. Activa el GPS y vuelve a intentarlo.");
+      if (originCoordinates) {
+        setMapCenter({ ...originCoordinates, timestamp: Date.now() });
+        setMessage("Mostrando última ubicación conocida.");
+      } else {
+        setMessage("No obtuvimos una ubicación precisa. Activa el GPS y vuelve a intentarlo.");
+      }
     }
-  }, []);
+  }, [originCoordinates]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       requestLocation();
     }, 100);
     return () => clearTimeout(timer);
-  }, [requestLocation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function planJourney(originPoint: Coordinates, destinationPoint: Coordinates) {
     if (!isSupabaseConfigured()) return setMessage("El planificador no está disponible.");
@@ -591,6 +601,22 @@ export function TransitApp() {
           zoomCommand={zoomCommand}
           originCoordinates={originCoordinates}
           destinationCoordinates={destinationCoordinates}
+          onOriginChange={(lat, lng) => {
+            const coords = { latitude: lat, longitude: lng };
+            setOrigin("Ubicación en el mapa");
+            setOriginCoordinates(coords);
+            if (destinationCoordinates) {
+              void planJourney(coords, destinationCoordinates);
+            }
+          }}
+          onDestinationChange={(lat, lng) => {
+            const coords = { latitude: lat, longitude: lng };
+            setDestination("Ubicación en el mapa");
+            setDestinationCoordinates(coords);
+            if (originCoordinates) {
+              void planJourney(originCoordinates, coords);
+            }
+          }}
         />
       </div>
 
