@@ -115,25 +115,25 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
         m.setPaintProperty("rail", "line-color", [
           "case",
           ["has", "service"],
-          "#cbd5e1",
-          "#475569"
+          "#94a3b8",
+          "#0f172a" // Much darker slate-900 for high visibility
         ]);
         m.setPaintProperty("rail", "line-width", [
           "interpolate",
           ["linear"],
           ["zoom"],
           10,
-          ["case", ["has", "service"], 0.8, 1.5],
+          ["case", ["has", "service"], 0.8, 2.0],
           14,
-          ["case", ["has", "service"], 0.8, 2.8],
+          ["case", ["has", "service"], 1.0, 3.8],
           18,
-          ["case", ["has", "service"], 0.8, 3.5]
+          ["case", ["has", "service"], 1.2, 5.0]
         ]);
         m.setPaintProperty("rail", "line-opacity", [
           "case",
           ["has", "service"],
-          0.12,
-          0.38
+          0.3,
+          0.95 // High opacity to make tracks stand out clearly
         ]);
       }
       if (m.getLayer("rail_dash")) {
@@ -143,14 +143,14 @@ export function MapCanvas({ activeRoute, mapCenter, zoomCommand, originCoordinat
           ["linear"],
           ["zoom"],
           10,
-          ["case", ["has", "service"], 0.0, 1.0],
+          ["case", ["has", "service"], 0.0, 1.2],
           14,
-          ["case", ["has", "service"], 0.0, 2.0],
+          ["case", ["has", "service"], 0.0, 2.5],
           18,
-          ["case", ["has", "service"], 0.0, 2.5]
+          ["case", ["has", "service"], 0.0, 3.5]
         ]);
         m.setPaintProperty("rail_dash", "line-dasharray", [3, 3]);
-        m.setPaintProperty("rail_dash", "line-opacity", 0.3);
+        m.setPaintProperty("rail_dash", "line-opacity", 0.95);
       }
 
       // 4. Periferico Paseo de la Republica destacado completo
