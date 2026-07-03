@@ -80,6 +80,31 @@ function getGeometryBounds(geometry: RouteGeometry): [number, number, number, nu
   return [minLng, minLat, maxLng, maxLat];
 }
 
+function getAccurateNativePosition(maxWaitMs = 18000, requiredAccuracyM = 80): Promise<any> {
+  return new Promise((resolve, reject) => {
+    let best: any = null;
+    let settled = false;
+    let watchId = -1;
+    const finish = (position?: any, error?: any) => {
+      if (settled) return;
+      settled = true;
+      if (watchId >= 0) Geolocation.clearWatch(watchId);
+      clearTimeout(timer);
+      if (position && Number(position.coords.accuracy) <= requiredAccuracyM) resolve(position);
+      else reject(error || new Error('La señal GPS no tiene suficiente precisión'));
+    };
+    const timer = setTimeout(() => finish(best), maxWaitMs);
+    watchId = Geolocation.watchPosition(
+      position => {
+        if (!best || Number(position.coords.accuracy) < Number(best.coords.accuracy)) best = position;
+        if (Number(position.coords.accuracy) <= 25) finish(position);
+      },
+      error => finish(undefined, error),
+      {enableHighAccuracy: true, timeout: maxWaitMs, maximumAge: 0, distanceFilter: 0},
+    );
+  });
+}
+
 function generateTrafficFallback(routeGeoJSON: any) {
   if (!routeGeoJSON || !routeGeoJSON.features || routeGeoJSON.features.length === 0) {
     return { type: "FeatureCollection", features: [] };
@@ -922,30 +947,16 @@ export function MapScreen({navigation}: Props) {
     }
     setMessage('Buscando tu ubicación…');
     
-    // Attempt high accuracy location (GPS)
-    Geolocation.getCurrentPosition(
-      position => {
-        const coordinates = {latitude: position.coords.latitude, longitude: position.coords.longitude};
-        setOrigin('Mi ubicación', coordinates);
-        camera.current?.flyTo({center: [coordinates.longitude, coordinates.latitude], zoom: 15, duration: 700});
-        setMessage('Ubicación actualizada');
-      },
-      error => {
-        console.warn('GPS location failed, trying network...', error);
-        // Fallback to low accuracy (Wi-Fi/cell tower triangulation) - essential for tablets!
-        Geolocation.getCurrentPosition(
-          lowPos => {
-            const coordinates = {latitude: lowPos.coords.latitude, longitude: lowPos.coords.longitude};
-            setOrigin('Mi ubicación', coordinates);
-            camera.current?.flyTo({center: [coordinates.longitude, coordinates.latitude], zoom: 15, duration: 700});
-            setMessage('Ubicación actualizada (Red)');
-          },
-          () => setMessage('No pudimos obtener tu ubicación. Verifica tu GPS/Wi-Fi.'),
-          {enableHighAccuracy: false, timeout: 10000},
-        );
-      },
-      {enableHighAccuracy: true, timeout: 6000},
-    );
+    try {
+      const position = await getAccurateNativePosition();
+      const coordinates = {latitude: position.coords.latitude, longitude: position.coords.longitude};
+      setOrigin('Mi ubicación', coordinates);
+      camera.current?.flyTo({center: [coordinates.longitude, coordinates.latitude], zoom: 16, duration: 700});
+      setMessage(`Ubicación actualizada (precisión ±${Math.round(position.coords.accuracy)} m)`);
+    } catch (error) {
+      console.warn('No precise GPS location available:', error);
+      setMessage('La señal GPS no tiene suficiente precisión. Activa Ubicación precisa e inténtalo de nuevo.');
+    }
   }
 
   async function planJourney() {

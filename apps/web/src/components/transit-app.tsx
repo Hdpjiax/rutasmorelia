@@ -48,6 +48,33 @@ type JourneyOption = {
 
 type Coordinates = { latitude: number; longitude: number };
 
+function getAccuratePosition(maxWaitMs = 15000, requiredAccuracyM = 80): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) return reject(new Error('Geolocalización no disponible'));
+    let best: GeolocationPosition | null = null;
+    let settled = false;
+    let watchId = 0;
+
+    const finish = (position?: GeolocationPosition, error?: GeolocationPositionError | Error) => {
+      if (settled) return;
+      settled = true;
+      navigator.geolocation.clearWatch(watchId);
+      window.clearTimeout(timer);
+      if (position && position.coords.accuracy <= requiredAccuracyM) resolve(position);
+      else reject(error || new Error('La señal GPS no tiene suficiente precisión'));
+    };
+    const timer = window.setTimeout(() => finish(best || undefined), maxWaitMs);
+    watchId = navigator.geolocation.watchPosition(
+      position => {
+        if (!best || position.coords.accuracy < best.coords.accuracy) best = position;
+        if (position.coords.accuracy <= 25) finish(position);
+      },
+      error => finish(undefined, error),
+      {enableHighAccuracy: true, timeout: maxWaitMs, maximumAge: 0},
+    );
+  });
+}
+
 type FavoriteItem = {
   id: string | number;
   route_id?: string | number | null;
@@ -435,23 +462,22 @@ export function TransitApp() {
     return scored.map((item) => item.route);
   }, [routeQuery, routes, transportFilter, favorites]);
 
-  const requestLocation = useCallback(() => {
+  const requestLocation = useCallback(async () => {
     if (!navigator.geolocation) {
       setMessage("Tu dispositivo no permite obtener la ubicación.");
       return;
     }
     setMessage("Buscando tu ubicación…");
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const point = { latitude: coords.latitude, longitude: coords.longitude };
-        setOrigin("Mi ubicación");
-        setOriginCoordinates(point);
-        setMapCenter({ ...point, timestamp: Date.now() });
-        setMessage("Ubicación actualizada.");
-      },
-      () => setMessage("No pudimos acceder a tu ubicación. Revisa los permisos."),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
-    );
+    try {
+      const {coords} = await getAccuratePosition();
+      const point = {latitude: coords.latitude, longitude: coords.longitude};
+      setOrigin("Mi ubicación");
+      setOriginCoordinates(point);
+      setMapCenter({...point, timestamp: Date.now()});
+      setMessage(`Ubicación actualizada (precisión ±${Math.round(coords.accuracy)} m).`);
+    } catch {
+      setMessage("No obtuvimos una ubicación precisa. Activa el GPS y vuelve a intentarlo.");
+    }
   }, []);
 
   useEffect(() => {
@@ -537,8 +563,8 @@ export function TransitApp() {
       } else if (origin === "Mi ubicación") {
         if (navigator.geolocation) {
           setMessage("Obteniendo tu ubicación para calcular la ruta…");
-          navigator.geolocation.getCurrentPosition(
-            ({ coords }) => {
+          getAccuratePosition(15000).then(
+            ({coords}) => {
               const startPoint = { latitude: coords.latitude, longitude: coords.longitude };
               setOriginCoordinates(startPoint);
               setMapCenter({ ...startPoint, timestamp: Date.now() });
@@ -547,7 +573,6 @@ export function TransitApp() {
             () => {
               setMessage("Por favor selecciona un punto de origen en la lista para planificar la ruta.");
             },
-            { enableHighAccuracy: true, timeout: 8000 }
           );
         } else {
           setMessage("Selecciona una dirección de origen.");
