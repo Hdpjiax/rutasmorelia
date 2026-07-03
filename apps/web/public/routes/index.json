@@ -393,8 +393,8 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/22.geojson?v=56f640d4f610",
-      "artifactSha256": "56f640d4f610e47c0ff46b05731c8a313fbcede9b3aa98d701fb56b561245307"
+      "geojsonFile": "/routes/22.geojson?v=47729bc1b2e9",
+      "artifactSha256": "47729bc1b2e93f13c57e12bb53be2782d75494b12b79a1eb1706aa6db5b2115b"
     },
     {
       "id": "23",
@@ -403,8 +403,8 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/23.geojson?v=ec98930e0891",
-      "artifactSha256": "ec98930e0891f6488849658a8771e9d467fe2b3f48f41a6c0f2ec63abd455614"
+      "geojsonFile": "/routes/23.geojson?v=804185551f99",
+      "artifactSha256": "804185551f99b10939919c76200d1b000f0895c8c399edb40134209250103946"
     },
     {
       "id": "80",
