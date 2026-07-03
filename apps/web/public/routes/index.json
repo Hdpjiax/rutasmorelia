@@ -453,8 +453,8 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/24.geojson?v=d878be2baefe",
-      "artifactSha256": "d878be2baefeedfbfe60d94872c6fd4b49a6b9c30debc504cf575911524ad85f"
+      "geojsonFile": "/routes/24.geojson?v=efac16e96d19",
+      "artifactSha256": "efac16e96d1910202eb00cba4fd6b9364cf2f8180a7cb1173446541ab5b3a1d7"
     },
     {
       "id": "26",
