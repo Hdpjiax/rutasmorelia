@@ -161,8 +161,99 @@ export function MapScreen({navigation}: Props) {
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [routeRequestVersion, setRouteRequestVersion] = useState(0);
+  const [customMapStyle, setCustomMapStyle] = useState<any>(null);
   const routeGeometryCache = useRef(new Map<string, CachedGeometry>());
   const suggestionCache = useRef(new Map<string, Suggestion[]>());
+
+  useEffect(() => {
+    async function loadAndCustomizeStyle() {
+      try {
+        const response = await fetch(MAP_STYLE_URL);
+        const style = await response.json();
+        
+        if (style && style.layers) {
+          style.layers = style.layers.map((layer: any) => {
+            if (layer.id === 'water') {
+              return {
+                ...layer,
+                paint: { ...layer.paint, 'fill-color': '#bae6fd' }
+              };
+            }
+            if (layer.id === 'waterway') {
+              return {
+                ...layer,
+                paint: { ...layer.paint, 'line-color': '#bae6fd' }
+              };
+            }
+            if (layer.id === 'park_national_park' || layer.id === 'park_nature_reserve') {
+              return {
+                ...layer,
+                paint: { ...layer.paint, 'fill-color': '#bbf7d0', 'fill-opacity': 0.95 }
+              };
+            }
+            if (layer.id === 'rail') {
+              return {
+                ...layer,
+                paint: {
+                  ...layer.paint,
+                  'line-color': [
+                    'case',
+                    ['has', 'service'],
+                    '#94a3b8',
+                    '#0f172a'
+                  ],
+                  'line-width': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    10,
+                    ['case', ['has', 'service'], 0.8, 2.0],
+                    14,
+                    ['case', ['has', 'service'], 1.0, 3.8],
+                    18,
+                    ['case', ['has', 'service'], 1.2, 5.0]
+                  ],
+                  'line-opacity': [
+                    'case',
+                    ['has', 'service'],
+                    0.3,
+                    0.95
+                  ]
+                }
+              };
+            }
+            if (layer.id === 'rail_dash') {
+              return {
+                ...layer,
+                paint: {
+                  ...layer.paint,
+                  'line-color': '#ffffff',
+                  'line-width': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    10,
+                    ['case', ['has', 'service'], 0.0, 1.2],
+                    14,
+                    ['case', ['has', 'service'], 0.0, 2.5],
+                    18,
+                    ['case', ['has', 'service'], 0.0, 3.5]
+                  ],
+                  'line-dasharray': [3, 3],
+                  'line-opacity': 0.95
+                }
+              };
+            }
+            return layer;
+          });
+          setCustomMapStyle(style);
+        }
+      } catch (e) {
+        console.warn('Failed to customize map style, using default:', e);
+      }
+    }
+    loadAndCustomizeStyle();
+  }, []);
 
   const isOriginFavorited = useMemo(() => {
     return favorites.some(f => (f.place_id || f.stop_id || f.latitude) && f.custom_name === originLabel);
@@ -375,7 +466,7 @@ export function MapScreen({navigation}: Props) {
               id: String(route.id),
               number,
               name: route.name,
-              detail: route.description || (route.transport_type === 'combi' ? 'Ruta de combi' : 'Ruta de autobús'),
+              detail: route.description || (route.transport_type === 'combi' ? 'Ruta de combi' : 'Ruta de camión'),
               time: route.transport_type === 'combi' ? 'Combi' : 'Camión',
               color: route.color || '#FFA500',
             };
@@ -813,7 +904,7 @@ export function MapScreen({navigation}: Props) {
 
   return (
     <View style={styles.root}>
-      <MapView style={StyleSheet.absoluteFill} mapStyle={MAP_STYLE_URL} logo={false} compass={false} attribution accessibilityLabel="Mapa de transporte público de Morelia">
+      <MapView style={StyleSheet.absoluteFill} mapStyle={customMapStyle ? JSON.stringify(customMapStyle) : MAP_STYLE_URL} logo={false} compass={false} attribution accessibilityLabel="Mapa de transporte público de Morelia">
         <Camera ref={camera} initialViewState={{center: [-101.194, 19.702], zoom: 13.3}} minZoom={10} maxZoom={19} />
         <Images images={{'route-arrow-icon': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAoElEQVR4Ae3BUYqEMBRFwXMk+9/ybftzHkpijAw0VvF6vQaEB22MCQ+RvvCXLCR94ZgsIH1hl4QvlUJu2LgoCUWAMGljQhKSUIQJ0hd2STijUsgg6Qu7JPSoFNIhfWGXhFEqhZzYeEASigDhQOMBKoWcaCykUkhHYwGVQgY1blAp5KLGBJUDMqFxkUohN0hfOCYLNK6ThRrj5J+E1+uXfQA38ic2CnPsfQAAAABJRU5ErkJggg=='}} />
         <GeoJSONSource id="routes" data={activeRouteGeoJSON || EMPTY_GEOJSON}>
