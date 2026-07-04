@@ -3,6 +3,12 @@ export const light = {
   muted: '#626657', line: '#D9DCCF', primary: '#6F7E24', primarySoft: '#EDF2D5',
 };
 export const dark = {
-  bg: '#181914', surface: '#22241D', surfaceStrong: '#303329', ink: '#F3F4ED',
-  muted: '#B5B9AA', line: '#424538', primary: '#B3C456', primarySoft: '#343A20',
+  bg: '#0F172A',
+  surface: '#1E293B',
+  surfaceStrong: '#334155',
+  ink: '#F8FAFC',
+  muted: '#94A3B8',
+  line: '#334155',
+  primary: '#BEF264',
+  primarySoft: '#1E293B',
 };

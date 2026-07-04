@@ -14,7 +14,7 @@ type TransitState = {
 
 export const useTransitStore = create<TransitState>(set => ({
   originLabel: 'Mi ubicación', destinationLabel: '', origin: null,
-  destination: null, activeRouteId: '4',
+  destination: null, activeRouteId: '',
   setOrigin: (originLabel, origin = null) => set({originLabel, origin}),
   setDestination: (destinationLabel, destination = null) => set({destinationLabel, destination}),
   setActiveRouteId: activeRouteId => set({activeRouteId}),

@@ -16,8 +16,22 @@ function AuthLinkHandler() {
     const client = supabase;
     if (!client) return;
     const handleUrl = async ({url}: {url: string}) => {
-      const code = new URL(url).searchParams.get('code');
-      if (code) await client.auth.exchangeCodeForSession(code);
+      try {
+        const urlObj = new URL(url);
+        const code = urlObj.searchParams.get('code');
+        if (code) {
+          await client.auth.exchangeCodeForSession(code);
+        } else if (urlObj.hash) {
+          const params = new URLSearchParams(urlObj.hash.substring(1));
+          const access_token = params.get('access_token');
+          const refresh_token = params.get('refresh_token');
+          if (access_token && refresh_token) {
+            await client.auth.setSession({access_token, refresh_token});
+          }
+        }
+      } catch (err) {
+        console.warn('Failed parsing deep link URL:', err);
+      }
     };
     const subscription = Linking.addEventListener('url', handleUrl);
     Linking.getInitialURL().then(url => {
