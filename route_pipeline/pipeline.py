@@ -249,7 +249,7 @@ def _apply_reference_overrides(
     corrected: list[Direction] = []
     audit: list[dict[str, Any]] = []
 
-    if route.slug == "46-naranja-3-trico-metropolis":
+    if route.slug == "46-naranja-3-trico-metropolis" and len(directions) == 2:
         dir1_comps = [comp[:] for comp in directions[0].components]
         dir2_comps = [comp[:] for comp in directions[1].components]
         if len(dir1_comps) >= 1:

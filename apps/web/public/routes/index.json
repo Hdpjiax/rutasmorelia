@@ -1,6 +1,6 @@
 {
   "type": "routes-index",
-  "generatedAt": "2026-07-03T18:51:20.886410+00:00",
+  "generatedAt": "2026-07-04T01:21:35.138562+00:00",
   "algorithm": "valhalla-kml-corridor-v1",
   "routes": [
     {
@@ -559,13 +559,13 @@
     },
     {
       "id": "86",
-      "name": "ISSSTE - Soledad",
-      "color": "#FFC800",
-      "transportType": "Camion",
+      "name": "ISSSTE/Soledad",
+      "color": "#FF0000",
+      "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/86.geojson?v=06d95b00bb3d",
-      "artifactSha256": "06d95b00bb3d1c782f2475dca3fd97c044a78f9fd052363c48aa6342d2fe668a"
+      "geojsonFile": "/routes/86.geojson?v=c9dcc5af3047",
+      "artifactSha256": "c9dcc5af3047b5929f530f35024f4fff1252ad507d3b255168e001afda883674"
     },
     {
       "id": "F19",
@@ -639,43 +639,43 @@
     },
     {
       "id": "38",
-      "name": "Naranja 1 ISSTE",
-      "color": "#FF5500",
+      "name": "Naranja 1 ISSSTE",
+      "color": "#EC5400",
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/38.geojson?v=8d8f7ab1b24b",
-      "artifactSha256": "8d8f7ab1b24b4302f8e564d3eec4ab3773e66589682498b059c4a71962b6a8d3"
+      "geojsonFile": "/routes/38.geojson?v=ea99a56ebd1f",
+      "artifactSha256": "ea99a56ebd1f7bbfd43d37ccc776e22060987962e68493c8bb27759477173cc1"
     },
     {
       "id": "39",
-      "name": "Naranja 1 La Soledad",
-      "color": "#FF5500",
+      "name": "Naranja 1 [La Soledad]",
+      "color": "#EC5400",
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/39.geojson?v=f2b79a1b284f",
-      "artifactSha256": "f2b79a1b284f232ebb8cf06db5a0c2a3bc637ad2d7f5e44f2dec28cb0a5abd49"
-    },
-    {
-      "id": "40",
-      "name": "Naranja 2 - 3 de Agosto",
-      "color": "#FF5500",
-      "transportType": "Combi",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/40.geojson?v=2ab6ef036319",
-      "artifactSha256": "2ab6ef036319fe6c1d5d9e8f29857725039abd831f46f1661aa0f6013c14c951"
+      "geojsonFile": "/routes/39.geojson?v=d0a189aa2ef9",
+      "artifactSha256": "d0a189aa2ef95fbb63c3541d2d700119bb1fd6656b011ccf36fc53fbfa174782"
     },
     {
       "id": "41",
       "name": "Naranja 2 Santa Fe",
-      "color": "#FF5500",
+      "color": "#EC5400",
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/41.geojson?v=95d53423ef92",
-      "artifactSha256": "95d53423ef924a1e265d0611f705c6d992b39146b7d677da834f0d900bb6cda2"
+      "geojsonFile": "/routes/41.geojson?v=0a748370fc8d",
+      "artifactSha256": "0a748370fc8d7f3893abc2c6b2332a9e5b71c23c79b45aeb51949147a6db5846"
+    },
+    {
+      "id": "40",
+      "name": "Naranja 2 [3 De Agosto]",
+      "color": "#EC5400",
+      "transportType": "Combi",
+      "colorName": "Amarillo",
+      "colorLetter": "C",
+      "geojsonFile": "/routes/40.geojson?v=09ca13fed2c3",
+      "artifactSha256": "09ca13fed2c3fa2cce7718f1b5e0829735568c78d9c33f47a786129765c43d6e"
     },
     {
       "id": "43",
@@ -689,43 +689,43 @@
     },
     {
       "id": "42",
-      "name": "Naranja 3 Centro - Puerta del Sol",
-      "color": "#FF5500",
+      "name": "Naranja 3 [Centro - Puerta Del Sol]",
+      "color": "#EC5400",
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/42.geojson?v=594817bb28e2",
-      "artifactSha256": "594817bb28e2f59b564952daeebcc1cdbbba5d90be313e81071d3ca7275294e8"
+      "geojsonFile": "/routes/42.geojson?v=d8b78f9cff80",
+      "artifactSha256": "d8b78f9cff801b0bfaef280a7003a89f5049e8d11d54918ef2485440bd6a3f62"
     },
     {
       "id": "44",
-      "name": "Naranja 3 Santa Maria - Erandeni",
-      "color": "#FF5500",
+      "name": "Naranja 3 [Sta. María - Erandeni]",
+      "color": "#EC5400",
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/44.geojson?v=cb365a920583",
-      "artifactSha256": "cb365a92058301c20831e1f4fbe3ba6086d99a48c012a1e5c70925a4c82afa52"
+      "geojsonFile": "/routes/44.geojson?v=2349b11984e9",
+      "artifactSha256": "2349b11984e9f11ed393241b14c3680b81bcdaffd28734535b3a97b634760f02"
     },
     {
       "id": "45",
-      "name": "Naranja 3 Santa Maria - ITA",
-      "color": "#FF5500",
+      "name": "Naranja 3 [Sta. María - Ita]",
+      "color": "#EC5400",
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/45.geojson?v=d105702703aa",
-      "artifactSha256": "d105702703aafe5801ab39447fa0683126b444ccc72aaf068c12cf5ab056fdad"
+      "geojsonFile": "/routes/45.geojson?v=d2ad64a1fd7c",
+      "artifactSha256": "d2ad64a1fd7ca2b2901f95335d03281060f4c6d27bd9f2f14adcc84f1f69a584"
     },
     {
       "id": "46",
-      "name": "Naranja 3 Trico - Metropolis",
-      "color": "#FF5500",
+      "name": "Naranja 3 [Trico - Metrópolis]",
+      "color": "#EC5400",
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/46.geojson?v=c2a8424f00b3",
-      "artifactSha256": "c2a8424f00b38a7486c6968195aaa4006c41bf506697be51a9ee85b3c3f36203"
+      "geojsonFile": "/routes/46.geojson?v=14d5c20b2922",
+      "artifactSha256": "14d5c20b2922f58281c86aa09d0f4b46a52757abdbe59566039f0438f64fe6a8"
     },
     {
       "id": "47",

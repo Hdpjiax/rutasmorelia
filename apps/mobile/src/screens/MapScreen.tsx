@@ -1,11 +1,11 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Camera, type CameraRef, GeoJSONSource, Layer, Map as MapView, ViewAnnotation} from '@maplibre/maplibre-react-native';
+import {Camera, type CameraRef, GeoJSONSource, Layer, Map as MapView, ViewAnnotation, Marker, UserLocation, Images} from '@maplibre/maplibre-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ArrowsDownUp, Car, Crosshair, Heart, List, MagnifyingGlass, MapPin, NavigationArrow, UserCircle} from 'phosphor-react-native';
-import {ActivityIndicator, FlatList, Modal, PermissionsAndroid, Platform, Pressable, StyleSheet, Text, TextInput, useColorScheme, View} from 'react-native';
+import {ArrowsDownUp, Car, Crosshair, Heart, List, MagnifyingGlass, MapPin, NavigationArrow, UserCircle, Trash} from 'phosphor-react-native';
+import {ActivityIndicator, Animated, FlatList, Keyboard, Modal, PermissionsAndroid, Platform, Pressable, StyleSheet, Text, TextInput, useColorScheme, View} from 'react-native';
 import type {RootStackParamList} from '../../App';
 import {BrandMark} from '../components/BrandMark';
 import {MAP_STYLE_URL} from '../config/map';
@@ -23,7 +23,7 @@ type DrawerItem = RouteItem & {kind?: 'route' | 'stop'; secondaryTime?: string; 
 type RouteFavorite = {id: number; route_id: number};
 type SavedPlace = {id: number; label: string; address: string | null; kind: string; location: {type?: string; coordinates?: [number, number]} | null};
 
-const ROUTES_CACHE_KEY = '@viamorelia/routes-v2';
+const ROUTES_CACHE_KEY = '@viamorelia/routes-v4';
 const ROUTES_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
 const EMPTY_GEOJSON: GeoJSON.FeatureCollection = {type: 'FeatureCollection', features: []};
 const PUBLISHED_ROUTES_BASE_URL = 'https://www.viamorelia.org/routes';
@@ -81,27 +81,19 @@ function getGeometryBounds(geometry: RouteGeometry): [number, number, number, nu
   return [minLng, minLat, maxLng, maxLat];
 }
 
-function getAccurateNativePosition(maxWaitMs = 18000, requiredAccuracyM = 80): Promise<any> {
+function getAccurateNativePosition(maxWaitMs = 6000, requiredAccuracyM = 80): Promise<any> {
   return new Promise((resolve, reject) => {
-    let best: any = null;
-    let settled = false;
-    let watchId = -1;
-    const finish = (position?: any, error?: any) => {
-      if (settled) return;
-      settled = true;
-      if (watchId >= 0) Geolocation.clearWatch(watchId);
-      clearTimeout(timer);
-      if (position && (Number(position.coords.accuracy) <= requiredAccuracyM || error === undefined)) resolve(position);
-      else reject(error || new Error('La señal GPS no tiene suficiente precisión'));
-    };
-    const timer = setTimeout(() => finish(best), maxWaitMs);
-    watchId = Geolocation.watchPosition(
-      position => {
-        if (!best || Number(position.coords.accuracy) < Number(best.coords.accuracy)) best = position;
-        if (Number(position.coords.accuracy) <= 25) finish(position);
+    Geolocation.getCurrentPosition(
+      position => resolve(position),
+      error => {
+        console.warn('[ViaMorelia] High accuracy location lookup failed, trying standard accuracy:', error);
+        Geolocation.getCurrentPosition(
+          pos => resolve(pos),
+          err => reject(err),
+          {enableHighAccuracy: false, timeout: 3000, maximumAge: 10000}
+        );
       },
-      error => finish(undefined, error),
-      {enableHighAccuracy: true, timeout: maxWaitMs, maximumAge: 0, distanceFilter: 0},
+      {enableHighAccuracy: true, timeout: maxWaitMs, maximumAge: 10000}
     );
   });
 }
@@ -198,8 +190,320 @@ function generateTrafficFallback(routeGeoJSON: any) {
   };
 }
 
+function adjustRouteColorForDarkTheme(color: string): string {
+  if (!color || !color.startsWith('#')) return color;
+  let r = parseInt(color.slice(1, 3), 16);
+  let g = parseInt(color.slice(3, 5), 16);
+  let b = parseInt(color.slice(5, 7), 16);
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return color;
+
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  // Adjust for dark mode: boost lightness and saturation if low
+  if (l < 0.45) l = 0.55;
+  if (s < 0.60) s = 0.85;
+
+  let rOut, gOut, bOut;
+  if (s === 0) {
+    rOut = gOut = bOut = l;
+  } else {
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    rOut = hue2rgb(p, q, h + 1/3);
+    gOut = hue2rgb(p, q, h);
+    bOut = hue2rgb(p, q, h - 1/3);
+  }
+
+  const toHex = (x: number) => {
+    const hex = Math.round(x * 255).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  return `#${toHex(rOut)}${toHex(gOut)}${toHex(bOut)}`.toUpperCase();
+}
+
+function findClosestPointOnLine(
+  geojson: any,
+  target: {latitude: number, longitude: number} | null
+): [number, number] | null {
+  if (!geojson || !target || !geojson.features) return null;
+  let minDistance = Infinity;
+  let closestCoord: [number, number] | null = null;
+
+  const lat1 = target.latitude;
+  const lon1 = target.longitude;
+
+  const getDistanceSq = (p: [number, number]) => {
+    const dLat = p[1] - lat1;
+    const dLon = p[0] - lon1;
+    return dLat * dLat + dLon * dLon;
+  };
+
+  geojson.features.forEach((feature: any) => {
+    if (feature.geometry && feature.geometry.type === 'LineString') {
+      const coords = feature.geometry.coordinates as [number, number][];
+      coords.forEach(p => {
+        const dist = getDistanceSq(p);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestCoord = p;
+        }
+      });
+    } else if (feature.geometry && feature.geometry.type === 'MultiLineString') {
+      const lines = feature.geometry.coordinates as [number, number][][];
+      lines.forEach(line => {
+        line.forEach(p => {
+          const dist = getDistanceSq(p);
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestCoord = p;
+          }
+        });
+      });
+    }
+  });
+
+  return closestCoord;
+}
+
+type PulsingMarkerProps = {
+  color: string;
+};
+
+function PulsingMarker({color}: PulsingMarkerProps) {
+  const pulse1 = useRef(new Animated.Value(0)).current;
+  const pulse2 = useRef(new Animated.Value(0)).current;
+  const pulse3 = useRef(new Animated.Value(0)).current;
+  const pulse4 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const startLoop = (value: Animated.Value) => {
+      value.setValue(0);
+      Animated.loop(
+        Animated.timing(value, {
+          toValue: 1,
+          duration: 2600,
+          useNativeDriver: true,
+        })
+      ).start();
+    };
+
+    const t1 = setTimeout(() => startLoop(pulse1), 0);
+    const t2 = setTimeout(() => startLoop(pulse2), 650);
+    const t3 = setTimeout(() => startLoop(pulse3), 1300);
+    const t4 = setTimeout(() => startLoop(pulse4), 1950);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+      pulse1.stopAnimation();
+      pulse2.stopAnimation();
+      pulse3.stopAnimation();
+      pulse4.stopAnimation();
+    };
+  }, [pulse1, pulse2, pulse3, pulse4]);
+
+  const getRingStyle = (value: Animated.Value, maxScale: number) => ({
+    position: 'absolute' as const,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: color,
+    transform: [{
+      scale: value.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0.2, maxScale],
+      })
+    }],
+    opacity: value.interpolate({
+      inputRange: [0, 0.15, 0.8, 1],
+      outputRange: [0, 0.45, 0.12, 0],
+    })
+  });
+
+  return (
+    <View style={{alignItems: 'center', justifyContent: 'center', width: 64, height: 64}}>
+      <Animated.View style={getRingStyle(pulse1, 1.3)} />
+      <Animated.View style={getRingStyle(pulse2, 1.8)} />
+      <Animated.View style={getRingStyle(pulse3, 2.4)} />
+      <Animated.View style={getRingStyle(pulse4, 3.2)} />
+      <View style={{
+        width: 18,
+        height: 18,
+        borderRadius: 9,
+        backgroundColor: color,
+        borderWidth: 3,
+        borderColor: '#ffffff',
+        shadowColor: '#000000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.4,
+        shadowRadius: 3,
+        elevation: 6
+      }} />
+    </View>
+  );
+}
+
 export function MapScreen({navigation}: Props) {
-  const colors = useColorScheme() === 'dark' ? dark : light;
+  const colorScheme = useColorScheme();
+  const colors = colorScheme === 'dark' ? dark : light;
+  const mapStyleUrl = colorScheme === 'dark' ? 'https://tiles.openfreemap.org/styles/dark' : 'https://tiles.openfreemap.org/styles/liberty';
+  const [customMapStyle, setCustomMapStyle] = useState<any>(null);
+
+  useEffect(() => {
+    let active = true;
+    const cacheKey = `custom_map_style_v3_${colorScheme}`;
+
+    async function loadStyle() {
+      try {
+        const cached = await AsyncStorage.getItem(cacheKey);
+        if (cached && active) {
+          setCustomMapStyle(JSON.parse(cached));
+        }
+      } catch (err) {
+        console.warn('[ViaMorelia] Failed to read style from cache:', err);
+      }
+
+      const url = colorScheme === 'dark'
+        ? 'https://tiles.openfreemap.org/styles/dark'
+        : 'https://tiles.openfreemap.org/styles/liberty';
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error();
+        const styleJson = await response.json();
+
+        if (colorScheme === 'dark') {
+          if (Array.isArray(styleJson.layers)) {
+            styleJson.layers.forEach((layer: any) => {
+              const id = (layer.id || '').toLowerCase();
+              
+              // 1. Background color
+              if (layer.type === 'background') {
+                if (!layer.paint) layer.paint = {};
+                layer.paint['background-color'] = '#1A1C24';
+              }
+              
+              // 2. Water fill
+              if (id.includes('water')) {
+                if (!layer.paint) layer.paint = {};
+                if (layer.type === 'fill') {
+                  layer.paint['fill-color'] = '#0F172A';
+                } else if (layer.type === 'line') {
+                  layer.paint['line-color'] = '#0F172A';
+                }
+              }
+
+              // 3. Roads/Streets visibility
+              const isRoadLine = layer.type === 'line' && (
+                id.includes('road') ||
+                id.includes('highway') ||
+                id.includes('motorway') ||
+                id.includes('street') ||
+                id.includes('bridge') ||
+                id.includes('tunnel') ||
+                id.includes('transportation')
+              );
+              const isRail = id.includes('rail') || id.includes('train');
+
+              if (isRoadLine && !isRail) {
+                const isCasing = id.includes('case') || id.includes('casing') || id.includes('outline');
+                if (!layer.paint) layer.paint = {};
+                layer.paint['line-color'] = isCasing ? '#111317' : '#2A2E3D';
+                layer.paint['line-opacity'] = isCasing ? 0.8 : 1.0;
+              }
+
+              // 4. Street name labels legibility
+              const isLabel = layer.type === 'symbol' && layer.layout && layer.layout['text-field'];
+              if (isLabel && (id.includes('road') || id.includes('street') || id.includes('way') || id.includes('name'))) {
+                if (!layer.paint) layer.paint = {};
+                layer.paint['text-color'] = '#E2E8F0';
+                layer.paint['text-halo-color'] = '#1A1C24';
+                layer.paint['text-halo-width'] = 2.0;
+              }
+            });
+          }
+        } else {
+          const peripheralNames = [
+            'Periférico Paseo de la República',
+            'Circuito Periférico Paseo de la República',
+            'Libramiento Paseo de la República',
+          ];
+
+          if (Array.isArray(styleJson.layers)) {
+            styleJson.layers.forEach((layer: any) => {
+              const id = (layer.id || '').toLowerCase();
+              const isRoadLine = layer.type === 'line' && (
+                id.includes('road') ||
+                id.includes('highway') ||
+                id.includes('motorway') ||
+                id.includes('street') ||
+                id.includes('bridge') ||
+                id.includes('tunnel') ||
+                id.includes('transportation')
+              );
+              const isRail = id.includes('rail') || id.includes('train');
+
+              if (isRoadLine && !isRail) {
+                const isCasing = id.includes('case') || id.includes('casing') || id.includes('outline');
+                if (!layer.paint) layer.paint = {};
+
+                layer.paint['line-color'] = [
+                  'case',
+                  [
+                    'in',
+                    ['coalesce', ['get', 'name'], ''],
+                    ['literal', peripheralNames],
+                  ],
+                  isCasing ? '#c97846' : '#e9ad82',
+                  isCasing ? '#cbd0d8' : '#ffffff',
+                ];
+                layer.paint['line-opacity'] = isCasing ? 0.72 : 1.0;
+              }
+            });
+          }
+        }
+
+        if (active) {
+          setCustomMapStyle(styleJson);
+          await AsyncStorage.setItem(cacheKey, JSON.stringify(styleJson));
+        }
+      } catch (err) {
+        console.warn('[ViaMorelia] Failed to fetch or customize style from network, using URL fallback:', err);
+        if (active) {
+          setCustomMapStyle(url);
+        }
+      }
+    }
+
+    void loadStyle();
+
+    return () => {
+      active = false;
+    };
+  }, [colorScheme]);
   const insets = useSafeAreaInsets();
   const camera = useRef<CameraRef>(null);
   const {originLabel, destinationLabel, origin, destination, activeRouteId, setOrigin, setDestination, setActiveRouteId} = useTransitStore();
@@ -209,7 +513,18 @@ export function MapScreen({navigation}: Props) {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [showTraffic, setShowTraffic] = useState(false);
   const [trafficGeoJSON, setTrafficGeoJSON] = useState<any>(null);
-  const [, setMessage] = useState('Servicio activo');
+  const [message, setMessageState] = useState<string>('');
+  const setMessage = useCallback((msg: string) => {
+    setMessageState(msg);
+  }, []);
+
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => {
+      setMessageState('');
+    }, 3800);
+    return () => clearTimeout(timer);
+  }, [message]);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -224,114 +539,24 @@ export function MapScreen({navigation}: Props) {
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [routeRequestVersion, setRouteRequestVersion] = useState(0);
-  const [customMapStyle, setCustomMapStyle] = useState<any>(null);
+  const pulseAnim = useRef(new Animated.Value(0)).current;
+  const originInputRef = useRef<TextInput>(null);
+  const destinationInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(pulseAnim, {
+        toValue: 1,
+        duration: 1800,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [pulseAnim]);
+
   const routeGeometryCache = useRef(new Map<string, CachedGeometry>());
   const suggestionCache = useRef(new Map<string, Suggestion[]>());
 
-  useEffect(() => {
-    async function loadAndCustomizeStyle() {
-      try {
-        const response = await fetch(MAP_STYLE_URL);
-        const style = await response.json();
-        
-        if (style && style.layers) {
-          style.layers = style.layers.map((layer: any) => {
-            if (layer.id === 'water') {
-              return {
-                ...layer,
-                paint: { ...layer.paint, 'fill-color': '#bae6fd' }
-              };
-            }
-            if (layer.id === 'waterway') {
-              return {
-                ...layer,
-                paint: { ...layer.paint, 'line-color': '#bae6fd' }
-              };
-            }
-            if (layer.id === 'park_national_park' || layer.id === 'park_nature_reserve') {
-              return {
-                ...layer,
-                paint: { ...layer.paint, 'fill-color': '#bbf7d0', 'fill-opacity': 0.95 }
-              };
-            }
-            if (layer.type === 'background') {
-              return {...layer, paint: {...layer.paint, 'background-color': '#f8fafc'}};
-            }
-            if (PERIFERICO_FILL_LAYERS.has(layer.id)) {
-              return {...layer, paint: {...layer.paint, 'line-color': ['case', ['in', ['coalesce', ['get', 'name'], ''], ['literal', PERIFERICO_NAMES]], '#e9ad82', '#f8fafc']}};
-            }
-            if (PERIFERICO_CASING_LAYERS.has(layer.id)) {
-              return {...layer, paint: {...layer.paint, 'line-color': ['case', ['in', ['coalesce', ['get', 'name'], ''], ['literal', PERIFERICO_NAMES]], '#c97846', '#cbd5e1'], 'line-opacity': 0.68}};
-            }
-            if (WHITE_ROAD_LAYERS.has(layer.id)) {
-              return {...layer, paint: {...layer.paint, 'line-color': '#ffffff'}};
-            }
-            if (ROAD_CASING_LAYERS.has(layer.id)) {
-              return {...layer, paint: {...layer.paint, 'line-color': '#cbd5e1', 'line-opacity': 0.68}};
-            }
-            if (layer.id === 'rail') {
-              return {
-                ...layer,
-                paint: {
-                  ...layer.paint,
-                  'line-color': [
-                    'case',
-                    ['has', 'service'],
-                    '#94a3b8',
-                    '#0f172a'
-                  ],
-                  'line-width': [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    10,
-                    ['case', ['has', 'service'], 0.8, 2.0],
-                    14,
-                    ['case', ['has', 'service'], 1.0, 3.8],
-                    18,
-                    ['case', ['has', 'service'], 1.2, 5.0]
-                  ],
-                  'line-opacity': [
-                    'case',
-                    ['has', 'service'],
-                    0.3,
-                    0.95
-                  ]
-                }
-              };
-            }
-            if (layer.id === 'rail_dash') {
-              return {
-                ...layer,
-                paint: {
-                  ...layer.paint,
-                  'line-color': '#ffffff',
-                  'line-width': [
-                    'interpolate',
-                    ['linear'],
-                    ['zoom'],
-                    10,
-                    ['case', ['has', 'service'], 0.0, 1.2],
-                    14,
-                    ['case', ['has', 'service'], 0.0, 2.5],
-                    18,
-                    ['case', ['has', 'service'], 0.0, 3.5]
-                  ],
-                  'line-dasharray': [3, 3],
-                  'line-opacity': 0.95
-                }
-              };
-            }
-            return layer;
-          });
-          setCustomMapStyle(style);
-        }
-      } catch (e) {
-        console.warn('Failed to customize map style, using default:', e);
-      }
-    }
-    loadAndCustomizeStyle();
-  }, []);
+
 
   const isOriginFavorited = useMemo(() => {
     return favorites.some(f => (f.place_id || f.stop_id || f.latitude) && f.custom_name === originLabel);
@@ -508,17 +733,31 @@ export function MapScreen({navigation}: Props) {
       if (cancelled || routes.length === 0) return;
       setRoutesList(routes);
       const selectedId = useTransitStore.getState().activeRouteId;
-      if (!routes.some(route => route.id === selectedId)) setActiveRouteId(routes[0].id);
+      if (selectedId && !routes.some(route => route.id === selectedId)) setActiveRouteId(routes[0].id);
     }
 
     async function loadRoutes() {
       const cachedRoutesPromise = AsyncStorage.getItem(ROUTES_CACHE_KEY).catch(() => null);
 
       const fetchRoutesFromBase = async (base: string) => {
-        const response = await fetch(`${base}/index.json`);
-        if (!response.ok) throw new Error();
-        const data = await response.json();
-        return data.routes ?? [];
+        const isLocal = base.includes('10.0.2.2') || base.includes('localhost');
+        const fetchController = new AbortController();
+        const timeoutId = setTimeout(() => {
+          if (isLocal) fetchController.abort();
+        }, 1200);
+
+        try {
+          const response = await fetch(`${base}/index.json`, {
+            signal: fetchController.signal,
+          });
+          clearTimeout(timeoutId);
+          if (!response.ok) throw new Error();
+          const data = await response.json();
+          return data.routes ?? [];
+        } catch (err) {
+          clearTimeout(timeoutId);
+          throw err;
+        }
       };
 
       let routesData: any[] = [];
@@ -575,12 +814,16 @@ export function MapScreen({navigation}: Props) {
     }
 
     async function loadRouteGeometry() {
+      console.warn('[ViaMorelia] loadRouteGeometry called for route ID:', activeRouteId);
       setRouteLoading(true);
       setRouteError(null);
       setActiveRouteGeoJSON(null);
 
       const selected = routesList.find(route => route.id === activeRouteId);
-      if (!selected?.geometryId) {
+      console.warn('[ViaMorelia] Selected route details:', selected);
+      const geometryId = selected?.geometryId || activeRouteId;
+      if (!geometryId) {
+        console.warn('[ViaMorelia] Missing geometryId');
         setRouteError('Esta ruta no tiene un recorrido disponible.');
         setRouteLoading(false);
         return;
@@ -591,12 +834,27 @@ export function MapScreen({navigation}: Props) {
       let loaded = false;
 
       for (const base of bases) {
+        const url = `${base}/${encodeURIComponent(geometryId)}.geojson`;
+        console.warn(`[ViaMorelia] Attempting to fetch route geometry from: ${url}`);
+        
+        const isLocal = base.includes('10.0.2.2') || base.includes('localhost');
+        const fetchController = new AbortController();
+        const timeoutId = setTimeout(() => {
+          if (isLocal) {
+            fetchController.abort();
+            console.warn(`[ViaMorelia] Local fetch timed out for: ${url}`);
+          }
+        }, 1200);
+
         try {
-          const response = await fetch(`${base}/${encodeURIComponent(selected.geometryId)}.geojson`, {
-            signal: controller.signal,
+          const response = await fetch(url, {
+            signal: fetchController.signal,
           });
+          clearTimeout(timeoutId);
+          console.warn(`[ViaMorelia] Fetch response status for ${url}:`, response.status);
           if (response.ok) {
             const geojson = await response.json() as GeoJSON.FeatureCollection;
+            console.warn(`[ViaMorelia] Successfully parsed geojson for ${geometryId}. Features count:`, geojson.features?.length);
             const geometryBounds = geojson.features
               .map(feature => feature.geometry)
               .filter((geometry): geometry is RouteGeometry => geometry.type === 'LineString' || geometry.type === 'MultiLineString')
@@ -613,10 +871,17 @@ export function MapScreen({navigation}: Props) {
                 ...geojson,
                 features: geojson.features.map(feature => ({
                   ...feature,
-                  properties: {...feature.properties, id: activeRouteId, color: feature.properties?.color || selected.color},
+                  properties: {
+                    ...feature.properties,
+                    id: activeRouteId,
+                    color: colorScheme === 'dark'
+                      ? adjustRouteColorForDarkTheme(feature.properties?.color || selected?.color || '#FFC800')
+                      : (feature.properties?.color || selected?.color || '#FFC800')
+                  },
                 })),
               };
 
+              console.warn('[ViaMorelia] Setting activeRouteGeoJSON with features:', normalized.features.length);
               const nextCached = {geojson: normalized, bounds};
               routeGeometryCache.current.set(activeRouteId, nextCached);
               if (routeGeometryCache.current.size > 12) {
@@ -627,15 +892,19 @@ export function MapScreen({navigation}: Props) {
               showGeometry(nextCached, 380);
               loaded = true;
               break;
+            } else {
+              console.warn('[ViaMorelia] No geometry bounds found in geojson!');
             }
           }
         } catch (error) {
-          // Silent catch to try next base
+          clearTimeout(timeoutId);
+          console.warn(`[ViaMorelia] Error fetching route geometry from ${url}:`, error);
         }
       }
 
       setRouteLoading(false);
       if (!loaded && !controller.signal.aborted) {
+        console.warn(`[ViaMorelia] Failed to load route geometry for ${activeRouteId} from all bases`);
         setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
       }
     }
@@ -808,19 +1077,23 @@ export function MapScreen({navigation}: Props) {
       );
       return optionsForTab.map((option, index) => ({
         kind: 'route',
-        id: String(option.route_id),
+        id: String(option.route_code || option.route_id),
         number: option.route_code ? (option.route_code.split('_')[1] || option.route_code[0]) : 'R',
         name: option.route_name,
         detail: Number(option.transfers || 0) > 0
-          ? `Transbordo a ${option.second_route_name} · camina ${Math.round(Number(option.transfer_walk_meters || 0))} m`
-          : `Directa · ${Math.round(Number(option.destination_walk_meters || 0))} m caminando al destino`,
+          ? `🚶 Camina ${Math.round(Number(option.origin_walk_meters || 0))} m\n📥 Sube: ${option.boarding_stop_name || 'Parada cercana'}\n🔄 Transbordo a ${option.second_route_name} (camina ${Math.round(Number(option.transfer_walk_meters || 0))} m)\n🏁 Baja: ${option.alighting_stop_name || 'Parada destino'} · camina ${Math.round(Number(option.destination_walk_meters || 0))} m`
+          : `🚶 Camina ${Math.round(Number(option.origin_walk_meters || 0))} m\n📥 Sube: ${option.boarding_stop_name || 'Parada cercana'}\n🏁 Baja: ${option.alighting_stop_name || 'Parada destino'} · camina ${Math.round(Number(option.destination_walk_meters || 0))} m al destino`,
         time: `${option.estimatedMinutes} min`,
         secondaryTime: `$${option.fare || '11.00'}`,
-        color: option.route_color || '#FFA500',
+        color: colorScheme === 'dark' ? adjustRouteColorForDarkTheme(option.route_color || '#FFA500') : (option.route_color || '#FFA500'),
         listKey: `${option.route_id}-${index}`,
       }));
     }
-    return baseRoutes.map(route => ({...route, kind: 'route'}));
+    return baseRoutes.map(route => ({
+      ...route,
+      kind: 'route',
+      color: colorScheme === 'dark' ? adjustRouteColorForDarkTheme(route.color) : route.color
+    }));
   }, [journeyOptions, journeyTab, visibleRoutes, showOnlyFavorites, favorites]);
 
   const selectDrawerItem = useCallback((item: DrawerItem) => {
@@ -848,7 +1121,7 @@ export function MapScreen({navigation}: Props) {
         </View>
         <View style={styles.routeCopy}>
           <Text numberOfLines={1} style={[styles.routeName, {color: colors.ink}]}>{item.name}</Text>
-          <Text numberOfLines={2} style={[styles.routeDetail, {color: colors.muted}]}>{item.detail}</Text>
+          <Text style={[styles.routeDetail, {color: colors.muted, lineHeight: 16}]}>{item.detail}</Text>
         </View>
         <View style={styles.routeTrailing}>
           {item.kind === 'route' && (
@@ -907,6 +1180,11 @@ export function MapScreen({navigation}: Props) {
   }
 
   async function planJourneyWithCoords(customOrigin = origin, customDestination = destination) {
+    originInputRef.current?.blur();
+    destinationInputRef.current?.blur();
+    Keyboard.dismiss();
+    setActiveInput(null);
+    setSuggestions([]);
     if (!destinationLabel.trim()) return setMessage('Escribe un destino para buscar rutas.');
     setIsMenuOpen(true);
     if (!supabase || !customOrigin || !customDestination) return setMessage(`Mostrando rutas relacionadas con ${destinationLabel}.`);
@@ -919,9 +1197,18 @@ export function MapScreen({navigation}: Props) {
       const options = data?.data as any[] | undefined;
       if (!error && options && options.length > 0) {
         setJourneyOptions(options);
-        setMessage(options.length > 0 ? `${options.length} opciones encontradas.` : 'No encontramos rutas cercanas para este viaje.');
-        if (options.length > 0) {
-          setActiveRouteId(String(options[0].route_id));
+        setMessage(`${options.length} opciones encontradas.`);
+        
+        const hasDirect = options.some(opt => Number(opt.transfers || 0) === 0);
+        const hasTransfers = options.some(opt => Number(opt.transfers || 0) > 0);
+        
+        if (hasDirect) {
+          setJourneyTab('direct');
+          const firstDirect = options.find(opt => Number(opt.transfers || 0) === 0);
+          if (firstDirect) setActiveRouteId(String(firstDirect.route_code || firstDirect.route_id));
+        } else if (hasTransfers) {
+          setJourneyTab('transfer');
+          setActiveRouteId(String(options[0].route_code || options[0].route_id));
         }
       } else {
         setJourneyOptions([]);
@@ -935,7 +1222,159 @@ export function MapScreen({navigation}: Props) {
   }
 
   async function planJourney() {
-    await planJourneyWithCoords(origin, destination);
+    let currentOrigin = origin;
+    let currentDestination = destination;
+
+    try {
+      // 1. Resolve Origin if "Mi ubicación" and coordinates are null
+      if (!currentOrigin && originLabel === 'Mi ubicación') {
+        setMessage('Buscando tu ubicación…');
+        try {
+          const position = await getAccurateNativePosition(4000, 150);
+          currentOrigin = {latitude: position.coords.latitude, longitude: position.coords.longitude};
+          setOrigin('Mi ubicación', currentOrigin);
+        } catch (err) {
+          console.warn('[ViaMorelia] Fast location lookup failed, using center fallback:', err);
+          currentOrigin = {latitude: 19.7027, longitude: -101.1944};
+          setOrigin('Mi ubicación (respaldo Centro)', currentOrigin);
+          setMessage('No se obtuvo GPS preciso; usando Centro Histórico.');
+        }
+      }
+
+      const resolveCoords = async (suggestion: Suggestion) => {
+        let lat = suggestion.latitude;
+        let lon = suggestion.longitude;
+        if (lat === null || lon === null) {
+          const client = supabase;
+          if (client && suggestion.entity_id !== 999999) {
+            try {
+              if (suggestion.entity_type === 'stop') {
+                const { data } = await client.from('stops').select('location').eq('id', suggestion.entity_id).single();
+                if (data && data.location) {
+                  const loc = data.location as { coordinates?: [number, number] } | null;
+                  lon = loc?.coordinates?.[0] || null;
+                  lat = loc?.coordinates?.[1] || null;
+                }
+              } else {
+                const { data } = await client.from('places').select('location').eq('id', suggestion.entity_id).single();
+                if (data && data.location) {
+                  if (typeof data.location === 'string') {
+                    const match = data.location.match(/POINT\(([^ ]+) ([^ ]+)\)/);
+                    if (match) {
+                      lon = parseFloat(match[1]);
+                      lat = parseFloat(match[2]);
+                    }
+                  } else if (data.location && Array.isArray(data.location.coordinates)) {
+                    lon = data.location.coordinates[0];
+                    lat = data.location.coordinates[1];
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn('[ViaMorelia] Failed to resolve suggestion coords:', e);
+            }
+          }
+        }
+        return lat !== null && lon !== null ? {latitude: lat, longitude: lon} : null;
+      };
+
+      // 2. Resolve Destination if coordinates are null
+      if (!currentDestination && destinationLabel.trim().length > 0) {
+        const activeSuggestions = displayedSuggestions;
+        if (activeSuggestions && activeSuggestions.length > 0) {
+          const first = activeSuggestions[0];
+          const coords = await resolveCoords(first);
+          if (coords) {
+            currentDestination = coords;
+            setDestination(first.label, coords);
+          }
+        } else {
+          // Direct fallback search in database
+          const client = supabase;
+          if (client) {
+            try {
+              const { data } = await client
+                .from('places')
+                .select('name, location')
+                .ilike('name', `%${destinationLabel.trim()}%`)
+                .limit(1);
+              if (data && data[0] && data[0].location) {
+                const firstPlace = data[0];
+                let lat: number | null = null;
+                let lon: number | null = null;
+                if (typeof firstPlace.location === 'string') {
+                  const match = firstPlace.location.match(/POINT\(([^ ]+) ([^ ]+)\)/);
+                  if (match) {
+                    lon = parseFloat(match[1]);
+                    lat = parseFloat(match[2]);
+                  }
+                }
+                if (lat !== null && lon !== null) {
+                  currentDestination = {latitude: lat, longitude: lon};
+                  setDestination(firstPlace.name, currentDestination);
+                }
+              }
+            } catch (e) {
+              console.warn('[ViaMorelia] Database fallback search failed:', e);
+            }
+          }
+        }
+      }
+
+      // 3. Resolve Origin if coordinates are null (and not "Mi ubicación")
+      if (!currentOrigin && originLabel.trim().length > 0 && originLabel !== 'Mi ubicación') {
+        const activeSuggestions = displayedSuggestions;
+        if (activeSuggestions && activeSuggestions.length > 0) {
+          const first = activeSuggestions[0];
+          const coords = await resolveCoords(first);
+          if (coords) {
+            currentOrigin = coords;
+            setOrigin(first.label, coords);
+          }
+        } else {
+          // Direct fallback search in database
+          const client = supabase;
+          if (client) {
+            try {
+              const { data } = await client
+                .from('places')
+                .select('name, location')
+                .ilike('name', `%${originLabel.trim()}%`)
+                .limit(1);
+              if (data && data[0] && data[0].location) {
+                const firstPlace = data[0];
+                let lat: number | null = null;
+                let lon: number | null = null;
+                if (typeof firstPlace.location === 'string') {
+                  const match = firstPlace.location.match(/POINT\(([^ ]+) ([^ ]+)\)/);
+                  if (match) {
+                    lon = parseFloat(match[1]);
+                    lat = parseFloat(match[2]);
+                  }
+                }
+                if (lat !== null && lon !== null) {
+                  currentOrigin = {latitude: lat, longitude: lon};
+                  setOrigin(firstPlace.name, currentOrigin);
+                }
+              }
+            } catch (e) {
+              console.warn('[ViaMorelia] Database fallback search failed for origin:', e);
+            }
+          }
+        }
+      }
+
+    } catch (e) {
+      console.error('[ViaMorelia] Error in planJourney prep:', e);
+    } finally {
+      originInputRef.current?.blur();
+      destinationInputRef.current?.blur();
+      Keyboard.dismiss();
+      setActiveInput(null);
+      setSuggestions([]);
+      setIsMenuOpen(true);
+      await planJourneyWithCoords(currentOrigin, currentDestination);
+    }
   }
 
   async function selectSuggestion(suggestion: Suggestion) {
@@ -978,6 +1417,9 @@ export function MapScreen({navigation}: Props) {
 
     const coords = lat !== null && lon !== null ? {latitude: lat, longitude: lon} : null;
     
+    const nextOrigin = activeInput === 'origin' ? coords : origin;
+    const nextDestination = activeInput === 'destination' ? coords : destination;
+
     if (activeInput === 'origin') {
       setOrigin(suggestion.label, coords);
     } else {
@@ -986,6 +1428,25 @@ export function MapScreen({navigation}: Props) {
     }
     setSuggestions([]);
     setActiveInput(null);
+
+    let currentOrigin = nextOrigin;
+    if (!currentOrigin && originLabel === 'Mi ubicación') {
+      setMessage('Buscando tu ubicación…');
+      try {
+        const position = await getAccurateNativePosition(4000, 150);
+        currentOrigin = {latitude: position.coords.latitude, longitude: position.coords.longitude};
+        setOrigin('Mi ubicación', currentOrigin);
+      } catch (err) {
+        console.warn('[ViaMorelia] Fast location lookup failed on suggestion, using center fallback:', err);
+        currentOrigin = {latitude: 19.7027, longitude: -101.1944};
+        setOrigin('Mi ubicación (respaldo Centro)', currentOrigin);
+        setMessage('No se obtuvo GPS preciso; usando Centro Histórico.');
+      }
+    }
+
+    if (currentOrigin && nextDestination) {
+      void planJourneyWithCoords(currentOrigin, nextDestination);
+    }
   }
 
   function swapLocations() {
@@ -993,6 +1454,55 @@ export function MapScreen({navigation}: Props) {
     setDestination(originLabel === 'Mi ubicación' ? '' : originLabel, origin);
     setSuggestions([]);
   }
+
+  function clearMap() {
+    setOrigin('', null);
+    setDestination('', null);
+    setActiveRouteId('');
+    setActiveRouteGeoJSON(null);
+    setSuggestions([]);
+    setJourneyOptions([]);
+    setMessage('Mapa limpio.');
+  }
+
+  const boardingCoord = useMemo(() => {
+    return findClosestPointOnLine(activeRouteGeoJSON, origin);
+  }, [activeRouteGeoJSON, origin]);
+
+  const alightingCoord = useMemo(() => {
+    return findClosestPointOnLine(activeRouteGeoJSON, destination);
+  }, [activeRouteGeoJSON, destination]);
+
+  const walkingPathsGeoJSON = useMemo(() => {
+    if (!activeRouteGeoJSON || !origin || !destination || !boardingCoord || !alightingCoord) return null;
+    return {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: { type: 'origin-walk' },
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [origin.longitude, origin.latitude],
+              boardingCoord
+            ]
+          }
+        },
+        {
+          type: 'Feature',
+          properties: { type: 'destination-walk' },
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              alightingCoord,
+              [destination.longitude, destination.latitude]
+            ]
+          }
+        }
+      ]
+    };
+  }, [activeRouteGeoJSON, origin, destination, boardingCoord, alightingCoord]);
 
   const displayedSuggestions = useMemo(() => {
     const query = activeInput === 'origin' ? originLabel : destinationLabel;
@@ -1011,38 +1521,179 @@ export function MapScreen({navigation}: Props) {
     return suggestions;
   }, [activeInput, originLabel, destinationLabel, favorites, suggestions]);
 
+  if (!customMapStyle) {
+    return (
+      <View style={[styles.root, {backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center'}]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.root}>
-      <MapView style={StyleSheet.absoluteFill} mapStyle={customMapStyle ? JSON.stringify(customMapStyle) : MAP_STYLE_URL} logo={false} compass={false} attribution accessibilityLabel="Mapa de transporte público de Morelia">
+      <MapView style={StyleSheet.absoluteFill} mapStyle={customMapStyle || mapStyleUrl} logo={false} compass={true} touchRotate={true} attribution accessibilityLabel="Mapa de transporte público de Morelia">
         <Camera ref={camera} initialViewState={{center: [-101.194, 19.702], zoom: 13.3}} minZoom={10} maxZoom={19} />
+        {!origin && (
+          <UserLocation animated={true} accuracy={true} heading={true} />
+        )}
+        <Images images={{ 'route-arrow-icon': { source: { uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAoElEQVR4nO3WwQmEMBAF0PhJA+akFaz9V6MV6MmUoLCwtw0mM3/Uw3zwojP8BxJICB6Pp5B++BzhhuAKYQ1BzZAlBC3DFhBIlpgQ1Azt6/x9LCBoGbaAQLLEhEACYEKgATAgYAA0kMgEpHH6+z5vS1faiU8VUwBJUawCJEKxCJCIxb90pQ8151hTrPoFmVAsAmRicRMgGxS/5k7o8YSncwLzh1hDCb69SgAAAABJRU5ErkJggg==' } } }} />
         <GeoJSONSource id="routes" data={activeRouteGeoJSON || EMPTY_GEOJSON}>
-          <Layer id="route-lines-casing" type="line" paint={{'line-color': '#111827', 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 2.0, 14, 3.4, 18, 4.6], 'line-opacity': 0.95}} layout={{'line-cap': 'round', 'line-join': 'round'}} />
-          <Layer id="route-lines" type="line" paint={{'line-color': ['get', 'color'], 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 1.0, 14, 1.8, 18, 2.8], 'line-opacity': 1.0}} layout={{'line-cap': 'round', 'line-join': 'round'}} />
-          <Layer id="route-arrows" type="symbol" layout={{symbolPlacement: 'line', symbolSpacing: ['interpolate', ['linear'], ['zoom'], 10, 90, 14, 130, 18, 180], textField: '▶', textSize: ['interpolate', ['linear'], ['zoom'], 10, 11, 14, 15, 18, 20], textRotationAlignment: 'map', textKeepUpright: false, textAllowOverlap: false, textIgnorePlacement: false, textPadding: 10} as any} paint={{'text-color': '#ffffff', 'text-halo-color': '#111827', 'text-halo-width': 2}} />
-          <Layer id="route-text-labels" type="symbol" layout={{symbolPlacement: 'line', symbolSpacing: ['interpolate', ['linear'], ['zoom'], 10, 180, 14, 240, 18, 320], textField: ['get', 'name'], textSize: ['interpolate', ['linear'], ['zoom'], 10, 8.5, 14, 10.5, 18, 12.5], textKeepUpright: true, textAllowOverlap: false, textIgnorePlacement: false} as any} paint={{'text-color': ['get', 'color'], 'text-halo-color': '#111827', 'text-halo-width': 1.5}} />
+          {colorScheme === 'dark' ? (
+            <Layer
+              id="route-lines-glow"
+              type="line"
+              style={{
+                lineColor: ['get', 'color'],
+                lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 5.0, 14, 10.0, 18, 14.0],
+                lineOpacity: 0.45,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+          ) : (
+            <Layer
+              id="route-lines-shadow"
+              type="line"
+              style={{
+                lineColor: '#000000',
+                lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 3.0, 14, 5.0, 18, 7.0],
+                lineOpacity: 0.12,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+          )}
+          <Layer
+            id="route-lines-casing"
+            type="line"
+            style={{
+              lineColor: colorScheme === 'dark' ? '#111317' : '#FFFFFF',
+              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 3.0, 14, 4.5, 18, 6.0],
+              lineOpacity: colorScheme === 'dark' ? 0.9 : 1.0,
+              lineCap: 'round',
+              lineJoin: 'round',
+            }}
+          />
+          <Layer
+            id="route-lines"
+            type="line"
+            style={{
+              lineColor: ['get', 'color'],
+              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 1.8, 14, 2.8, 18, 3.8],
+              lineOpacity: 1.0,
+              lineCap: 'round',
+              lineJoin: 'round',
+            }}
+          />
+          <Layer
+            id="route-arrows"
+            type="symbol"
+            style={{
+              symbolPlacement: 'line',
+              symbolSpacing: ['interpolate', ['linear'], ['zoom'], 10, 90, 14, 130, 18, 180],
+              iconImage: 'route-arrow-icon',
+              iconSize: ['interpolate', ['linear'], ['zoom'], 10, 0.45, 14, 0.65, 18, 0.85],
+              iconRotationAlignment: 'map',
+              iconAllowOverlap: true,
+              iconIgnorePlacement: true,
+            }}
+          />
         </GeoJSONSource>
+        {walkingPathsGeoJSON && (
+          <GeoJSONSource id="walking-paths" data={walkingPathsGeoJSON as any}>
+            <Layer
+              id="walking-lines"
+              type="line"
+              style={{
+                lineColor: colorScheme === 'dark' ? '#94A3B8' : '#64748B',
+                lineWidth: 3,
+                lineDasharray: [2, 2],
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+          </GeoJSONSource>
+        )}
+        {boardingCoord && (
+          <Marker
+            key={`boarding-stop-marker-${activeRouteId}-${colorScheme}`}
+            id="boarding-stop-marker"
+            lngLat={boardingCoord}
+          >
+            <View style={{
+              backgroundColor: '#10B981',
+              paddingVertical: 6,
+              paddingHorizontal: 10,
+              borderRadius: 8,
+              borderWidth: 2,
+              borderColor: '#FFFFFF',
+              alignItems: 'center',
+              shadowColor: '#000000',
+              shadowOpacity: 0.35,
+              shadowRadius: 4,
+              shadowOffset: {width: 0, height: 3},
+              elevation: 12,
+              zIndex: 999
+            }}>
+              <Text style={{color: '#FFFFFF', fontSize: 11, fontWeight: 'bold'}}>📥 Sube aquí</Text>
+            </View>
+          </Marker>
+        )}
+        {alightingCoord && (
+          <Marker
+            key={`alighting-stop-marker-${activeRouteId}-${colorScheme}`}
+            id="alighting-stop-marker"
+            lngLat={alightingCoord}
+          >
+            <View style={{
+              backgroundColor: '#EF4444',
+              paddingVertical: 6,
+              paddingHorizontal: 10,
+              borderRadius: 8,
+              borderWidth: 2,
+              borderColor: '#FFFFFF',
+              alignItems: 'center',
+              shadowColor: '#000000',
+              shadowOpacity: 0.35,
+              shadowRadius: 4,
+              shadowOffset: {width: 0, height: 3},
+              elevation: 12,
+              zIndex: 999
+            }}>
+              <Text style={{color: '#FFFFFF', fontSize: 11, fontWeight: 'bold'}}>🏁 Baja aquí</Text>
+            </View>
+          </Marker>
+        )}
         <GeoJSONSource id="traffic" data={trafficGeoJSON || EMPTY_GEOJSON}>
           <Layer
             id="traffic-lines"
             type="line"
             filter={['==', ['to-string', ['get', 'route_id']], String(activeRouteId)]}
-            paint={{
-              'line-color': ['get', 'traffic_color'],
-              'line-width': ['interpolate', ['linear'], ['zoom'], 10, 1.2, 14, 2.2, 18, 3.2],
-              'line-opacity': 0.85,
-            }}
-            layout={{
-              'line-cap': 'round',
-              'line-join': 'round',
+            style={{
+              lineColor: ['get', 'traffic_color'],
+              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 1.2, 14, 2.2, 18, 3.2],
+              lineOpacity: 0.85,
+              lineCap: 'round',
+              lineJoin: 'round',
               visibility: showTraffic ? 'visible' : 'none',
-            } as any}
+            }}
           />
         </GeoJSONSource>
         <GeoJSONSource id="stops" data={EMPTY_GEOJSON}>
-          <Layer id="stops-layer" type="circle" paint={{'circle-radius': 7, 'circle-color': colors.primary, 'circle-stroke-color': '#FFFFFF', 'circle-stroke-width': 3}} />
+          <Layer
+            id="stops-layer"
+            type="circle"
+            style={{
+              circleRadius: 7,
+              circleColor: colors.primary,
+              circleStrokeColor: '#FFFFFF',
+              circleStrokeWidth: 3,
+            }}
+          />
         </GeoJSONSource>
         {origin && (
           <ViewAnnotation
+            key={`origin-marker-${activeRouteId}-${colorScheme}`}
             id="origin-marker"
             lngLat={[origin.longitude, origin.latitude]}
             draggable={true}
@@ -1057,26 +1708,12 @@ export function MapScreen({navigation}: Props) {
               }
             }}
           >
-            <View style={{
-              width: 24,
-              height: 24,
-              borderRadius: 12,
-              backgroundColor: '#2563eb',
-              borderWidth: 2,
-              borderColor: '#ffffff',
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: '#000000',
-              shadowOpacity: 0.3,
-              shadowRadius: 3,
-              elevation: 4
-            }}>
-              <Text style={{color: '#ffffff', fontSize: 10, fontWeight: '800'}}>O</Text>
-            </View>
+            <PulsingMarker color="#2563eb" />
           </ViewAnnotation>
         )}
         {destination && (
           <ViewAnnotation
+            key={`destination-marker-${activeRouteId}-${colorScheme}`}
             id="destination-marker"
             lngLat={[destination.longitude, destination.latitude]}
             draggable={true}
@@ -1091,22 +1728,7 @@ export function MapScreen({navigation}: Props) {
               }
             }}
           >
-            <View style={{
-              width: 24,
-              height: 24,
-              borderRadius: 12,
-              backgroundColor: '#ef4444',
-              borderWidth: 2,
-              borderColor: '#ffffff',
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: '#000000',
-              shadowOpacity: 0.3,
-              shadowRadius: 3,
-              elevation: 4
-            }}>
-              <Text style={{color: '#ffffff', fontSize: 10, fontWeight: '800'}}>D</Text>
-            </View>
+            <PulsingMarker color="#ef4444" />
           </ViewAnnotation>
         )}
       </MapView>
@@ -1114,7 +1736,7 @@ export function MapScreen({navigation}: Props) {
       <View pointerEvents="box-none" style={[styles.overlay, {paddingTop: insets.top + 4}]}>
         {/* Floating search inputs card at the top - Hidden when menu drawer is open */}
         {!isMenuOpen && (
-          <View style={[styles.floatingSearchCard, {backgroundColor: colors.bg, borderColor: colors.line, top: insets.top + 8}]}>
+          <View style={[styles.floatingSearchCard, {backgroundColor: colors.surface, borderColor: colors.line, top: insets.top + 8}]}>
             <Pressable onPress={() => setIsMenuOpen(true)} style={[styles.hamburgerBtn, {backgroundColor: colors.surface, borderColor: colors.line}]}>
               <List size={22} color={colors.ink} />
             </Pressable>
@@ -1122,8 +1744,9 @@ export function MapScreen({navigation}: Props) {
             <View style={{flex: 1}}>
               <View style={styles.searchFields}>
                 <View style={[styles.compactInputRow, {borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line}]}>
-                  <Crosshair size={16} color={colors.primary} />
+                  <Crosshair size={16} color="#10B981" weight="bold" />
                   <TextInput
+                    ref={originInputRef}
                     accessibilityLabel="Origen"
                     style={[styles.compactInput, {color: colors.ink}]}
                     value={originLabel}
@@ -1140,11 +1763,12 @@ export function MapScreen({navigation}: Props) {
                       <Heart size={16} color={isOriginFavorited ? colors.primary : colors.muted} weight={isOriginFavorited ? 'fill' : 'regular'} />
                     </Pressable>
                   )}
-                  <Pressable onPress={locate} style={{padding: 4}}><NavigationArrow size={16} color={colors.muted} /></Pressable>
+                  <Pressable onPress={locate} style={{padding: 4}}><NavigationArrow size={16} color={colors.primary} weight="fill" /></Pressable>
                 </View>
                 <View style={styles.compactInputRow}>
-                  <MapPin size={16} color={colors.muted} />
+                  <MapPin size={16} color="#EF4444" weight="fill" />
                   <TextInput
+                    ref={destinationInputRef}
                     accessibilityLabel="Destino"
                     style={[styles.compactInput, {color: colors.ink}]}
                     value={destinationLabel}
@@ -1163,13 +1787,13 @@ export function MapScreen({navigation}: Props) {
                       <Heart size={16} color={isDestinationFavorited ? colors.primary : colors.muted} weight={isDestinationFavorited ? 'fill' : 'regular'} />
                     </Pressable>
                   )}
-                  <Pressable onPress={swapLocations} style={{padding: 4}}><ArrowsDownUp size={16} color={colors.muted} /></Pressable>
+                  <Pressable onPress={swapLocations} style={{padding: 4}}><ArrowsDownUp size={16} color={colors.primary} weight="bold" /></Pressable>
                 </View>
               </View>
 
               {/* suggestions absolute dropdown inside card */}
               {displayedSuggestions.length > 0 && activeInput ? (
-                <View style={[styles.suggestions, {borderColor: colors.line}]}>
+                <View style={[styles.suggestions, {borderColor: colors.line, backgroundColor: colors.surface}]}>
                   {displayedSuggestions.map(suggestion => {
                     const isFav = suggestion.subtitle?.includes('favorit');
                     return (
@@ -1223,7 +1847,8 @@ export function MapScreen({navigation}: Props) {
         {/* Floating actions on the right */}
         <View style={[styles.mapActions, {top: insets.top + 112}]}>
           <Pressable accessibilityRole="button" accessibilityLabel="Centrar en mi ubicación" onPress={locate} style={[styles.floatingButton, {backgroundColor: colors.bg, borderColor: colors.line, marginBottom: 8}]}><Crosshair size={22} color={colors.ink} weight="bold" /></Pressable>
-          <Pressable accessibilityRole="button" accessibilityLabel="Mostrar tráfico" onPress={() => setShowTraffic(prev => !prev)} style={[styles.floatingButton, {backgroundColor: showTraffic ? colors.primarySoft : colors.bg, borderColor: showTraffic ? colors.primary : colors.line}]}><Car size={22} color={showTraffic ? colors.primary : colors.ink} weight={showTraffic ? 'fill' : 'regular'} /></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Mostrar tráfico" onPress={() => setShowTraffic(prev => !prev)} style={[styles.floatingButton, {backgroundColor: showTraffic ? colors.primarySoft : colors.bg, borderColor: showTraffic ? colors.primary : colors.line, marginBottom: 8}]}><Car size={22} color={showTraffic ? colors.primary : colors.ink} weight={showTraffic ? 'fill' : 'regular'} /></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Limpiar mapa" onPress={clearMap} style={[styles.floatingButton, {backgroundColor: colors.bg, borderColor: colors.line}]}><Trash size={22} color={colors.ink} /></Pressable>
         </View>
 
         {/* Floating Traffic Legend at the bottom-left of the overlay */}
@@ -1281,46 +1906,72 @@ export function MapScreen({navigation}: Props) {
                  </Pressable>
                </View>
 
-              {journeyOptions.length > 0 && !showOnlyFavorites ? (
-                <View style={[styles.journeyTabs, {backgroundColor: colors.surface}]} accessibilityRole="tablist">
-                  {(['direct', 'transfer'] as const).map(tabValue => {
-                    const selected = journeyTab === tabValue;
-                    const count = journeyOptions.filter(option => tabValue === 'direct' ? Number(option.transfers || 0) === 0 : Number(option.transfers || 0) > 0).length;
-                    return (
-                      <Pressable
-                        key={tabValue}
-                        accessibilityRole="tab"
-                        accessibilityState={{selected}}
-                        onPress={() => setJourneyTab(tabValue)}
-                        style={[styles.journeyTab, selected && {backgroundColor: colors.bg}]}
-                      >
-                        <Text style={[styles.journeyTabLabel, {color: selected ? colors.ink : colors.muted}]}>{tabValue === 'direct' ? 'Directos' : 'Transbordos'}</Text>
-                        <View style={[styles.journeyTabCount, {backgroundColor: colors.surface}]}><Text style={[styles.journeyTabCountText, {color: colors.ink}]}>{count}</Text></View>
-                      </Pressable>
-                    );
-                  })}
+              {loading ? (
+                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 60}}>
+                  <ActivityIndicator size="large" color={colors.primary} />
+                  <Text style={{color: colors.ink, fontSize: 14, marginTop: 16, fontWeight: '600', textAlign: 'center'}}>
+                    Buscando las mejores rutas...
+                  </Text>
+                  <Text style={{color: colors.muted, fontSize: 11, marginTop: 6, textAlign: 'center', paddingHorizontal: 20}}>
+                    Calculando transbordos y caminata óptima en Morelia.
+                  </Text>
                 </View>
-              ) : null}
+              ) : (
+                <>
+                  {journeyOptions.length > 0 && !showOnlyFavorites ? (
+                    <View style={[styles.journeyTabs, {backgroundColor: colors.surface}]} accessibilityRole="tablist">
+                      {(['direct', 'transfer'] as const).map(tabValue => {
+                        const selected = journeyTab === tabValue;
+                        const count = journeyOptions.filter(option => tabValue === 'direct' ? Number(option.transfers || 0) === 0 : Number(option.transfers || 0) > 0).length;
+                        return (
+                          <Pressable
+                            key={tabValue}
+                            accessibilityRole="tab"
+                            accessibilityState={{selected}}
+                            onPress={() => setJourneyTab(tabValue)}
+                            style={[styles.journeyTab, selected && {backgroundColor: colors.bg}]}
+                          >
+                            <Text style={[styles.journeyTabLabel, {color: selected ? colors.ink : colors.muted}]}>{tabValue === 'direct' ? 'Directos' : 'Transbordos'}</Text>
+                            <View style={[styles.journeyTabCount, {backgroundColor: colors.surface}]}><Text style={[styles.journeyTabCountText, {color: colors.ink}]}>{count}</Text></View>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  ) : null}
 
-              <FlatList
-                data={drawerItems}
-                renderItem={renderDrawerItem}
-                keyExtractor={item => item.listKey || `${item.kind}-${item.id}`}
-                style={styles.drawerList}
-                contentContainerStyle={styles.drawerListContent}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                initialNumToRender={10}
-                maxToRenderPerBatch={8}
-                updateCellsBatchingPeriod={40}
-                windowSize={5}
-                removeClippedSubviews={Platform.OS === 'android'}
-                ListEmptyComponent={<Text style={[styles.empty, {color: colors.muted}]}>{journeyOptions.length > 0 && journeyTab === 'transfer' ? 'No necesitas un transbordo que reduzca significativamente la caminata.' : 'No encontramos rutas. Prueba con una colonia o punto conocido.'}</Text>}
-              />
+                  <FlatList
+                    data={drawerItems}
+                    renderItem={renderDrawerItem}
+                    keyExtractor={item => item.listKey || `${item.kind}-${item.id}`}
+                    style={styles.drawerList}
+                    contentContainerStyle={styles.drawerListContent}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    initialNumToRender={10}
+                    maxToRenderPerBatch={8}
+                    updateCellsBatchingPeriod={40}
+                    windowSize={5}
+                    removeClippedSubviews={Platform.OS === 'android'}
+                    ListEmptyComponent={<Text style={[styles.empty, {color: colors.muted}]}>{journeyOptions.length > 0 && journeyTab === 'transfer' ? 'No necesitas un transbordo que reduzca significativamente la caminata.' : 'No encontramos rutas. Prueba con una colonia o punto conocido.'}</Text>}
+                  />
+                </>
+              )}
             </View>
           </View>
         </View>
       </Modal>
+      {Boolean(message) && (
+        <View style={[
+          styles.toastContainer,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.line,
+            bottom: insets.bottom + 16,
+          }
+        ]}>
+          <Text style={[styles.toastText, {color: colors.ink}]}>{message}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -1540,5 +2191,27 @@ const styles = StyleSheet.create({
   legendLabel: {
     fontSize: 10,
     fontWeight: '500',
+  },
+  toastContainer: {
+    position: 'absolute',
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    shadowColor: '#000000',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    maxWidth: '85%',
+    zIndex: 9999,
+  },
+  toastText: {
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
