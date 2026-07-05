@@ -6,10 +6,12 @@ import {
   createLocalPlaceFavorite,
   createLocalRouteFavorite,
   expandSearchQuery,
+  favoriteCoords,
   filterFavoriteSuggestions,
   filterJourneyOptions,
   findPlaceFavorite,
   findRouteFavorite,
+  mergeLocalFavorites,
   haversineDistanceKm,
   isCombiTransportType,
   isPlaceFavorited,
@@ -151,26 +153,34 @@ export function TransitApp() {
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return;
     
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        supabase.from("favorites").select("*, place:places(id, name, location)").then(({ data, error }) => {
-          if (!error && data) setFavorites(data);
-        });
-      } else {
-        const stored = localStorage.getItem(LOCAL_FAVORITES_KEY);
-        if (stored) setFavorites(JSON.parse(stored));
+    const loadFavorites = async (userId: string | null) => {
+      const stored = localStorage.getItem(LOCAL_FAVORITES_KEY);
+      const local = stored ? (JSON.parse(stored) as FavoriteItem[]) : [];
+
+      if (!userId) {
+        setFavorites(local);
+        return;
       }
+
+      const { data, error } = await supabase
+        .from("favorites")
+        .select("*, place:places(id, name, location), route:routes(id, code)")
+        .eq("user_id", userId);
+
+      if (!error && data) {
+        setFavorites(mergeLocalFavorites(data as FavoriteItem[], local));
+        return;
+      }
+
+      setFavorites(local);
+    };
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      void loadFavorites(user?.id ?? null);
     });
 
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        supabase.from("favorites").select("*, place:places(id, name, location)").then(({ data, error }) => {
-          if (!error && data) setFavorites(data);
-        });
-      } else {
-        const stored = localStorage.getItem(LOCAL_FAVORITES_KEY);
-        setFavorites(stored ? JSON.parse(stored) : []);
-      }
+      void loadFavorites(session?.user?.id ?? null);
     });
 
     return () => data.subscription.unsubscribe();
@@ -247,7 +257,15 @@ export function TransitApp() {
             .select("id")
             .single();
 
-          if (!placeError && placeData) {
+          if (placeError) {
+            if (process.env.NODE_ENV === "development") {
+              console.warn("[ViaMorelia] No se pudo crear el lugar en Supabase:", placeError);
+            }
+            setMessage("No se pudo guardar en la nube. Revisa tu sesión o inténtalo de nuevo.");
+            return;
+          }
+
+          if (placeData) {
             const { data, error } = await supabase
               .from("favorites")
               .insert({
@@ -257,14 +275,18 @@ export function TransitApp() {
               })
               .select("*, place:places(id, name, location)")
               .single();
-            if (!error && data) newFav = data;
+            if (!error && data) {
+              newFav = data;
+            } else if (process.env.NODE_ENV === "development") {
+              console.warn("[ViaMorelia] No se pudo crear el favorito en Supabase:", error);
+            }
           }
         }
       }
       const updated = [...favorites, newFav];
       setFavorites(updated);
       localStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(updated));
-      setMessage("Lugar guardado en favoritos");
+      setMessage(newFav.is_local ? "Lugar guardado en favoritos locales" : "Lugar guardado en favoritos");
     }
   }, [favorites]);
 
@@ -569,18 +591,19 @@ export function TransitApp() {
             {activeSearch && (
               <div className={`address-suggestions ${activeSearch}`} role="listbox" aria-label="Sugerencias de direcciones">
                 {(activeSearch === "origin" ? origin : destination).trim().length < 2 ? (
-                  favorites.filter((f) => f.place_id || f.latitude || f.custom_name).length > 0 ? (
+                  favorites.filter((f) => f.place_id || f.latitude || f.custom_name || f.place?.location).length > 0 ? (
                     <>
                       <div className="suggestion-section-title" style={{ padding: "8px 12px", fontSize: "11px", fontWeight: "bold", color: "var(--muted)", borderBottom: "1px solid var(--line)" }}>
                         LUGARES FAVORITOS
                       </div>
-                      {favorites.filter((f) => f.place_id || f.latitude || f.custom_name).map((fav) => {
+                      {favorites.filter((f) => f.place_id || f.latitude || f.custom_name || f.place?.location).map((fav) => {
                         const label = fav.custom_name || (fav.place && fav.place.name) || "Lugar favorito";
-                        const lat = fav.latitude || (fav.place && fav.place.location?.coordinates?.[1]) || 0;
-                        const lon = fav.longitude || (fav.place && fav.place.location?.coordinates?.[0]) || 0;
+                        const coords = favoriteCoords(fav);
+                        if (!coords) return null;
+                        const { latitude: lat, longitude: lon } = coords;
                         return (
                           <div key={`fav-place-${fav.id}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
-                            <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion({ entity_type: "place", entity_id: fav.id, label, subtitle: "Lugar favorito", latitude: lat, longitude: lon })}>
+                            <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion({ entity_type: "place", entity_id: fav.place_id ?? fav.id, label, subtitle: "Lugar favorito", latitude: lat, longitude: lon })}>
                               <MagnifyingGlassIcon size={17} style={{ color: "var(--accent)" }} />
                               <span><strong>{label}</strong><small>Lugar favorito</small></span>
                             </button>

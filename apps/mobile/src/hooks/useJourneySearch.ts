@@ -209,6 +209,11 @@ export function useJourneySearch({
         return;
       }
 
+      if (!coords) {
+        setMessage('No pudimos ubicar el destino. Elige una sugerencia o escribe un lugar conocido.', 'error');
+        return;
+      }
+
       setDestination(suggestion.label, coords);
       if (suggestion.entity_type === 'route') setActiveRouteId(String(suggestion.entity_id));
       dismissSearchUi();
@@ -219,14 +224,12 @@ export function useJourneySearch({
         currentOrigin = await resolveCurrentOrigin();
       }
 
-      if (currentOrigin && nextDestination) {
-        await planJourneyWithCoords(currentOrigin, nextDestination);
+      if (currentOrigin) {
+        await planJourneyWithCoords(currentOrigin, coords);
         return;
       }
 
-      if (nextDestination) {
-        setMessage(`Rutas hacia ${suggestion.label}.`, 'info');
-      }
+      setMessage(`Rutas hacia ${suggestion.label}.`, 'info');
     },
     [
       activeInput,

@@ -36,6 +36,29 @@ describe('resolveSuggestionCoords', () => {
     });
   });
 
+  it('resolves supabase favorites from WKT location by favorite id', async () => {
+    const favorites: FavoriteItem[] = [
+      {
+        id: 42,
+        place_id: 7,
+        custom_name: 'Trabajo',
+        place: {id: 7, name: 'Trabajo', location: 'POINT(-101.19 19.71)'},
+      },
+    ];
+    const suggestion: Suggestion = {
+      entity_type: 'place',
+      entity_id: 42,
+      label: 'Trabajo',
+      subtitle: null,
+      latitude: null,
+      longitude: null,
+    };
+    await expect(resolveSuggestionCoords(null, suggestion, favorites)).resolves.toEqual({
+      latitude: 19.71,
+      longitude: -101.19,
+    });
+  });
+
   it('fetches stop coordinates from the data client', async () => {
     const client: TransitDataClient = {
       fetchStopLocation: vi.fn().mockResolvedValue('POINT(-101.3 19.8)'),

@@ -1,3 +1,4 @@
+import {favoriteCoords, findFavoriteBySuggestion} from './favorites';
 import {parseLocationField} from './places';
 import type {Coordinates, FavoriteItem, Suggestion} from './types';
 
@@ -8,43 +9,43 @@ export interface TransitDataClient {
   fetchPlaceLocation(placeId: number | string): Promise<LocationField>;
 }
 
-const LOCAL_FAVORITE_ENTITY_ID = 999999;
-
 export async function resolveSuggestionCoords(
   client: TransitDataClient | null,
   suggestion: Suggestion,
   favorites: FavoriteItem[] = [],
 ): Promise<Coordinates | null> {
   const {latitude: lat, longitude: lon} = suggestion;
-  if (lat !== null && lon !== null) {
+  if (lat !== null && lon !== null && !(lat === 0 && lon === 0)) {
     return {latitude: lat, longitude: lon};
   }
 
-  if (suggestion.entity_id === LOCAL_FAVORITE_ENTITY_ID) {
-    const localFavorite = favorites.find(
-      f => f.custom_name === suggestion.label || f.name === suggestion.label,
-    );
-    if (
-      localFavorite?.latitude != null &&
-      localFavorite?.longitude != null
-    ) {
-      return {
-        latitude: localFavorite.latitude,
-        longitude: localFavorite.longitude,
-      };
-    }
-    return null;
+  const favorite = findFavoriteBySuggestion(favorites, suggestion);
+  if (favorite) {
+    const coords = favoriteCoords(favorite);
+    if (coords) return coords;
   }
 
   if (!client) return null;
 
+  const placeId =
+    favorite?.place_id ??
+    (suggestion.entity_type === 'place' ? suggestion.entity_id : null);
+  const stopId =
+    favorite?.stop_id ??
+    (suggestion.entity_type === 'stop' ? suggestion.entity_id : null);
+
   try {
-    const location =
-      suggestion.entity_type === 'stop'
-        ? await client.fetchStopLocation(suggestion.entity_id)
-        : await client.fetchPlaceLocation(suggestion.entity_id);
-    return parseLocationField(location);
+    if (stopId != null) {
+      const location = await client.fetchStopLocation(stopId);
+      return parseLocationField(location);
+    }
+    if (placeId != null) {
+      const location = await client.fetchPlaceLocation(placeId);
+      return parseLocationField(location);
+    }
   } catch {
     return null;
   }
+
+  return null;
 }

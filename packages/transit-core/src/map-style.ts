@@ -89,14 +89,21 @@ export function customizeMapStyle(
   darkPalette: DarkMapPalette = DEFAULT_DARK_PALETTE,
 ): MapStyleJson {
   if (!Array.isArray(styleJson.layers)) return styleJson;
+  const layers = styleJson.layers.map(layer => ({
+    ...layer,
+    paint: layer.paint ? {...layer.paint} : layer.paint,
+    layout: layer.layout ? {...layer.layout} : layer.layout,
+  }));
+  const cloned: MapStyleJson = {...styleJson, layers};
   const palette = darkPalette;
-  styleJson.layers.forEach(layer => {
+  layers.forEach(layer => {
     if (colorScheme === 'dark') customizeDarkLayer(layer, palette);
     else customizeLightLayer(layer);
   });
-  return styleJson;
+  return cloned;
 }
 
-export function getMapStyleUrl(colorScheme: 'light' | 'dark'): string {
-  return colorScheme === 'dark' ? OPENFREEMAP_STYLE_URLS.dark : OPENFREEMAP_STYLE_URLS.light;
+/** Usa siempre Liberty (misma base que web) y aplica paleta oscura vía customizeMapStyle. */
+export function getMapStyleUrl(_colorScheme: 'light' | 'dark'): string {
+  return OPENFREEMAP_STYLE_URLS.light;
 }

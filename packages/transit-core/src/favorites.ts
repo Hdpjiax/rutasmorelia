@@ -1,4 +1,16 @@
+import {parseLocationField} from './places';
 import type {Coordinates, FavoriteItem, Suggestion} from './types';
+
+export function favoriteCoords(favorite: FavoriteItem): Coordinates | null {
+  if (favorite.latitude != null && favorite.longitude != null) {
+    return {latitude: favorite.latitude, longitude: favorite.longitude};
+  }
+
+  const fromPlace = parseLocationField(favorite.place?.location as Parameters<typeof parseLocationField>[0]);
+  if (fromPlace) return fromPlace;
+
+  return null;
+}
 
 export function findRouteFavorite(
   favorites: FavoriteItem[],
@@ -22,6 +34,26 @@ export function findPlaceFavorite(
       f.place?.name === label ||
       f.name === label,
   );
+}
+
+export function findFavoriteBySuggestion(
+  favorites: FavoriteItem[],
+  suggestion: Suggestion,
+): FavoriteItem | undefined {
+  const entityId = suggestion.entity_id;
+
+  if (typeof entityId === 'number' || typeof entityId === 'string') {
+    const byPlaceId = favorites.find(f => f.place_id != null && String(f.place_id) === String(entityId));
+    if (byPlaceId) return byPlaceId;
+
+    const byStopId = favorites.find(f => f.stop_id != null && String(f.stop_id) === String(entityId));
+    if (byStopId) return byStopId;
+
+    const byFavoriteId = favorites.find(f => String(f.id) === String(entityId));
+    if (byFavoriteId) return byFavoriteId;
+  }
+
+  return findPlaceFavorite(favorites, suggestion.label);
 }
 
 export function isRouteFavorited(
@@ -86,17 +118,18 @@ export function removeFavoriteById(
 
 export function favoritesToSuggestions(favorites: FavoriteItem[]): Suggestion[] {
   return favorites
-    .filter(f => f.place_id || f.stop_id || f.latitude != null)
-    .map(fav => ({
-      entity_type: fav.stop_id ? 'stop' : 'place',
-      entity_id: fav.stop_id || fav.place_id || 999999,
-      label: fav.custom_name || fav.place?.name || fav.name || '',
-      subtitle: fav.stop_id ? 'Parada favorita' : 'Lugar favorito',
-      latitude:
-        fav.latitude ?? fav.place?.location?.coordinates?.[1] ?? null,
-      longitude:
-        fav.longitude ?? fav.place?.location?.coordinates?.[0] ?? null,
-    }));
+    .filter(f => f.place_id || f.stop_id || f.latitude != null || f.place?.location)
+    .map(fav => {
+      const coords = favoriteCoords(fav);
+      return {
+        entity_type: fav.stop_id ? 'stop' : 'place',
+        entity_id: fav.stop_id || fav.place_id || 999999,
+        label: fav.custom_name || fav.place?.name || fav.name || '',
+        subtitle: fav.stop_id ? 'Parada favorita' : 'Lugar favorito',
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null,
+      };
+    });
 }
 
 export function filterFavoriteSuggestions(
@@ -109,20 +142,17 @@ export function filterFavoriteSuggestions(
 
   const normQuery = trimmed.toLowerCase();
   return favorites
-    .filter(f => f.place_id || f.latitude != null || f.custom_name)
+    .filter(f => f.place_id || f.latitude != null || f.custom_name || f.place?.location)
     .map(fav => {
       const label = fav.custom_name || fav.place?.name || 'Lugar favorito';
-      const latitude =
-        fav.latitude ?? fav.place?.location?.coordinates?.[1] ?? null;
-      const longitude =
-        fav.longitude ?? fav.place?.location?.coordinates?.[0] ?? null;
+      const coords = favoriteCoords(fav);
       return {
         entity_type: 'place',
-        entity_id: fav.id,
+        entity_id: fav.place_id || fav.stop_id || fav.id,
         label,
         subtitle: 'Dirección favorita guardada',
-        latitude,
-        longitude,
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null,
       } satisfies Suggestion;
     })
     .filter(suggestion => suggestion.label.toLowerCase().includes(normQuery));

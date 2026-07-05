@@ -12,7 +12,7 @@ export function useMapStyle() {
 
   useEffect(() => {
     let active = true;
-    const cacheKey = `custom_map_style_v5_${colorScheme}`;
+    const cacheKey = `custom_map_style_v6_liberty_${colorScheme}`;
     const url = getMapStyleUrl(colorScheme);
 
     async function loadStyle() {
