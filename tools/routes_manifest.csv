@@ -99,3 +99,5 @@ F9,9_CENTROS_COMERCIALES-LEANDRO_VALLE,Centros Comerciales (Lenadro Valle),#FFC8
 12,12_CAFE_1_LAGO,Café 1 Lago,Cafe,#8B4513,C,Combi,,,Combi,rutastransporte\01_RUTAS_DE_COMBI\12_CAFE_1_LAGO\KML\Café 1 Lago.kmz,01_RUTAS_DE_COMBI
 25,25_GRIS_2,Gris 2,Gris,#808080,C,Combi,,,Combi,rutastransporte\01_RUTAS_DE_COMBI\25_GRIS_2\KML\Gris_2.kmz,01_RUTAS_DE_COMBI
 F19,19_JESUS_DEL_MONTE,Jesús del Monte,#FFC800,#FFC800,A,Autobús,,,Autobús,rutastransporte\02_RUTAS_DE_AUTOBUSES_FORANEOS\19_JESUS_DEL_MONTE\KML\Jesus_Del_Monte.kml,02_RUTAS_DE_AUTOBUSES_FORANEOS
+43,43_NARANJA_3_CENTRO,Naranja 3 (Directo),Naranja,#FF5500,N,Autobús,13.1143,1583,Autobús,rutastransporte\01_RUTAS_DE_COMBI\43_NARANJA_3_CENTRO\KML_naranja3centro\Naranja3_centro_kml.kml,01_RUTAS_DE_COMBI
+

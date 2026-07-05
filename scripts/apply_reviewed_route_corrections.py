@@ -126,6 +126,47 @@ def restore_guinda_2(index: dict) -> None:
     write_route("31", document, "official-kml-explicit-coordinates", index)
 
 
+def restore_route_from_kml(code: str, index: dict) -> None:
+    from route_pipeline.config import ROUTES
+    from route_pipeline.kml import parse_kml
+    
+    route = next(r for r in ROUTES.values() if r.code == code)
+    directions = parse_kml(route.kml)
+    
+    features = []
+    for idx, item in enumerate(directions):
+        direction = "ida" if idx == 0 else "vuelta"
+        title = "Ida" if idx == 0 else "Vuelta"
+        features.append({
+            "type": "Feature",
+            "properties": {
+                "id": f"{code}_{idx}",
+                "routeId": code,
+                "routeName": route.name,
+                "direction": direction,
+                "directionIndex": idx + 1,
+                "color": route.color,
+                "casingColor": "#222222",
+                "transportType": route.transport_type,
+                "name": title,
+                "geometrySource": "official-kml-explicit-coordinates",
+                "matchingEngine": "none",
+            },
+            "geometry": {
+                "type": "MultiLineString",
+                "coordinates": [
+                    [[round(lon, 7), round(lat, 7)] for lon, lat in component]
+                    for component in item.components
+                ],
+            },
+        })
+    document = {
+        "type": "FeatureCollection",
+        "features": features,
+    }
+    write_route(code, document, "official-kml-explicit-coordinates", index)
+
+
 def restore_naranja_routes(index: dict) -> None:
     from route_pipeline.config import ROUTES
     from route_pipeline.kml import parse_shape_file
@@ -208,14 +249,16 @@ def remove_short_detours(line: list[list[float]]) -> tuple[list[list[float]], in
 
 def main() -> None:
     index = json.loads(INDEX.read_text(encoding="utf-8"))
-    correct_alberca("78", index)
+    restore_route_from_kml("78", index)
     correct_alberca("79", index)
     restore_cafe_oro_2(index)
     correct_coral_1(index)
     restore_guinda_2(index)
     restore_naranja_routes(index)
+    restore_route_from_kml("84", index)
+    restore_route_from_kml("85", index)
     INDEX.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print("Updated reviewed routes: 78, 79, 13, 18, 31, oranges (excl. 39)")
+    print("Updated reviewed routes: 78, 79, 13, 18, 31, oranges (excl. 39), 84, 85")
 
 
 if __name__ == "__main__":

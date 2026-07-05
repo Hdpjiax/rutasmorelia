@@ -1,6 +1,6 @@
 {
   "type": "routes-index",
-  "generatedAt": "2026-07-05T01:42:09.930688+00:00",
+  "generatedAt": "2026-07-05T01:54:54.102317+00:00",
   "algorithm": "valhalla-kml-corridor-v1",
   "routes": [
     {
@@ -10,9 +10,9 @@
       "transportType": "Camion",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/78.geojson?v=572861d51de4",
-      "artifactSha256": "572861d51de47f8b0f34ba3d05aca5f28a7ce808d032bd1196b4a62659de6e9c",
-      "algorithm": "reviewed-alberca-red-corridor-v2"
+      "geojsonFile": "/routes/78.geojson?v=1ffc65ec8c9b",
+      "artifactSha256": "1ffc65ec8c9b761d7fcfb072a5c349c672fc7f0bc18ca46a714791ef344e9784",
+      "algorithm": "official-kml-explicit-coordinates"
     },
     {
       "id": "79",
@@ -59,31 +59,31 @@
       "id": "F1",
       "name": "Arcos San Pedro",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F1.geojson?v=481c902c976d",
-      "artifactSha256": "481c902c976dbffa7c82484994bcf8dcc1b31fcee7ddd9f7c3ed06bb4292680f"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F1.geojson?v=17207ad9f5de",
+      "artifactSha256": "17207ad9f5def19b520e1e1c2e3ffc8bd83bdd7bbb4cf45311b8439cf6273921"
     },
     {
       "id": "F2",
       "name": "Arroyo Colorado",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F2.geojson?v=7d83aa060508",
-      "artifactSha256": "7d83aa06050824e9ead98ec80548b8c6c8bebc0413090157faf2c650e90934ab"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F2.geojson?v=e668c83ecc8f",
+      "artifactSha256": "e668c83ecc8fa05f7e106eb9ce12e1f945c3bf37437ab76e2fa289172da0d05d"
     },
     {
       "id": "F3",
       "name": "Atécuaro",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F3.geojson?v=eb41f83d0345",
-      "artifactSha256": "eb41f83d03452a541ca3bb28d8d5bdbf930a2807e53bcc19d5717ec8a7f17563"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F3.geojson?v=d739ccba7412",
+      "artifactSha256": "d739ccba7412d7489605cda3e9c9803f3e8f787a68eb832c78b962be773b8d62"
     },
     {
       "id": "5",
@@ -139,11 +139,11 @@
       "id": "F8",
       "name": "CD Hidalgo",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F8.geojson?v=fd352e0412e6",
-      "artifactSha256": "fd352e0412e6d8fdc2a73a1a7ab3ddb02cf2eb132a6091090727e64198a25e4f"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F8.geojson?v=46971ca48f33",
+      "artifactSha256": "46971ca48f336710b363c8103d2cc40c33cd0aedeae76f86d24c1a90f66410df"
     },
     {
       "id": "13",
@@ -230,121 +230,121 @@
       "id": "F4",
       "name": "Campestre (Misión del Valle)",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F4.geojson?v=a81d612c699a",
-      "artifactSha256": "a81d612c699a9b54670c8cfb70de3661208a107013db1fc4210eab1ee17774d9"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F4.geojson?v=4220ae4567ef",
+      "artifactSha256": "4220ae4567efb6c5863475124529db44e8e5fb5b8c70fbb36155a8d80f04e7dc"
     },
     {
       "id": "F5",
       "name": "Campestre (Posta Trebol - Monarca)",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F5.geojson?v=91b04dcb4941",
-      "artifactSha256": "91b04dcb494125cd452dcd4942fc0b584ae387ef8b57c9fdcdf2ab42c9c67714"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F5.geojson?v=0a57d813ef81",
+      "artifactSha256": "0a57d813ef81d46673050e6be0a94aa3cd2aabb8229c1c3c7dcad3e1913e7e8e"
     },
     {
       "id": "F6",
       "name": "Canteras Bachilleres (Alamos - San Bernabe)",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F6.geojson?v=a4387348c0ef",
-      "artifactSha256": "a4387348c0eff7d2640de8130f56f975eef70ef2d8e0c05fc3b2ac63720fdf74"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F6.geojson?v=4f0e224efa9b",
+      "artifactSha256": "4f0e224efa9bf87d5c050d0768a31eb026cef828e980913e824b21cab65fd5b2"
     },
     {
       "id": "F7",
       "name": "Capula",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F7.geojson?v=0654d7598e67",
-      "artifactSha256": "0654d7598e67a9210603b7d0862b49fe064664aa652005528056a9fca2870196"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F7.geojson?v=857302d90322",
+      "artifactSha256": "857302d903229d56e35b4aeaf4d738a20aaaee384c5e32f8a5315efc9cd3ceaf"
     },
     {
       "id": "F9",
       "name": "Centros Comerciales (Lenadro Valle)",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F9.geojson?v=5940fe773e7d",
-      "artifactSha256": "5940fe773e7ded0ecf5110d94b2fa2be7822066afce24165c91fe6303ca06387"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F9.geojson?v=a3ea52331c7a",
+      "artifactSha256": "a3ea52331c7a895a18d3a27bf846ec023965c37464e77ce9429248c0a8e5ce88"
     },
     {
       "id": "F10",
       "name": "Centros Comerciales (Lucio Cabañas)",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F10.geojson?v=7fac5d489dc4",
-      "artifactSha256": "7fac5d489dc40e4bfab62a98b7d0bc4b5aeb9b1f8c79267658ab677c53647def"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F10.geojson?v=b33a3b7d868a",
+      "artifactSha256": "b33a3b7d868a9d709d3aee7c1825ac717dd1369acd0fbd48e849674cc20c00d4"
     },
     {
       "id": "F11",
       "name": "Charo",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F11.geojson?v=515d801ac317",
-      "artifactSha256": "515d801ac317cdcee64518e8ce009d7a14f613685edd68908d673de122c0149f"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F11.geojson?v=00d783afcaef",
+      "artifactSha256": "00d783afcaef05f2c5dc1e99b46885d75faf57cf183035b346dd055364be8823"
     },
     {
       "id": "F13",
       "name": "Charo (San Antonio Corrales)",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F13.geojson?v=0c587481970e",
-      "artifactSha256": "0c587481970e8815e927a99ff757ff8a9f44751f610594aa55cf52852e5e9dd3"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F13.geojson?v=743a75ad33e4",
+      "artifactSha256": "743a75ad33e4e399b41cbe2ccb03c997aeb522f0e76b776bf0485be5c67a42f6"
     },
     {
       "id": "F12",
       "name": "Charo - Ind Atapaneo (ISSTE - Soledad)",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F12.geojson?v=485150ea6530",
-      "artifactSha256": "485150ea653089173b89b5caf24c8860782aaf44f18501cd5d62e38a0b2ba8f9"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F12.geojson?v=0a9c680c659a",
+      "artifactSha256": "0a9c680c659a9ae8b2f4808cec579d3eb0f76bca8cb008c9e5e891d1845189f4"
     },
     {
       "id": "F14",
       "name": "Chihuerio",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F14.geojson?v=911a9bde33b9",
-      "artifactSha256": "911a9bde33b98b723d029c81b4e9fe6b0ae53e51a38e630e5eba7451481afcf7"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F14.geojson?v=50fe2c0d833d",
+      "artifactSha256": "50fe2c0d833de08a242b9cdc7481fbbf3440cb83319e37e65801af94b743e202"
     },
     {
       "id": "F15",
       "name": "Chiquimitio (Por Torreon Nuevo)",
       "color": "#FFC800",
       "transportType": "Camión",
-      "colorName": "Amarillo",
-      "colorLetter": "A",
-      "geojsonFile": "/routes/F15.geojson?v=db95b7d42a6e",
-      "artifactSha256": "db95b7d42a6e9dd6b0041364cb1d8e799a31b98c7f85c2682e8bee9bddfeff83"
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F15.geojson?v=aab21775a261",
+      "artifactSha256": "aab21775a2612ee026b5b2ba9a301412ea26dc195fd831f9ac987c6a0f6694fb"
     },
     {
       "id": "F16",
       "name": "Chucandiro",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F16.geojson?v=ae843ed3c342",
-      "artifactSha256": "ae843ed3c34259167bf5a4446934dd8d3f8cfc42a12c82e60d791619fd93b672"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F16.geojson?v=7f62a0d55954",
+      "artifactSha256": "7f62a0d55954b28c1d4493b1581845ddc6ebb21d449db9819156d9cf40dd02ca"
     },
     {
       "id": "81",
@@ -360,21 +360,21 @@
       "id": "F17",
       "name": "Coeneo",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F17.geojson?v=573308dfebf5",
-      "artifactSha256": "573308dfebf546e0c5f42511270596a2bc470126cc15fa11417edec8b8b12d4a"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F17.geojson?v=4f973403c425",
+      "artifactSha256": "4f973403c425ce5a774a900d65e039847557f2b8a5f5bfd43785e4dcfeffe15b"
     },
     {
       "id": "F18",
       "name": "Cointzio",
       "color": "#FFC800",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/F18.geojson?v=1658a28d2f0c",
-      "artifactSha256": "1658a28d2f0c714ca50b4782619c85e0f2e6c04efc41cf39335dfb5752f16ed9"
+      "transportType": "Camión",
+      "colorName": "#FFC800",
+      "colorLetter": "?",
+      "geojsonFile": "/routes/F18.geojson?v=e13c4af5db79",
+      "artifactSha256": "e13c4af5db79dede9d2478b9444b0345b2ac9df4bbb013394d20eb0dabcf67db"
     },
     {
       "id": "18",
@@ -451,11 +451,11 @@
       "id": "89",
       "name": "Dorado (Lomas de Morelia)",
       "color": "#D1BE3C",
-      "transportType": "Camion",
-      "colorName": "Amarillo",
-      "colorLetter": "C",
-      "geojsonFile": "/routes/89.geojson?v=f29f1251ad70",
-      "artifactSha256": "f29f1251ad7028374614558a152fdbd5b879e76e6350a452365d60d9acd6ee57"
+      "transportType": "Camión",
+      "colorName": "Dorado",
+      "colorLetter": "D",
+      "geojsonFile": "/routes/89.geojson?v=061a6d9358e7",
+      "artifactSha256": "061a6d9358e72cbef239cc16a5bac2e601f86e5314ca06694cd05474c4d596e2"
     },
     {
       "id": "87",
@@ -683,6 +683,16 @@
       "algorithm": "official-kml-explicit-coordinates"
     },
     {
+      "id": "43",
+      "name": "Naranja 3 (Directo)",
+      "color": "#FF5500",
+      "transportType": "Camión",
+      "colorName": "Naranja",
+      "colorLetter": "N",
+      "geojsonFile": "/routes/43.geojson?v=48b556f3256d",
+      "artifactSha256": "48b556f3256d7bad54c1d7e3ba8181f700876dba7200aa443487be4980e60915"
+    },
+    {
       "id": "42",
       "name": "Naranja 3 [Centro - Puerta Del Sol]",
       "color": "#EC5400",
@@ -823,8 +833,9 @@
       "transportType": "Camion",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/84.geojson?v=3ef31e26c2cf",
-      "artifactSha256": "3ef31e26c2cf7db2ffbe6e4e2dea88f74ee0d22ea7aa336961dc9c7050ffb968"
+      "geojsonFile": "/routes/84.geojson?v=dd539ec6aae2",
+      "artifactSha256": "dd539ec6aae22ec18aa077d8e29da7b528a3e3704e9a8d3976569234fe3f1b32",
+      "algorithm": "official-kml-explicit-coordinates"
     },
     {
       "id": "85",
@@ -833,8 +844,9 @@
       "transportType": "Camion",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/85.geojson?v=f99ee611371e",
-      "artifactSha256": "f99ee611371e0eb1944d860e484fbb6968a8110eae5f1714f0820064830756e4"
+      "geojsonFile": "/routes/85.geojson?v=f3c5ee34f7da",
+      "artifactSha256": "f3c5ee34f7da5fd3a952704f8c5256d6a1c99e752052f0ad49a749ff49ca58c0",
+      "algorithm": "official-kml-explicit-coordinates"
     },
     {
       "id": "55",
