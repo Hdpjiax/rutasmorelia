@@ -1,6 +1,17 @@
 import {parseLocationField} from './places';
 import type {Coordinates, FavoriteItem, Suggestion} from './types';
 
+export const DEFAULT_ORIGIN_LABEL = 'Mi ubicación';
+
+export function shouldShowFavoriteSuggestions(
+  activeInput: 'origin' | 'destination' | null,
+  query: string,
+): boolean {
+  if (!activeInput) return false;
+  const trimmed = query.trim();
+  return trimmed.length < 2 || (activeInput === 'origin' && trimmed === DEFAULT_ORIGIN_LABEL);
+}
+
 export function favoriteCoords(favorite: FavoriteItem): Coordinates | null {
   if (favorite.latitude != null && favorite.longitude != null) {
     return {latitude: favorite.latitude, longitude: favorite.longitude};
@@ -123,13 +134,14 @@ export function favoritesToSuggestions(favorites: FavoriteItem[]): Suggestion[] 
       const coords = favoriteCoords(fav);
       return {
         entity_type: fav.stop_id ? 'stop' : 'place',
-        entity_id: fav.stop_id || fav.place_id || 999999,
+        entity_id: fav.place_id || fav.stop_id || fav.id,
         label: fav.custom_name || fav.place?.name || fav.name || '',
         subtitle: fav.stop_id ? 'Parada favorita' : 'Lugar favorito',
         latitude: coords?.latitude ?? null,
         longitude: coords?.longitude ?? null,
       };
-    });
+    })
+    .filter(s => s.latitude != null && s.longitude != null);
 }
 
 export function filterFavoriteSuggestions(
@@ -155,5 +167,6 @@ export function filterFavoriteSuggestions(
         longitude: coords?.longitude ?? null,
       } satisfies Suggestion;
     })
+    .filter(suggestion => suggestion.latitude != null && suggestion.longitude != null)
     .filter(suggestion => suggestion.label.toLowerCase().includes(normQuery));
 }

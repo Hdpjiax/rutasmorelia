@@ -3,7 +3,7 @@ pid: 19276
 cwd: "C:\RutasMorelia"
 command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\\android\"; .\\gradlew.bat :app:buildCMakeRelWithDebInfo[arm64-v8a] --stacktrace 2>&1 | Select-Object -Last 100"
 started_at: 2026-07-05T02:42:49.368Z
-running_for_ms: 2020004  
+running_for_ms: 4665005  
 ---
 >>> referenced by stdexcept:163 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
 

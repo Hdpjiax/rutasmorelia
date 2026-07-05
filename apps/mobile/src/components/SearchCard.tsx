@@ -1,16 +1,19 @@
 import {
   ArrowsDownUp,
-  Crosshair,
   Heart,
   List,
   MagnifyingGlass,
   MapPin,
   NavigationArrow,
 } from 'phosphor-react-native';
-import {ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
+import {useEffect, useRef} from 'react';
+import {ActivityIndicator, Animated, Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
 import type {AppColorScheme} from '../lib/color-scheme';
 import type {Suggestion} from '../types/transit';
 import {dark, light} from '../theme';
+
+const ORIGIN_COLOR = '#2563eb';
+const DESTINATION_COLOR = '#ef4444';
 
 type ThemeColors = typeof light;
 
@@ -25,6 +28,7 @@ type SearchCardProps = {
   isDestinationFavorited: boolean;
   displayedSuggestions: Suggestion[];
   activeInput: 'origin' | 'destination' | null;
+  browsingFavorites: boolean;
   loading: boolean;
   originInputRef: React.RefObject<TextInput | null>;
   destinationInputRef: React.RefObject<TextInput | null>;
@@ -52,6 +56,7 @@ export function SearchCard({
   isDestinationFavorited,
   displayedSuggestions,
   activeInput,
+  browsingFavorites,
   loading,
   originInputRef,
   destinationInputRef,
@@ -68,6 +73,29 @@ export function SearchCard({
   onSearch,
 }: SearchCardProps) {
   const colors: ThemeColors = colorScheme === 'dark' ? dark : light;
+  const suggestionsAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const shouldShow = displayedSuggestions.length > 0 && Boolean(activeInput);
+    Animated.spring(suggestionsAnim, {
+      toValue: shouldShow ? 1 : 0,
+      useNativeDriver: true,
+      friction: 8,
+      tension: 80,
+    }).start();
+  }, [activeInput, displayedSuggestions.length, suggestionsAnim]);
+
+  const suggestionsStyle = {
+    opacity: suggestionsAnim,
+    transform: [
+      {
+        translateY: suggestionsAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [-8, 0],
+        }),
+      },
+    ],
+  };
 
   return (
     <View style={[styles.floatingSearchCard, {backgroundColor: colors.surface, borderColor: colors.line, top}]}>
@@ -81,9 +109,19 @@ export function SearchCard({
       <View style={{flex: 1}}>
         <View style={styles.searchFields}>
           <View
-            style={[styles.compactInputRow, {borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line}]}
+            style={[
+              styles.compactInputRow,
+              {
+                borderBottomWidth: StyleSheet.hairlineWidth,
+                borderBottomColor: colors.line,
+                backgroundColor: activeInput === 'origin' ? `${ORIGIN_COLOR}18` : 'transparent',
+                borderRadius: 10,
+                borderWidth: activeInput === 'origin' ? 1.5 : 0,
+                borderColor: activeInput === 'origin' ? ORIGIN_COLOR : 'transparent',
+              },
+            ]}
           >
-            <Crosshair size={16} color="#10B981" weight="bold" />
+            <MapPin size={16} color={ORIGIN_COLOR} weight="fill" />
             <TextInput
               ref={originInputRef}
               accessibilityLabel="Origen"
@@ -98,17 +136,27 @@ export function SearchCard({
               <Pressable onPress={onToggleOriginFavorite} style={{padding: 4}}>
                 <Heart
                   size={16}
-                  color={isOriginFavorited ? colors.primary : colors.muted}
+                  color={isOriginFavorited ? ORIGIN_COLOR : colors.muted}
                   weight={isOriginFavorited ? 'fill' : 'regular'}
                 />
               </Pressable>
             ) : null}
             <Pressable onPress={onLocate} style={{padding: 4}}>
-              <NavigationArrow size={16} color={colors.primary} weight="fill" />
+              <NavigationArrow size={16} color={ORIGIN_COLOR} weight="fill" />
             </Pressable>
           </View>
-          <View style={styles.compactInputRow}>
-            <MapPin size={16} color="#EF4444" weight="fill" />
+          <View
+            style={[
+              styles.compactInputRow,
+              {
+                backgroundColor: activeInput === 'destination' ? `${DESTINATION_COLOR}18` : 'transparent',
+                borderRadius: 10,
+                borderWidth: activeInput === 'destination' ? 1.5 : 0,
+                borderColor: activeInput === 'destination' ? DESTINATION_COLOR : 'transparent',
+              },
+            ]}
+          >
+            <MapPin size={16} color={DESTINATION_COLOR} weight="fill" />
             <TextInput
               ref={destinationInputRef}
               accessibilityLabel="Destino"
@@ -125,7 +173,7 @@ export function SearchCard({
               <Pressable onPress={onToggleDestinationFavorite} style={{padding: 4}}>
                 <Heart
                   size={16}
-                  color={isDestinationFavorited ? colors.primary : colors.muted}
+                  color={isDestinationFavorited ? DESTINATION_COLOR : colors.muted}
                   weight={isDestinationFavorited ? 'fill' : 'regular'}
                 />
               </Pressable>
@@ -137,9 +185,19 @@ export function SearchCard({
         </View>
 
         {displayedSuggestions.length > 0 && activeInput ? (
-          <View style={[styles.suggestions, {borderColor: colors.line, backgroundColor: colors.surface}]}>
+          <Animated.View
+            style={[
+              styles.suggestions,
+              {borderColor: colors.line, backgroundColor: colors.surface},
+              suggestionsStyle,
+            ]}
+          >
+            {browsingFavorites && displayedSuggestions.length > 0 ? (
+              <Text style={[styles.suggestionsHeading, {color: colors.muted}]}>LUGARES FAVORITOS</Text>
+            ) : null}
             {displayedSuggestions.map(suggestion => {
-              const isFav = suggestion.subtitle?.includes('favorit');
+              const isFav = suggestion.subtitle?.toLowerCase().includes('favorit');
+              const iconColor = activeInput === 'origin' ? ORIGIN_COLOR : DESTINATION_COLOR;
               return (
                 <Pressable
                   key={`${suggestion.entity_type}-${suggestion.entity_id}-${suggestion.label}`}
@@ -147,13 +205,13 @@ export function SearchCard({
                   style={[styles.suggestion, {borderBottomColor: colors.line}]}
                 >
                   {isFav ? (
-                    <Heart size={17} color={colors.primary} weight="fill" />
+                    <Heart size={17} color={iconColor} weight="fill" />
                   ) : (
-                    <MapPin size={17} color={colors.muted} />
+                    <MapPin size={17} color={iconColor} />
                   )}
                   <View style={styles.suggestionCopy}>
                     <Text numberOfLines={1} style={[styles.suggestionTitle, {color: colors.ink}]}>
-                      {suggestion.label}
+                      {isFav ? `★ ${suggestion.label}` : suggestion.label}
                     </Text>
                     <Text numberOfLines={1} style={[styles.suggestionSubtitle, {color: colors.muted}]}>
                       {suggestion.subtitle || 'Morelia'}
@@ -162,7 +220,7 @@ export function SearchCard({
                 </Pressable>
               );
             })}
-          </View>
+          </Animated.View>
         ) : null}
       </View>
 
@@ -224,6 +282,16 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     elevation: 8,
     zIndex: 100,
+  },
+  suggestionsHeading: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 6,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(128,128,128,0.25)',
   },
   suggestion: {
     minHeight: 50,

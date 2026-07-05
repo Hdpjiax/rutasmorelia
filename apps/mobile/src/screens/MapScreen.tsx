@@ -28,7 +28,7 @@ import {useRouteCatalog} from '../hooks/useRouteCatalog';
 import {useRouteGeometry} from '../hooks/useRouteGeometry';
 import {useToast} from '../hooks/useToast';
 import {useTraffic} from '../hooks/useTraffic';
-import {findClosestPointOnLine} from '@rutas-morelia/transit-core';
+import {DEFAULT_ORIGIN_LABEL, findClosestPointOnLine, shouldShowFavoriteSuggestions} from '@rutas-morelia/transit-core';
 import {useTransitStore} from '../store/transit-store';
 import {dark, light} from '../theme';
 import {EMPTY_GEOJSON, type DrawerItem} from '../types/transit';
@@ -39,7 +39,7 @@ const ROUTE_ARROW_ICON =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAoElEQVR4nO3WwQmEMBAF0PhJA+akFaz9V6MV6MmUoLCwtw0mM3/Uw3zwojP8BxJICB6Pp5B++BzhhuAKYQ1BzZAlBC3DFhBIlpgQ1Azt6/x9LCBoGbaAQLLEhEACYEKgATAgYAA0kMgEpHH6+z5vS1faiU8VUwBJUawCJEKxCJCIxb90pQ8151hTrPoFmVAsAmRicRMgGxS/5k7o8YSncwLzh1hDCb69SgAAAABJRU5ErkJggg==';
 
 export function MapScreen({navigation}: Props) {
-  const {colorScheme, customMapStyle, mapStyleUrl} = useMapStyle();
+  const {colorScheme, mapStyle} = useMapStyle();
   const colors = colorScheme === 'dark' ? dark : light;
   const insets = useSafeAreaInsets();
   const camera = useRef<CameraRef>(null);
@@ -81,7 +81,14 @@ export function MapScreen({navigation}: Props) {
     origin,
     destination,
     favoriteSuggestions,
+    favorites,
   });
+
+  const browsingFavorites = shouldShowFavoriteSuggestions(
+    activeInput,
+    activeInput === 'origin' ? originLabel : destinationLabel,
+  );
+  const isMyLocationOrigin = originLabel === DEFAULT_ORIGIN_LABEL && origin != null;
 
   const {
     journeyOptions,
@@ -94,6 +101,7 @@ export function MapScreen({navigation}: Props) {
     locate,
     swapLocations,
     resetJourney,
+    dismissSearchUi,
   } = useJourneySearch({
     originLabel,
     destinationLabel,
@@ -191,26 +199,19 @@ export function MapScreen({navigation}: Props) {
     setMessage('Mapa limpio.', 'success');
   }, [clearSuggestions, resetJourney, setActiveRouteGeoJSON, setActiveRouteId, setDestination, setMessage, setOrigin]);
 
-  if (!customMapStyle) {
-    return (
-      <View style={[styles.root, {backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center'}]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
   const searchLoading = autocompleteLoading || journeyLoading;
 
   return (
     <View style={styles.root}>
       <MapView
         style={StyleSheet.absoluteFill}
-        mapStyle={(typeof customMapStyle === 'string' ? customMapStyle : customMapStyle) as string}
+        mapStyle={mapStyle}
         logo={false}
         compass
         touchRotate
         attribution
         accessibilityLabel="Mapa de transporte público de Morelia"
+        onPress={() => dismissSearchUi()}
       >
         <Camera
           key="main-camera"
@@ -220,6 +221,16 @@ export function MapScreen({navigation}: Props) {
           maxZoom={19}
         />
         {!origin ? <UserLocation key="user-location" animated accuracy heading /> : null}
+
+        {isMyLocationOrigin ? (
+          <ViewAnnotation
+            key="my-location-marker"
+            id="my-location-marker"
+            lngLat={[origin.longitude, origin.latitude]}
+          >
+            <PulsingMarker color="#2563eb" variant="location" />
+          </ViewAnnotation>
+        ) : null}
         <Images key="route-arrow-images" images={{'route-arrow-icon': {source: {uri: ROUTE_ARROW_ICON}}}} />
 
         <GeoJSONSource key="routes" id="routes" data={activeRouteGeoJSON || EMPTY_GEOJSON}>
@@ -352,7 +363,7 @@ export function MapScreen({navigation}: Props) {
           </Marker>
         ) : null}
 
-        {origin ? (
+        {origin && !isMyLocationOrigin ? (
           <ViewAnnotation
             key="origin-marker"
             id="origin-marker"
@@ -404,16 +415,17 @@ export function MapScreen({navigation}: Props) {
             isDestinationFavorited={isPlaceFavorited(destinationLabel)}
             displayedSuggestions={displayedSuggestions}
             activeInput={activeInput}
+            browsingFavorites={browsingFavorites}
             loading={searchLoading}
             originInputRef={originInputRef}
             destinationInputRef={destinationInputRef}
             onOpenMenu={() => setIsMenuOpen(true)}
             onOriginChange={value => {
-              setOrigin(value);
+              setOrigin(value, value === DEFAULT_ORIGIN_LABEL ? origin : null);
               setActiveInput('origin');
             }}
             onDestinationChange={value => {
-              setDestination(value);
+              setDestination(value, null);
               setActiveInput('destination');
             }}
             onOriginFocus={() => setActiveInput('origin')}

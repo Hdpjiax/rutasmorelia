@@ -1,4 +1,9 @@
-import {buildPhotonSearchUrl, mapPhotonFeatures} from '@rutas-morelia/transit-core';
+import {
+  buildPhotonSearchUrl,
+  filterFavoriteSuggestions,
+  mapPhotonFeatures,
+  shouldShowFavoriteSuggestions,
+} from '@rutas-morelia/transit-core';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {supabase} from '../lib/supabase';
 import type {Coordinates} from '../store/transit-store';
@@ -11,6 +16,7 @@ type UsePlaceAutocompleteOptions = {
   origin: Coordinates | null;
   destination: Coordinates | null;
   favoriteSuggestions: Suggestion[];
+  favorites: FavoriteItem[];
 };
 
 export function usePlaceAutocomplete({
@@ -20,18 +26,21 @@ export function usePlaceAutocomplete({
   origin,
   destination,
   favoriteSuggestions,
+  favorites,
 }: UsePlaceAutocompleteOptions) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const suggestionCache = useRef(new Map<string, Suggestion[]>());
 
+  const query = activeInput === 'origin' ? originLabel.trim() : destinationLabel.trim();
+  const browsingFavorites = shouldShowFavoriteSuggestions(activeInput, query);
+
   useEffect(() => {
     const client = supabase;
-    const query = activeInput === 'origin' ? originLabel.trim() : destinationLabel.trim();
-    const coordsSet = activeInput === 'origin' ? origin : destination;
 
-    if (!client || query.length < 2 || coordsSet || !activeInput) {
-      setSuggestions([]);
+    if (!client || !activeInput || browsingFavorites) {
+      if (!browsingFavorites) setSuggestions([]);
+      setLoading(false);
       return;
     }
 
@@ -98,13 +107,29 @@ export function usePlaceAutocomplete({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [activeInput, origin, destination, originLabel, destinationLabel]);
+  }, [activeInput, browsingFavorites, query]);
 
   const displayedSuggestions = useMemo(() => {
-    const query = activeInput === 'origin' ? originLabel : destinationLabel;
-    if (activeInput && query.trim().length < 2) return favoriteSuggestions;
-    return suggestions;
-  }, [activeInput, originLabel, destinationLabel, favoriteSuggestions, suggestions]);
+    if (!activeInput) return [];
+
+    if (browsingFavorites) {
+      return favoriteSuggestions;
+    }
+
+    const matchingFavs = filterFavoriteSuggestions(favorites, query);
+    const deduped = suggestions.filter(
+      item =>
+        !matchingFavs.some(
+          fav =>
+            fav.label.toLowerCase() === item.label.toLowerCase() ||
+            (fav.latitude != null &&
+              item.latitude != null &&
+              Math.abs(fav.latitude - item.latitude) < 0.0001 &&
+              Math.abs((fav.longitude ?? 0) - (item.longitude ?? 0)) < 0.0001),
+        ),
+    );
+    return [...matchingFavs, ...deduped];
+  }, [activeInput, browsingFavorites, favoriteSuggestions, favorites, query, suggestions]);
 
   const clearSuggestions = () => setSuggestions([]);
 

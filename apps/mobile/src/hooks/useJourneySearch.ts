@@ -1,8 +1,13 @@
 import type {CameraRef} from '@maplibre/maplibre-react-native';
 import {useCallback, useState} from 'react';
 import {Keyboard, PermissionsAndroid, Platform, type TextInput} from 'react-native';
-import {selectInitialJourneyRouteId, selectInitialJourneyTab} from '@rutas-morelia/transit-core';
-import {getAccurateNativePosition, MORELIA_CENTER} from '../lib/location';
+import {
+  favoriteCoords,
+  findFavoriteBySuggestion,
+  selectInitialJourneyRouteId,
+  selectInitialJourneyTab,
+} from '@rutas-morelia/transit-core';
+import {getAccurateNativePosition} from '../lib/location';
 import {resolveSuggestionCoords, searchPlaceByName} from '../lib/places';
 import {supabase} from '../lib/supabase';
 import type {SetMessageFn} from './useToast';
@@ -60,25 +65,6 @@ export function useJourneySearch({
     clearSuggestions();
   }, [clearSuggestions, destinationInputRef, originInputRef, setActiveInput]);
 
-  const resolveCurrentOrigin = useCallback(async (): Promise<Coordinates | null> => {
-    if (origin) return origin;
-    if (originLabel !== 'Mi ubicación') return null;
-
-    setMessage('Buscando tu ubicación…', 'info');
-    try {
-      const position = await getAccurateNativePosition(4000, 150);
-      const coords = {latitude: position.coords.latitude, longitude: position.coords.longitude};
-      setOrigin('Mi ubicación', coords);
-      return coords;
-    } catch (err) {
-      if (__DEV__) console.warn('[ViaMorelia] Fast location lookup failed, using center fallback:', err);
-      const coords = {...MORELIA_CENTER};
-      setOrigin('Mi ubicación (respaldo Centro)', coords);
-      setMessage('No se obtuvo GPS preciso; usando Centro Histórico.', 'info');
-      return coords;
-    }
-  }, [origin, originLabel, setMessage, setOrigin]);
-
   const planJourneyWithCoords = useCallback(
     async (customOrigin: Coordinates | null, customDestination: Coordinates | null) => {
       dismissSearchUi();
@@ -120,20 +106,75 @@ export function useJourneySearch({
     [destinationLabel, dismissSearchUi, setActiveRouteId, setIsMenuOpen, setMessage],
   );
 
+  const resolveCoordsForSuggestion = useCallback(
+    async (suggestion: Suggestion): Promise<Coordinates | null> => {
+      if (
+        suggestion.latitude != null &&
+        suggestion.longitude != null &&
+        !(suggestion.latitude === 0 && suggestion.longitude === 0)
+      ) {
+        return {latitude: suggestion.latitude, longitude: suggestion.longitude};
+      }
+
+      const favorite = findFavoriteBySuggestion(favorites, suggestion);
+      if (favorite) {
+        const fromFavorite = favoriteCoords(favorite);
+        if (fromFavorite) return fromFavorite;
+      }
+
+      return resolveSuggestionCoords(supabase, suggestion, favorites);
+    },
+    [favorites],
+  );
+
   const resolveEndpoint = useCallback(
     async (
       label: string,
       current: Coordinates | null,
       isOrigin: boolean,
+      suggestion?: Suggestion,
     ): Promise<Coordinates | null> => {
       if (current) return current;
       if (!label.trim() || (isOrigin && label === 'Mi ubicación')) return null;
 
-      if (displayedSuggestions.length > 0) {
-        const coords = await resolveSuggestionCoords(supabase, displayedSuggestions[0], favorites);
+      if (suggestion) {
+        const coords = await resolveCoordsForSuggestion(suggestion);
         if (coords) {
-          if (isOrigin) setOrigin(displayedSuggestions[0].label, coords);
-          else setDestination(displayedSuggestions[0].label, coords);
+          if (isOrigin) setOrigin(suggestion.label, coords);
+          else setDestination(suggestion.label, coords);
+          return coords;
+        }
+      }
+
+      if (displayedSuggestions.length > 0) {
+        const match =
+          displayedSuggestions.find(s => s.label === label) ?? displayedSuggestions[0];
+        const coords = await resolveCoordsForSuggestion(match);
+        if (coords) {
+          if (isOrigin) setOrigin(match.label, coords);
+          else setDestination(match.label, coords);
+          return coords;
+        }
+      }
+
+      const favoriteMatch = favorites.find(
+        f =>
+          f.custom_name === label ||
+          f.place?.name === label ||
+          f.name === label,
+      );
+      if (favoriteMatch) {
+        const coords = await resolveCoordsForSuggestion({
+          entity_type: 'place',
+          entity_id: favoriteMatch.place_id || favoriteMatch.id,
+          label,
+          subtitle: null,
+          latitude: null,
+          longitude: null,
+        });
+        if (coords) {
+          if (isOrigin) setOrigin(label, coords);
+          else setDestination(label, coords);
           return coords;
         }
       }
@@ -148,7 +189,7 @@ export function useJourneySearch({
       }
       return null;
     },
-    [displayedSuggestions, favorites, setDestination, setOrigin],
+    [displayedSuggestions, favorites, resolveCoordsForSuggestion, setDestination, setOrigin],
   );
 
   const planJourney = useCallback(async () => {
@@ -164,7 +205,8 @@ export function useJourneySearch({
       let currentDestination = destination;
 
       if (!currentOrigin && originLabel === 'Mi ubicación') {
-        currentOrigin = await resolveCurrentOrigin();
+        setMessage('Toca el botón de ubicación para fijar tu origen.', 'error');
+        return;
       }
 
       currentDestination = await resolveEndpoint(destinationLabel, currentDestination, false);
@@ -192,18 +234,20 @@ export function useJourneySearch({
     origin,
     originLabel,
     planJourneyWithCoords,
-    resolveCurrentOrigin,
     resolveEndpoint,
     setMessage,
   ]);
 
   const selectSuggestion = useCallback(
     async (suggestion: Suggestion) => {
-      const coords = await resolveSuggestionCoords(supabase, suggestion, favorites);
-      const nextOrigin = activeInput === 'origin' ? coords : origin;
-      const nextDestination = activeInput === 'destination' ? coords : destination;
+      const coords = await resolveCoordsForSuggestion(suggestion);
+      const inputTarget = activeInput ?? 'destination';
 
-      if (activeInput === 'origin') {
+      if (inputTarget === 'origin') {
+        if (!coords) {
+          setMessage('No pudimos ubicar ese lugar. Elige otra sugerencia.', 'error');
+          return;
+        }
         setOrigin(suggestion.label, coords);
         dismissSearchUi();
         return;
@@ -219,13 +263,13 @@ export function useJourneySearch({
       dismissSearchUi();
       setIsMenuOpen(true);
 
-      let currentOrigin = nextOrigin;
-      if (!currentOrigin && originLabel === 'Mi ubicación') {
-        currentOrigin = await resolveCurrentOrigin();
+      if (origin) {
+        await planJourneyWithCoords(origin, coords);
+        return;
       }
 
-      if (currentOrigin) {
-        await planJourneyWithCoords(currentOrigin, coords);
+      if (originLabel === 'Mi ubicación') {
+        setMessage('Toca el botón de ubicación para fijar tu origen.', 'info');
         return;
       }
 
@@ -233,16 +277,16 @@ export function useJourneySearch({
     },
     [
       activeInput,
-      destination,
       dismissSearchUi,
-      favorites,
       origin,
       originLabel,
       planJourneyWithCoords,
-      resolveCurrentOrigin,
+      resolveCoordsForSuggestion,
       setActiveRouteId,
       setDestination,
+      setMessage,
       setOrigin,
+      setIsMenuOpen,
     ],
   );
 
@@ -260,9 +304,7 @@ export function useJourneySearch({
       }
     }
 
-    if (origin) {
-      camera.current?.flyTo({center: [origin.longitude, origin.latitude], zoom: 16, duration: 700});
-    }
+    setOrigin('Mi ubicación', origin);
     setMessage('Buscando tu ubicación…', 'info');
 
     try {
@@ -278,6 +320,7 @@ export function useJourneySearch({
     } catch (error) {
       if (__DEV__) console.warn('No precise GPS location available:', error);
       if (origin) {
+        setOrigin('Mi ubicación', origin);
         camera.current?.flyTo({center: [origin.longitude, origin.latitude], zoom: 16, duration: 700});
         setMessage('Mostrando última ubicación conocida.', 'info');
       } else {
@@ -308,5 +351,6 @@ export function useJourneySearch({
     locate,
     swapLocations,
     resetJourney,
+    dismissSearchUi,
   };
 }

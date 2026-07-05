@@ -3,46 +3,52 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useState} from 'react';
 import {useColorScheme} from 'react-native';
 import {resolveColorScheme, type AppColorScheme} from '../lib/color-scheme';
-import {dark} from '../theme';
 import type {MapStyleJson} from '../types/transit';
 
+const DARK_GRAY_PALETTE = {bg: '#2A2E36', ink: '#B0B8C4'};
+
+/** Liberty para alinear rutas; en oscuro se aplica capa gris opaca sobre el mismo tileset. */
 export function useMapStyle() {
   const colorScheme = resolveColorScheme(useColorScheme());
-  const [customMapStyle, setCustomMapStyle] = useState<MapStyleJson | string | null>(null);
+  const [mapStyle, setMapStyle] = useState<MapStyleJson | string>(getMapStyleUrl(colorScheme));
 
   useEffect(() => {
     let active = true;
-    const cacheKey = `custom_map_style_v6_liberty_${colorScheme}`;
     const url = getMapStyleUrl(colorScheme);
 
-    async function loadStyle() {
+    if (colorScheme === 'light') {
+      setMapStyle(url);
+      return;
+    }
+
+    const cacheKey = `custom_map_style_v7_liberty_dark`;
+
+    async function loadDarkStyle() {
       try {
         const cached = await AsyncStorage.getItem(cacheKey);
         if (cached && active) {
-          setCustomMapStyle(JSON.parse(cached) as MapStyleJson);
+          setMapStyle(JSON.parse(cached) as MapStyleJson);
         }
       } catch (err) {
-        if (__DEV__) console.warn('[ViaMorelia] Failed to read style from cache:', err);
+        if (__DEV__) console.warn('[ViaMorelia] Failed to read dark style cache:', err);
       }
 
       try {
         const response = await fetch(url);
         if (!response.ok) throw new Error('style fetch failed');
         const styleJson = (await response.json()) as MapStyleJson;
-        const customized = customizeMapStyle(styleJson, colorScheme, {bg: dark.bg, ink: dark.ink});
+        const customized = customizeMapStyle(styleJson, 'dark', DARK_GRAY_PALETTE);
         if (active) {
-          setCustomMapStyle(customized);
+          setMapStyle(customized);
           await AsyncStorage.setItem(cacheKey, JSON.stringify(customized));
         }
       } catch (err) {
-        if (__DEV__) {
-          console.warn('[ViaMorelia] Failed to fetch or customize style from network, using URL fallback:', err);
-        }
-        if (active) setCustomMapStyle(url);
+        if (__DEV__) console.warn('[ViaMorelia] Dark style fetch failed, using URL:', err);
+        if (active) setMapStyle(url);
       }
     }
 
-    void loadStyle();
+    void loadDarkStyle();
     return () => {
       active = false;
     };
@@ -50,7 +56,7 @@ export function useMapStyle() {
 
   return {
     colorScheme: colorScheme as AppColorScheme,
-    customMapStyle,
+    mapStyle,
     mapStyleUrl: getMapStyleUrl(colorScheme),
   };
 }

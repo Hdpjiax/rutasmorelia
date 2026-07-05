@@ -9,6 +9,7 @@ import {
   favoriteCoords,
   filterFavoriteSuggestions,
   filterJourneyOptions,
+  findFavoriteBySuggestion,
   findPlaceFavorite,
   findRouteFavorite,
   mergeLocalFavorites,
@@ -487,12 +488,30 @@ export function TransitApp() {
     void planJourney(originCoordinates, destinationCoordinates);
   }
 
+  function resolveSuggestionPoint(suggestion: PlaceSuggestion): Coordinates | null {
+    if (
+      suggestion.latitude != null &&
+      suggestion.longitude != null &&
+      !(suggestion.latitude === 0 && suggestion.longitude === 0)
+    ) {
+      return { latitude: suggestion.latitude, longitude: suggestion.longitude };
+    }
+
+    const favorite = findFavoriteBySuggestion(favorites, suggestion);
+    if (favorite) {
+      return favoriteCoords(favorite);
+    }
+
+    return null;
+  }
+
   function selectSuggestion(suggestion: PlaceSuggestion) {
-    if (suggestion.latitude == null || suggestion.longitude == null) {
+    const point = resolveSuggestionPoint(suggestion);
+    if (!point) {
       setMessage("No se pudo obtener la ubicación de ese lugar.");
       return;
     }
-    const point = { latitude: suggestion.latitude, longitude: suggestion.longitude };
+
     if (activeSearch === "origin") {
       setOrigin(suggestion.label);
       setOriginCoordinates(point);
@@ -503,26 +522,7 @@ export function TransitApp() {
       if (originCoordinates) {
         void planJourney(originCoordinates, point);
       } else if (origin === "Mi ubicación") {
-        if (navigator.geolocation) {
-          setMessage("Obteniendo tu ubicación para calcular la ruta…");
-          getAccuratePosition(6000, 150, (position) => {
-            const startPoint = { latitude: position.coords.latitude, longitude: position.coords.longitude };
-            setOriginCoordinates(startPoint);
-            setMapCenter({ ...startPoint, timestamp: Date.now() });
-          }).then(
-            ({coords}) => {
-              const startPoint = { latitude: coords.latitude, longitude: coords.longitude };
-              setOriginCoordinates(startPoint);
-              setMapCenter({ ...startPoint, timestamp: Date.now() });
-              void planJourney(startPoint, point);
-            },
-            () => {
-              setMessage("Por favor selecciona un punto de origen en la lista para planificar la ruta.");
-            },
-          );
-        } else {
-          setMessage("Selecciona una dirección de origen.");
-        }
+        setMessage("Toca el botón de ubicación para fijar tu origen.");
       } else {
         setMessage("Selecciona una dirección de origen.");
       }

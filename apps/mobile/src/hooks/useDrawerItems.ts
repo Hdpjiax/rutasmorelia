@@ -2,6 +2,7 @@ import {
   adjustRouteColorForDarkTheme,
   filterJourneyOptions,
   formatJourneyDetail,
+  isRouteFavorited,
 } from '@rutas-morelia/transit-core';
 import {useMemo} from 'react';
 import type {AppColorScheme} from '../lib/color-scheme';
@@ -27,7 +28,7 @@ export function useDrawerItems({
   return useMemo<DrawerItem[]>(() => {
     let baseRoutes = visibleRoutes;
     if (showOnlyFavorites) {
-      baseRoutes = visibleRoutes.filter(r => favorites.some(f => String(f.route_id) === String(r.id)));
+      baseRoutes = visibleRoutes.filter(r => isRouteFavorited(favorites, r.id));
     }
 
     if (journeyOptions.length > 0 && !showOnlyFavorites) {

@@ -568,8 +568,9 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/86.geojson?v=c9dcc5af3047",
-      "artifactSha256": "c9dcc5af3047b5929f530f35024f4fff1252ad507d3b255168e001afda883674"
+      "geojsonFile": "/routes/86.geojson?v=3644bfbddb11",
+      "artifactSha256": "3644bfbddb11736215e26240fb479e76e595b8cf01dc7667fe8858e2a6607bb4",
+      "algorithm": "official-kml-explicit-coordinates"
     },
     {
       "id": "F19",

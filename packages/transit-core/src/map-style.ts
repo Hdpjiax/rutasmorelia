@@ -47,7 +47,7 @@ function customizeDarkLayer(layer: MapStyleLayer, palette: DarkMapPalette): void
   ) {
     if (!layer.paint) layer.paint = {};
     layer.paint['fill-color'] = id.includes('building') ? '#323845' : '#30353F';
-    layer.paint['fill-opacity'] = id.includes('building') ? 0.35 : 0.55;
+    layer.paint['fill-opacity'] = id.includes('building') ? 0.5 : 0.72;
     return;
   }
 

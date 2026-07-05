@@ -1,11 +1,13 @@
 import {describe, expect, it} from 'vitest';
 import {
   createLocalPlaceFavorite,
+  DEFAULT_ORIGIN_LABEL,
   favoritesToSuggestions,
   filterFavoriteSuggestions,
   isPlaceFavorited,
   isRouteFavorited,
   mergeLocalFavorites,
+  shouldShowFavoriteSuggestions,
 } from '../favorites';
 import type {FavoriteItem} from '../types';
 
@@ -39,5 +41,11 @@ describe('favorites', () => {
     const filtered = filterFavoriteSuggestions(favorites, 'univ');
     expect(filtered).toHaveLength(1);
     expect(filtered[0]?.subtitle).toBe('Dirección favorita guardada');
+  });
+
+  it('shows favorite suggestions before typing or with default origin label', () => {
+    expect(shouldShowFavoriteSuggestions('destination', '')).toBe(true);
+    expect(shouldShowFavoriteSuggestions('origin', DEFAULT_ORIGIN_LABEL)).toBe(true);
+    expect(shouldShowFavoriteSuggestions('origin', 'Centro Histórico')).toBe(false);
   });
 });

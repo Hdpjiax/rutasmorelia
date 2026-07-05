@@ -70,7 +70,7 @@ export type FavoriteItem = {
   place?: {
     id: string | number;
     name: string;
-    location?: {type: string; coordinates: number[]} | null;
+    location?: {type: string; coordinates: number[]} | string | null;
   } | null;
   route?: {
     id: string | number;

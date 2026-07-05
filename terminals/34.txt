@@ -3,7 +3,7 @@ pid: 11304
 cwd: "C:\RutasMorelia"
 command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\\android\"; .\\gradlew.bat :app:assembleRelease --no-daemon 2>&1 | Select-Object -Last 30"
 started_at: 2026-07-05T02:50:29.981Z
-running_for_ms: 1560009  
+running_for_ms: 4205000  
 ---
 > Task :app:dexBuilderRelease
 > Task :app:mergeReleaseGlobalSynthetics UP-TO-DATE

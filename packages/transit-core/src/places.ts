@@ -3,19 +3,26 @@ import type {Coordinates, Suggestion} from './types';
 
 type LocationField =
   | string
-  | {type?: string; coordinates?: [number, number]}
+  | {type?: string; coordinates?: [number, number] | number[]; geometry?: {coordinates?: number[]}}
   | null
   | undefined;
 
 export function parseLocationField(location: LocationField): Coordinates | null {
   if (!location) return null;
   if (typeof location === 'string') {
-    const match = location.match(/POINT\(([^ ]+) ([^ ]+)\)/);
+    const match = location.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
     if (!match) return null;
     return {latitude: parseFloat(match[2]), longitude: parseFloat(match[1])};
   }
-  if (Array.isArray(location.coordinates) && location.coordinates.length >= 2) {
-    return {latitude: location.coordinates[1], longitude: location.coordinates[0]};
+  if (typeof location === 'object') {
+    const raw = location.coordinates ?? location.geometry?.coordinates;
+    if (Array.isArray(raw) && raw.length >= 2) {
+      const lon = Number(raw[0]);
+      const lat = Number(raw[1]);
+      if (Number.isFinite(lat) && Number.isFinite(lon)) {
+        return {latitude: lat, longitude: lon};
+      }
+    }
   }
   return null;
 }

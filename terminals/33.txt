@@ -3,7 +3,7 @@ pid: 32020
 cwd: "C:\RutasMorelia"
 command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\\android\"; Remove-Item -Recurse -Force \".\\app\\.cxx\" -ErrorAction SilentlyContinue; .\\gradlew.bat :app:assembleRelease --no-daemon 2>&1 | Select-Object -Last 40"
 started_at: 2026-07-05T02:46:03.048Z
-running_for_ms: 1825006  
+running_for_ms: 4474999  
 ---
 transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)FAILURE: Build failed with an exception.
 
