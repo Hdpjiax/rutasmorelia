@@ -1,18 +1,8 @@
 "use client";
 
+import { getContrastCasingColor } from "@rutas-morelia/transit-core";
 import { useEffect, useRef, useState } from "react";
 import mapboxgl, { type Map } from "maplibre-gl";
-
-function getContrastCasingColor(hexColor: string): string {
-  if (!hexColor) return "#ffffff";
-  const cleanHex = hexColor.replace("#", "");
-  if (cleanHex.length !== 6) return "#ffffff";
-  const r = parseInt(cleanHex.substring(0, 2), 16);
-  const g = parseInt(cleanHex.substring(2, 4), 16);
-  const b = parseInt(cleanHex.substring(4, 6), 16);
-  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-  return yiq >= 155 ? "#222222" : "#ffffff";
-}
 
 type MapCanvasProps = {
   activeRoute: string;

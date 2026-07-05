@@ -1,9 +1,10 @@
 import 'react-native-url-polyfill/auto';
 import {useEffect} from 'react';
-import {Linking, StatusBar, useColorScheme} from 'react-native';
+import {Alert, Linking, StatusBar, useColorScheme} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {handleAuthDeepLink} from './src/lib/auth-deep-link';
 import {supabase} from './src/lib/supabase';
 import {AccountScreen} from './src/screens/AccountScreen';
 import {MapScreen} from './src/screens/MapScreen';
@@ -15,27 +16,17 @@ function AuthLinkHandler() {
   useEffect(() => {
     const client = supabase;
     if (!client) return;
+
     const handleUrl = async ({url}: {url: string}) => {
-      try {
-        const urlObj = new URL(url);
-        const code = urlObj.searchParams.get('code');
-        if (code) {
-          await client.auth.exchangeCodeForSession(code);
-        } else if (urlObj.hash) {
-          const params = new URLSearchParams(urlObj.hash.substring(1));
-          const access_token = params.get('access_token');
-          const refresh_token = params.get('refresh_token');
-          if (access_token && refresh_token) {
-            await client.auth.setSession({access_token, refresh_token});
-          }
-        }
-      } catch (err) {
-        console.warn('Failed parsing deep link URL:', err);
+      const result = await handleAuthDeepLink(client, url);
+      if (!result.ok) {
+        Alert.alert('Inicio de sesión', result.message);
       }
     };
+
     const subscription = Linking.addEventListener('url', handleUrl);
     Linking.getInitialURL().then(url => {
-      if (url) handleUrl({url});
+      if (url) void handleUrl({url});
     });
     return () => subscription.remove();
   }, []);

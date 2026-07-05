@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@rutas-morelia/transit-core": "*",
     "@hookform/resolvers": "^5.4.0",
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/ssr": "^0.12.0",

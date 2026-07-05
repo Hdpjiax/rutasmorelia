@@ -10,5 +10,5 @@ export const dark = {
   muted: '#94A3B8',
   line: '#334155',
   primary: '#BEF264',
-  primarySoft: '#1E293B',
+  primarySoft: '#293548',
 };

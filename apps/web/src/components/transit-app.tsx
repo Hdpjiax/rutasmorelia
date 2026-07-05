@@ -1,5 +1,28 @@
 "use client";
 
+import {
+  buildPhotonSearchUrl,
+  contrastColor,
+  createLocalPlaceFavorite,
+  createLocalRouteFavorite,
+  expandSearchQuery,
+  filterFavoriteSuggestions,
+  filterJourneyOptions,
+  findPlaceFavorite,
+  findRouteFavorite,
+  haversineDistanceKm,
+  isCombiTransportType,
+  isPlaceFavorited,
+  isRouteFavorited,
+  LOCAL_FAVORITES_KEY,
+  mapPhotonFeatures,
+  removeFavoriteById,
+  scoreRoutesByQuery,
+  type Coordinates,
+  type FavoriteItem,
+  type JourneyOption,
+  type PlaceSuggestion,
+} from "@rutas-morelia/transit-core";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
@@ -21,32 +44,6 @@ type RouteData = {
   transportType: string;
   geojsonFile: string;
 };
-
-type PlaceSuggestion = {
-  entity_id: number | string;
-  label: string;
-  subtitle?: string;
-  latitude: number;
-  longitude: number;
-};
-
-type JourneyOption = {
-  route_id: number | string;
-  route_code?: string;
-  route_name: string;
-  route_color?: string;
-  second_route_id?: number | string;
-  second_route_code?: string;
-  second_route_name?: string;
-  second_route_color?: string;
-  origin_walk_meters?: number;
-  destination_walk_meters?: number;
-  transfer_walk_meters?: number;
-  transfers?: number;
-  estimatedMinutes?: number;
-};
-
-type Coordinates = { latitude: number; longitude: number };
 
 function getAccuratePosition(maxWaitMs = 15000, requiredAccuracyM = 80): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
@@ -76,79 +73,8 @@ function getAccuratePosition(maxWaitMs = 15000, requiredAccuracyM = 80): Promise
 }
 
 
-type FavoriteItem = {
-  id: string | number;
-  route_id?: string | number | null;
-  place_id?: string | number | null;
-  custom_name?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
-  place?: {
-    id: string | number;
-    name: string;
-    location?: { type: string; coordinates: number[] } | null;
-  } | null;
-};
-
 function isCombi(route: RouteData) {
-  const type = route.transportType.toLocaleLowerCase("es-MX");
-  return type.includes("combi") || type.includes("microbus") || type.includes("microbús");
-}
-
-function contrastColor(hex: string) {
-  const value = hex.replace("#", "");
-  if (value.length !== 6) return "#fff";
-  const [r, g, b] = [0, 2, 4].map((index) => Number.parseInt(value.slice(index, index + 2), 16));
-  return (r * 299 + g * 587 + b * 114) / 1000 >= 155 ? "#111" : "#fff";
-}
-
-function normalizeString(str: string): string {
-  return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function editDistance(s1: string, s2: string): number {
-  const costs: number[] = [];
-  for (let i = 0; i <= s1.length; i++) {
-    let lastValue = i;
-    for (let j = 0; j <= s2.length; j++) {
-      if (i === 0) {
-        costs[j] = j;
-      } else {
-        if (j > 0) {
-          let newValue = costs[j - 1];
-          if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
-            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-          }
-          costs[j - 1] = lastValue;
-          lastValue = newValue;
-        }
-      }
-    }
-    if (i > 0) {
-      costs[s2.length] = lastValue;
-    }
-  }
-  return costs[s2.length];
-}
-
-function stringSimilarity(s1: string, s2: string): number {
-  let longer = s1;
-  let shorter = s2;
-  if (s1.length < s2.length) {
-    longer = s2;
-    shorter = s1;
-  }
-  const longerLength = longer.length;
-  if (longerLength === 0) {
-    return 1.0;
-  }
-  return (longerLength - editDistance(longer, shorter)) / longerLength;
+  return isCombiTransportType(route.transportType);
 }
 
 function BrandMark() {
@@ -197,7 +123,7 @@ export function TransitApp() {
           if (!error && data) setFavorites(data);
         });
       } else {
-        const stored = localStorage.getItem("local_favorites");
+        const stored = localStorage.getItem(LOCAL_FAVORITES_KEY);
         if (stored) setFavorites(JSON.parse(stored));
       }
     });
@@ -208,7 +134,7 @@ export function TransitApp() {
           if (!error && data) setFavorites(data);
         });
       } else {
-        const stored = localStorage.getItem("local_favorites");
+        const stored = localStorage.getItem(LOCAL_FAVORITES_KEY);
         setFavorites(stored ? JSON.parse(stored) : []);
       }
     });
@@ -218,8 +144,8 @@ export function TransitApp() {
 
   const toggleRouteFavorite = useCallback(async (routeId: string | number) => {
     const supabase = getSupabaseBrowserClient();
-    const existing = favorites.find((f) => String(f.route_id) === String(routeId));
-    
+    const existing = findRouteFavorite(favorites, routeId);
+
     if (existing) {
       if (supabase) {
         const { data: { user } } = await supabase.auth.getUser();
@@ -227,16 +153,15 @@ export function TransitApp() {
           await supabase.from("favorites").delete().eq("id", existing.id);
         }
       }
-      const updated = favorites.filter((f) => String(f.route_id) !== String(routeId));
+      const updated = removeFavoriteById(favorites, existing.id);
       setFavorites(updated);
-      localStorage.setItem("local_favorites", JSON.stringify(updated));
+      localStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(updated));
       setMessage("Ruta eliminada de favoritos");
     } else {
-      let newFav: FavoriteItem = { id: "local_" + Date.now(), route_id: routeId };
+      let newFav: FavoriteItem = createLocalRouteFavorite(routeId);
       if (supabase) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          // Find route id from name/code
           const { data: routeData } = await supabase.from("routes").select("id").eq("code", String(routeId)).limit(1);
           const rId = routeData?.[0]?.id || (typeof routeId === "number" ? routeId : null);
           if (rId) {
@@ -251,15 +176,15 @@ export function TransitApp() {
       }
       const updated = [...favorites, newFav];
       setFavorites(updated);
-      localStorage.setItem("local_favorites", JSON.stringify(updated));
+      localStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(updated));
       setMessage("Ruta guardada en favoritos");
     }
   }, [favorites]);
 
   const togglePlaceFavorite = useCallback(async (label: string, lat: number, lon: number) => {
     const supabase = getSupabaseBrowserClient();
-    const existing = favorites.find((f) => f.custom_name === label || (f.place && f.place.name === label));
-    
+    const existing = findPlaceFavorite(favorites, label);
+
     if (existing) {
       if (supabase) {
         const { data: { user } } = await supabase.auth.getUser();
@@ -267,12 +192,12 @@ export function TransitApp() {
           await supabase.from("favorites").delete().eq("id", existing.id);
         }
       }
-      const updated = favorites.filter((f) => f.custom_name !== label && (!f.place || f.place.name !== label));
+      const updated = removeFavoriteById(favorites, existing.id);
       setFavorites(updated);
-      localStorage.setItem("local_favorites", JSON.stringify(updated));
+      localStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(updated));
       setMessage("Lugar eliminado de favoritos");
     } else {
-      let newFav: FavoriteItem = { id: "local_" + Date.now(), custom_name: label, latitude: lat, longitude: lon };
+      let newFav: FavoriteItem = createLocalPlaceFavorite(label, { latitude: lat, longitude: lon });
       if (supabase) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -287,7 +212,7 @@ export function TransitApp() {
             })
             .select("id")
             .single();
-            
+
           if (!placeError && placeData) {
             const { data, error } = await supabase
               .from("favorites")
@@ -304,30 +229,16 @@ export function TransitApp() {
       }
       const updated = [...favorites, newFav];
       setFavorites(updated);
-      localStorage.setItem("local_favorites", JSON.stringify(updated));
+      localStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(updated));
       setMessage("Lugar guardado en favoritos");
     }
   }, [favorites]);
 
   const query = (activeSearch === "origin" ? origin : destination).trim();
-  const matchingFavs = useMemo(() => {
-    if (query.length < 2) return [];
-    return favorites
-      .filter((f) => f.place_id || f.latitude || f.custom_name)
-      .map((fav) => {
-        const label = fav.custom_name || (fav.place && fav.place.name) || "Lugar favorito";
-        const lat = fav.latitude || (fav.place && fav.place.location?.coordinates?.[1]) || 0;
-        const lon = fav.longitude || (fav.place && fav.place.location?.coordinates?.[0]) || 0;
-        return {
-          entity_id: fav.id,
-          label,
-          subtitle: "Dirección favorita guardada",
-          latitude: lat,
-          longitude: lon,
-        };
-      })
-      .filter((fav) => fav.label.toLowerCase().includes(query.toLowerCase()));
-  }, [favorites, query]);
+  const matchingFavs = useMemo(
+    () => filterFavoriteSuggestions(favorites, query),
+    [favorites, query],
+  );
 
   useEffect(() => {
     fetch("/routes/index.json", { cache: "no-store" })
@@ -364,54 +275,29 @@ export function TransitApp() {
       try {
         if (!isSupabaseConfigured()) throw new Error("Supabase no configurado");
         const client = getSupabaseBrowserClient();
-        const expanded = query.replace(/\bblvd\.?\b/gi, "boulevard").replace(/\bav\.?\b/gi, "avenida");
-        const variants = [...new Set([query, expanded])];
+        const variants = expandSearchQuery(query);
         const locationParams = mapCenter ? { latitude: mapCenter.latitude, longitude: mapCenter.longitude } : {};
         const responses = await Promise.all(variants.map((value) => client!.functions.invoke("search-transit", { body: { query: value, limit: 25, ...locationParams } })));
         let results: PlaceSuggestion[] = responses.flatMap(({ data, error }) => error || !Array.isArray(data?.data) ? [] : data.data);
         results = results.filter((item, index, list) => index === list.findIndex((other) => other.label === item.label && other.latitude === item.latitude));
         if (results.length === 0) {
-          const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lat=19.702&lon=-101.194&limit=25`);
+          const response = await fetch(buildPhotonSearchUrl(query, 25));
           if (response.ok) {
             const places = await response.json();
-            const mapped = Array.isArray(places.features) ? places.features.map((feature: any, index: number) => {
-              const p = feature.properties;
-              const name = p.name || "";
-              const street = p.street || "";
-              const housenumber = p.housenumber || "";
-              const city = p.city || "Morelia";
-              const state = p.state || "Michoacán";
-
-              let label = name;
-              if (housenumber && !label.includes(housenumber)) {
-                label = `${label} ${housenumber}`;
-              }
-
-              let subtitleParts = [];
-              if (street && street !== name) {
-                subtitleParts.push(street);
-              }
-              subtitleParts.push(city);
-              subtitleParts.push(state);
-              const subtitle = subtitleParts.join(", ").trim();
-
-              return {
-                entity_id: `photon-${p.osm_type}-${p.osm_id ?? index}`,
-                label,
-                subtitle,
-                latitude: Number(feature.geometry.coordinates[1]),
-                longitude: Number(feature.geometry.coordinates[0]),
-              };
-            }) : [];
-
+            const mapped: PlaceSuggestion[] = mapPhotonFeatures(places.features).map((item) => ({
+              entity_type: item.entity_type,
+              entity_id: item.entity_id,
+              label: item.label,
+              subtitle: item.subtitle,
+              latitude: item.latitude ?? 0,
+              longitude: item.longitude ?? 0,
+            }));
             if (mapCenter) {
-              const getDist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-                const dLat = (lat2 - lat1) * Math.PI / 180;
-                const dLon = (lon2 - lon1) * Math.PI / 180;
-                const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
-                return 12742 * Math.asin(Math.sqrt(a));
-              };
-              mapped.sort((a: any, b: any) => getDist(mapCenter.latitude, mapCenter.longitude, a.latitude, a.longitude) - getDist(mapCenter.latitude, mapCenter.longitude, b.latitude, b.longitude));
+              mapped.sort(
+                (a, b) =>
+                  haversineDistanceKm(mapCenter.latitude, mapCenter.longitude, a.latitude ?? 0, a.longitude ?? 0) -
+                  haversineDistanceKm(mapCenter.latitude, mapCenter.longitude, b.latitude ?? 0, b.longitude ?? 0),
+              );
             }
             results = mapped;
           }
@@ -430,7 +316,7 @@ export function TransitApp() {
     const query = routeQuery.trim();
     const filterFn = (route: RouteData) => {
       if (transportFilter === "fav") {
-        return favorites.some((f) => String(f.route_id) === String(route.id));
+        return isRouteFavorited(favorites, route.id);
       }
       return transportFilter === "all" || (transportFilter === "combi" ? isCombi(route) : !isCombi(route));
     };
@@ -441,27 +327,10 @@ export function TransitApp() {
         .sort((a, b) => Number(!isCombi(a)) - Number(!isCombi(b)) || a.name.localeCompare(b.name, "es-MX"));
     }
 
-    const normQuery = normalizeString(query);
-    const scored = routes
-      .filter(filterFn)
-      .map((route) => {
-        const normName = normalizeString(route.name);
-        const normCode = normalizeString(route.id || "");
-        
-        let score = 0;
-        if (normName.includes(normQuery) || normCode.includes(normQuery)) {
-          score = 1.0;
-        } else {
-          const simName = stringSimilarity(normName, normQuery);
-          const simCode = stringSimilarity(normCode, normQuery);
-          score = Math.max(simName, simCode);
-        }
-        return { route, score };
-      })
-      .filter((item) => item.score > 0.35)
-      .sort((a, b) => b.score - a.score || a.route.name.localeCompare(b.route.name, "es-MX"));
-
-    return scored.map((item) => item.route);
+    return scoreRoutesByQuery(
+      routes.filter(filterFn),
+      query,
+    );
   }, [routeQuery, routes, transportFilter, favorites]);
 
   const requestLocation = useCallback(async () => {
@@ -520,11 +389,11 @@ export function TransitApp() {
   }
 
   const directJourneyOptions = useMemo(
-    () => journeyOptions.filter(option => Number(option.transfers || 0) === 0),
+    () => filterJourneyOptions(journeyOptions, "direct"),
     [journeyOptions],
   );
   const transferJourneyOptions = useMemo(
-    () => journeyOptions.filter(option => Number(option.transfers || 0) > 0),
+    () => filterJourneyOptions(journeyOptions, "transfer"),
     [journeyOptions],
   );
   const visibleJourneyOptions = journeyTab === "direct" ? directJourneyOptions : transferJourneyOptions;
@@ -556,6 +425,10 @@ export function TransitApp() {
   }
 
   function selectSuggestion(suggestion: PlaceSuggestion) {
+    if (suggestion.latitude == null || suggestion.longitude == null) {
+      setMessage("No se pudo obtener la ubicación de ese lugar.");
+      return;
+    }
     const point = { latitude: suggestion.latitude, longitude: suggestion.longitude };
     if (activeSearch === "origin") {
       setOrigin(suggestion.label);
@@ -662,7 +535,7 @@ export function TransitApp() {
                         const lon = fav.longitude || (fav.place && fav.place.location?.coordinates?.[0]) || 0;
                         return (
                           <div key={`fav-place-${fav.id}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
-                            <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion({ entity_id: fav.id, label, latitude: lat, longitude: lon })}>
+                            <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion({ entity_type: "place", entity_id: fav.id, label, subtitle: "Lugar favorito", latitude: lat, longitude: lon })}>
                               <MagnifyingGlassIcon size={17} style={{ color: "var(--accent)" }} />
                               <span><strong>{label}</strong><small>Lugar favorito</small></span>
                             </button>
@@ -704,7 +577,7 @@ export function TransitApp() {
                           <button
                             type="button"
                             className="suggestion-fav-btn"
-                            onClick={(e) => { e.stopPropagation(); togglePlaceFavorite(suggestion.label, suggestion.latitude, suggestion.longitude); }}
+                            onClick={(e) => { e.stopPropagation(); if (suggestion.latitude != null && suggestion.longitude != null) togglePlaceFavorite(suggestion.label, suggestion.latitude, suggestion.longitude); }}
                             style={{
                               padding: "10px 14px",
                               background: "transparent",
@@ -722,9 +595,9 @@ export function TransitApp() {
                       );
                     })}
                     {suggestions
-                      .filter((suggestion) => !matchingFavs.some((f) => f.label.toLowerCase() === suggestion.label.toLowerCase() || (Math.abs(f.latitude - suggestion.latitude) < 0.0001 && Math.abs(f.longitude - suggestion.longitude) < 0.0001)))
+                      .filter((suggestion) => !matchingFavs.some((f) => f.label.toLowerCase() === suggestion.label.toLowerCase() || (f.latitude != null && f.longitude != null && suggestion.latitude != null && suggestion.longitude != null && Math.abs(f.latitude - suggestion.latitude) < 0.0001 && Math.abs(f.longitude - suggestion.longitude) < 0.0001)))
                       .map((suggestion) => {
-                        const isFav = favorites.some((f) => f.custom_name === suggestion.label || (f.place && f.place.name === suggestion.label));
+                        const isFav = isPlaceFavorited(favorites, suggestion.label);
                         return (
                           <div key={`${suggestion.entity_id}-${suggestion.latitude}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
                             <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion(suggestion)}>
@@ -734,7 +607,7 @@ export function TransitApp() {
                             <button
                               type="button"
                               className="suggestion-fav-btn"
-                              onClick={(e) => { e.stopPropagation(); togglePlaceFavorite(suggestion.label, suggestion.latitude, suggestion.longitude); }}
+                              onClick={(e) => { e.stopPropagation(); if (suggestion.latitude != null && suggestion.longitude != null) togglePlaceFavorite(suggestion.label, suggestion.latitude, suggestion.longitude); }}
                               style={{
                                 padding: "10px 14px",
                                 background: "transparent",
@@ -777,7 +650,7 @@ export function TransitApp() {
                 </div>
                 <div className="modal-route-list">
                   {isLoading ? <div className="empty-state">Cargando rutas…</div> : filteredRoutes.length ? filteredRoutes.map((route) => {
-                    const isFav = favorites.some((f) => String(f.route_id) === String(route.id));
+                    const isFav = isRouteFavorited(favorites, route.id);
                     return (
                       <div key={route.id} className="route-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
                         <button className="route-row" type="button" style={{ flex: 1, borderBottom: 0 }} aria-pressed={activeRoute === route.id} onClick={() => { setActiveRoute(route.id); setRoutesOpen(false); }}>
@@ -874,7 +747,7 @@ export function TransitApp() {
               <div className="journey-results">
                 {isPlanningJourney ? <div className="suggestion-state">Buscando rutas cercanas…</div> : visibleJourneyOptions.length ? visibleJourneyOptions.map((option, index) => {
                   const rCode = option.route_code || option.route_id;
-                  const isFav = favorites.some((f) => String(f.route_id) === String(rCode));
+                  const isFav = isRouteFavorited(favorites, rCode);
                   return (
                     <div key={`${option.route_id}-${index}`} className="journey-result-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
                       <button className="journey-result" type="button" style={{ flex: 1, borderBottom: 0 }} onClick={() => setActiveRoute(Number(option.transfers || 0) > 0 ? `${option.route_code},${option.second_route_code}` : String(option.route_code || option.route_id))}>

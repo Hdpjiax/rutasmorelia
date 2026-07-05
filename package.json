@@ -2,12 +2,21 @@
   "name": "rutas-morelia",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev:web": "npm --prefix apps/web run dev",
-    "dev:api": "npm --prefix apps/api run start:dev",
-    "dev:mobile": "npm --prefix apps/mobile run start",
-    "build:web": "npm --prefix apps/web run build",
-    "build:api": "npm --prefix apps/api run build",
-    "check": "npm --prefix apps/web run lint && npm --prefix apps/web run build && npm --prefix apps/api run lint && npm --prefix apps/api test -- --runInBand && npm --prefix apps/api run build && npm --prefix apps/mobile run typecheck"
+    "dev:web": "npm run dev -w web",
+    "dev:api": "npm run start:dev -w api",
+    "dev:mobile": "npm run start -w mx.gob.morelia.simum",
+    "build:web": "npm run build -w web",
+    "build:api": "npm run build -w api",
+    "build:transit-core": "npm run build -w @rutas-morelia/transit-core",
+    "test:transit-core": "npm run test -w @rutas-morelia/transit-core",
+    "check": "npm run build:transit-core && npm run test:transit-core && npm run lint -w web && npm run build -w web && npm run lint -w api && npm test -w api -- --runInBand && npm run build -w api && npm run typecheck -w mx.gob.morelia.simum"
+  },
+  "devDependencies": {
+    "next": "16.2.9"
   }
 }
