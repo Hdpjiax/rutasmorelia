@@ -67,18 +67,25 @@ def _update_web_index(route: RouteDefinition, artifact_sha256: str) -> None:
         except (json.JSONDecodeError, OSError):
             routes = []
     routes = [item for item in routes if str(item.get("id")) != route.code]
-    routes.append(
-        {
-            "id": route.code,
-            "name": route.name,
-            "color": route.color,
-            "transportType": "Combi" if route.transport_type == "combi" else "Camión",
-            "colorName": "Amarillo",
-            "colorLetter": "C" if route.transport_type == "combi" else "A",
-            "geojsonFile": f"/routes/{route.code}.geojson?v={artifact_sha256[:12]}",
-            "artifactSha256": artifact_sha256,
-        }
-    )
+    entry = {
+        "id": route.code,
+        "name": route.name,
+        "color": route.color,
+        "transportType": "Combi" if route.transport_type == "combi" else "Camión",
+        "colorName": route.color_name,
+        "colorLetter": route.color_letter,
+        "geojsonFile": f"/routes/{route.code}.geojson?v={artifact_sha256[:12]}",
+        "artifactSha256": artifact_sha256,
+    }
+    validation_path = OUTPUT_ROOT / route.slug / "validation.json"
+    if validation_path.is_file():
+        try:
+            algorithm = json.loads(validation_path.read_text(encoding="utf-8")).get("metadata", {}).get("algorithm")
+            if algorithm:
+                entry["algorithm"] = algorithm
+        except (json.JSONDecodeError, OSError):
+            pass
+    routes.append(entry)
     payload = {
         "type": "routes-index",
         "generatedAt": datetime.now(timezone.utc).isoformat(),

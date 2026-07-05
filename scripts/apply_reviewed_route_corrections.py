@@ -88,6 +88,90 @@ def restore_cafe_oro_2(index: dict) -> None:
     write_route("13", document, "official-kml-explicit-coordinates", index)
 
 
+def restore_guinda_2(index: dict) -> None:
+    from route_pipeline.kml import parse_kml
+    kml_path = ROOT / "rutastransporte" / "01_RUTAS_DE_COMBI" / "31_GUINDA_2" / "KML" / "Guinda_2.kml"
+    directions = parse_kml(kml_path)
+    features = []
+    for idx, item in enumerate(directions):
+        direction = "ida" if idx == 0 else "vuelta"
+        title = "Ida" if idx == 0 else "Vuelta"
+        features.append({
+            "type": "Feature",
+            "properties": {
+                "id": f"31_{idx}",
+                "routeId": "31",
+                "routeName": "Guinda 2",
+                "direction": direction,
+                "directionIndex": idx + 1,
+                "color": "#611240",
+                "casingColor": "#222222",
+                "transportType": "combi",
+                "name": title,
+                "geometrySource": "official-kml-explicit-coordinates",
+                "matchingEngine": "none",
+            },
+            "geometry": {
+                "type": "MultiLineString",
+                "coordinates": [
+                    [[round(lon, 7), round(lat, 7)] for lon, lat in component]
+                    for component in item.components
+                ],
+            },
+        })
+    document = {
+        "type": "FeatureCollection",
+        "features": features,
+    }
+    write_route("31", document, "official-kml-explicit-coordinates", index)
+
+
+def restore_naranja_routes(index: dict) -> None:
+    from route_pipeline.config import ROUTES
+    from route_pipeline.kml import parse_shape_file
+    
+    naranja_codes_to_restore = {"38", "40", "41", "42", "44", "45", "46"}
+    
+    for code in naranja_codes_to_restore:
+        route = next(r for r in ROUTES.values() if r.code == code)
+        directions = parse_shape_file(route.kml)
+        
+        features = []
+        for idx, item in enumerate(directions):
+            direction = "ida" if idx == 0 else "vuelta"
+            title = "Ida" if idx == 0 else "Vuelta"
+            features.append({
+                "type": "Feature",
+                "properties": {
+                    "id": f"{code}_{idx}",
+                    "routeId": code,
+                    "routeName": route.name,
+                    "direction": direction,
+                    "directionIndex": idx + 1,
+                    "color": route.color,
+                    "casingColor": "#222222",
+                    "transportType": route.transport_type,
+                    "name": title,
+                    "geometrySource": "official-kml-explicit-coordinates",
+                    "matchingEngine": "none",
+                },
+                "geometry": {
+                    "type": "MultiLineString",
+                    "coordinates": [
+                        [[round(lon, 7), round(lat, 7)] for lon, lat in component]
+                        for component in item.components
+                    ],
+                },
+            })
+        document = {
+            "type": "FeatureCollection",
+            "features": features,
+        }
+        write_route(code, document, "official-kml-explicit-coordinates", index)
+
+
+
+
 def distance_m(a: list[float], b: list[float]) -> float:
     dx = (a[0] - b[0]) * 104_500
     dy = (a[1] - b[1]) * 111_000
@@ -128,8 +212,10 @@ def main() -> None:
     correct_alberca("79", index)
     restore_cafe_oro_2(index)
     correct_coral_1(index)
+    restore_guinda_2(index)
+    restore_naranja_routes(index)
     INDEX.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print("Updated reviewed routes: 78, 79, 13, 18")
+    print("Updated reviewed routes: 78, 79, 13, 18, 31, oranges (excl. 39)")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,110 @@
+{
+  "generated_at": "2026-07-05T01:23:19.911679+00:00",
+  "source": "pdf-only",
+  "routes": [
+    {
+      "code": "38",
+      "name": "Naranja 1 ISSSTE",
+      "color": "#EC5400",
+      "color_name": "Naranja",
+      "color_letter": "N",
+      "transport_type": "combi",
+      "pdf_path": "rutasdecombi/Naranja 1 [Issste].pdf",
+      "moovit_url": "https://moovitapp.com/tripplan/morelia-6204/lines/NARANJA_1/154082943/7121722/es-419?ref=2&poiType=line&customerId=4908",
+      "source_geojson": "rutasdecombi/sources/38.source.geojson",
+      "point_count": 366,
+      "stop_count": 54
+    },
+    {
+      "code": "39",
+      "name": "Naranja 1 [La Soledad]",
+      "color": "#EC5400",
+      "color_name": "Naranja",
+      "color_letter": "N",
+      "transport_type": "combi",
+      "pdf_path": "rutasdecombi/Naranja 1 [La Soledad].pdf",
+      "moovit_url": "https://moovitapp.com/tripplan/morelia-6204/lines/NARANJA_1/154082944/7121723/es-419?ref=2&poiType=line&customerId=4908",
+      "source_geojson": "rutasdecombi/sources/39.source.geojson",
+      "point_count": 442,
+      "stop_count": 65
+    },
+    {
+      "code": "40",
+      "name": "Naranja 2 [3 De Agosto]",
+      "color": "#EC5400",
+      "color_name": "Naranja",
+      "color_letter": "N",
+      "transport_type": "combi",
+      "pdf_path": "rutasdecombi/Naranja 2 [3 De Agosto].pdf",
+      "moovit_url": "https://moovitapp.com/tripplan/morelia-6204/lines/NARANJA_2/154082946/7121725/es-419?ref=2&poiType=line&customerId=4908",
+      "source_geojson": "rutasdecombi/sources/40.source.geojson",
+      "point_count": 487,
+      "stop_count": 92
+    },
+    {
+      "code": "41",
+      "name": "Naranja 2 Santa Fe",
+      "color": "#EC5400",
+      "color_name": "Naranja",
+      "color_letter": "N",
+      "transport_type": "combi",
+      "pdf_path": "rutasdecombi/NARANJA 2 (↔ Santa Fe).pdf",
+      "moovit_url": "https://moovitapp.com/tripplan/morelia-6204/lines/NARANJA_2/154082945/7121724/es-419?ref=2&poiType=line&customerId=4908",
+      "source_geojson": "rutasdecombi/sources/41.source.geojson",
+      "point_count": 516,
+      "stop_count": 94
+    },
+    {
+      "code": "42",
+      "name": "Naranja 3 [Centro - Puerta Del Sol]",
+      "color": "#EC5400",
+      "color_name": "Naranja",
+      "color_letter": "N",
+      "transport_type": "combi",
+      "pdf_path": "rutasdecombi/Naranja 3 [Centro - Puerta Del Sol].pdf",
+      "moovit_url": "https://moovitapp.com/tripplan/morelia-6204/lines/NARANJA_3/154082950/7121729/es-419?ref=2&poiType=line&customerId=4908",
+      "source_geojson": "rutasdecombi/sources/42.source.geojson",
+      "point_count": 675,
+      "stop_count": 99
+    },
+    {
+      "code": "44",
+      "name": "Naranja 3 [Sta. María - Erandeni]",
+      "color": "#EC5400",
+      "color_name": "Naranja",
+      "color_letter": "N",
+      "transport_type": "combi",
+      "pdf_path": "rutasdecombi/Naranja 3 [Sta. María - Erandeni].pdf",
+      "moovit_url": "https://moovitapp.com/tripplan/morelia-6204/lines/NARANJA_3/154082949/7121728/es-419?ref=2&poiType=line&customerId=4908",
+      "source_geojson": "rutasdecombi/sources/44.source.geojson",
+      "point_count": 813,
+      "stop_count": 149
+    },
+    {
+      "code": "45",
+      "name": "Naranja 3 [Sta. María - Ita]",
+      "color": "#EC5400",
+      "color_name": "Naranja",
+      "color_letter": "N",
+      "transport_type": "combi",
+      "pdf_path": "rutasdecombi/Naranja 3 [Sta. María - Ita].pdf",
+      "moovit_url": "https://moovitapp.com/tripplan/morelia-6204/lines/NARANJA_3/154082947/7121726/es-419?ref=2&poiType=line&customerId=4908",
+      "source_geojson": "rutasdecombi/sources/45.source.geojson",
+      "point_count": 746,
+      "stop_count": 135
+    },
+    {
+      "code": "46",
+      "name": "Naranja 3 [Trico - Metrópolis]",
+      "color": "#EC5400",
+      "color_name": "Naranja",
+      "color_letter": "N",
+      "transport_type": "combi",
+      "pdf_path": "rutasdecombi/Naranja 3 [Trico - Metrópolis].pdf",
+      "moovit_url": "https://moovitapp.com/tripplan/morelia-6204/lines/NARANJA_3/154082948/7121727/es-419?ref=2&poiType=line&customerId=4908",
+      "source_geojson": "rutasdecombi/sources/46.source.geojson",
+      "point_count": 712,
+      "stop_count": 111
+    }
+  ]
+}

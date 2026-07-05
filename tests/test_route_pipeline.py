@@ -33,7 +33,7 @@ class KmlTests(unittest.TestCase):
         ignored = []
         selected = _select_components(1, directions[0].components, ignored)
         self.assertEqual([2, 3], [index for index, _ in selected])
-        self.assertEqual("redundant_sub_5m_kml_marker", ignored[0]["reason"])
+        self.assertEqual("redundant_sub_30m_kml_marker", ignored[0]["reason"])
         # The two 36.8 m opposite fragments in the return remain available to
         # Valhalla because they can encode a real terminal turn.
         return_selected = _select_components(2, directions[1].components, ignored)
@@ -75,7 +75,7 @@ class GeometryTests(unittest.TestCase):
         request = _trace_request([(-101.2, 19.7), (-101.19, 19.7)], 30, QualityThresholds())
         self.assertEqual("map_snap", request["shape_match"])
         self.assertEqual("auto", request["costing"])
-        self.assertFalse(request["costing_options"]["auto"]["ignore_oneways"])
+        self.assertTrue(request["costing_options"]["auto"]["ignore_oneways"])
         self.assertEqual(30, request["trace_options"]["search_radius"])
 
 

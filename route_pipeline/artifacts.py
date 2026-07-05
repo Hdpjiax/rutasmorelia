@@ -82,7 +82,7 @@ def write_artifacts(
         "schema_version": 1,
         "route": route.slug,
         "route_code": route.code,
-        "method": "hybrid_kml_corridor_pyvalhalla_auto_legal_oneways",
+        "method": metadata.get("algorithm") or "hybrid_kml_corridor_pyvalhalla_auto_legal_oneways",
         "quality_pass": quality_pass,
         "manually_approved": False,
         "metadata": metadata,

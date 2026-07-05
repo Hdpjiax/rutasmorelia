@@ -1,0 +1,69 @@
+---
+pid: 36248
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia; npm run lint -w web; npm run build -w web"
+started_at: 2026-07-05T00:28:28.092Z
+running_for_ms: 4750003  
+---
+
+> web@0.1.0 lint
+> eslint
+
+
+Oops! Something went wrong! :(
+
+ESLint: 9.39.4
+
+Error: Cannot find module 'next/dist/compiled/babel/eslint-parser'
+Require stack:
+- C:\RutasMorelia\node_modules\eslint-config-next\dist\parser.js
+- C:\RutasMorelia\node_modules\eslint-config-next\dist\index.js
+- C:\RutasMorelia\node_modules\eslint-config-next\dist\core-web-vitals.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1500:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1116:12)
+    at Module._load (node:internal/modules/cjs/loader:1285:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1600:12)
+    at require (node:internal/modules/helpers:153:16)
+    at Object.<anonymous> (C:\RutasMorelia\node_modules\eslint-config-next\dist\parser.js:2:21)
+    at Module._compile (node:internal/modules/cjs/loader:1854:14)
+npm error Lifecycle script `lint` failed with error:
+npm error code 2
+npm error path C:\RutasMorelia\apps\web
+npm error workspace web@0.1.0
+npm error location C:\RutasMorelia\apps\web
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c eslint
+
+> web@0.1.0 build
+> next build
+
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.1s
+  Running TypeScript ...
+  Finished TypeScript in 3.7s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/6) ...
+  Generating static pages using 7 workers (1/6) 
+  Generating static pages using 7 workers (2/6) 
+  Generating static pages using 7 workers (4/6) 
+✓ Generating static pages using 7 workers (6/6) in 595ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/transit/traffic
+└ ƒ /auth/callback
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

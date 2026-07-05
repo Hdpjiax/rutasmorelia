@@ -6,10 +6,10 @@ from pathlib import Path
 from typing import Any
 
 from .artifacts import write_artifacts
-from .config import DATA_ROOT, OUTPUT_ROOT, QualityThresholds, RouteDefinition
+from .config import DATA_ROOT, NARANJA_CODES, OUTPUT_ROOT, QualityThresholds, RouteDefinition
 from .geometry import distance_m, line_length_m, point_segment_distance_m
-from .kml import Direction, parse_kml
-from .valhalla_engine import actor_version, create_actor, match_component
+from .kml import Direction, parse_shape_file
+from .valhalla_engine import MatchedComponent, actor_version, create_actor, match_component
 from .validation import validate_component
 
 
@@ -19,7 +19,7 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
         raise FileNotFoundError(
             f"Falta {config_path}. Ejecute primero: python -m route_pipeline bootstrap-map --pbf <archivo.osm.pbf>"
         )
-    raw_directions = parse_kml(route.kml)
+    raw_directions = parse_shape_file(route.kml)
     should_swap_and_reverse = route.code not in ("79", "13", "F15")
     if should_swap_and_reverse and len(raw_directions) == 2:
         dir1 = Direction(1, raw_directions[1].name, raw_directions[1].components)
@@ -56,10 +56,26 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
         thresholds = QualityThresholds(max_distance_m=210.0, p95_distance_m=65.0)
     elif route.code == "12":
         thresholds = QualityThresholds(max_distance_m=75.0)
+    elif route.code == "31":
+        thresholds = QualityThresholds(
+            densify_m=5.0,
+            search_radii_m=(10, 20, 30),
+            max_distance_m=35.0,
+            p95_distance_m=12.0,
+            endpoint_distance_m=30.0,
+        )
     elif route.code == "F15":
         thresholds = QualityThresholds(
             p95_distance_m=150.0,
             max_distance_m=300.0,
+        )
+    elif route.code in NARANJA_CODES:
+        thresholds = QualityThresholds(
+            p95_distance_m=45.0,
+            max_distance_m=120.0,
+            endpoint_distance_m=70.0,
+            search_radii_m=(15, 30, 50, 80),
+            densify_m=10.0,
         )
     matched = []
     reports = []
@@ -90,6 +106,7 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
             "built_at": datetime.now(timezone.utc).isoformat(),
             "actor_status": actor_version(actor),
             "kml": str(route.kml),
+            "source_kind": route.source_kind,
             "pdf": str(route.pdf) if route.pdf else None,
             "ignored_kml_components": ignored_components,
             "reference_overrides": reference_overrides,
@@ -147,10 +164,52 @@ def _remove_corridor_excursions(
     return result, removed
 
 
+def _clean_directions_for_corridor_matching(
+    directions: list[Direction],
+    *,
+    reason: str,
+    rdp_tolerance_m: float = 35.0,
+    remove_excursions: bool = True,
+) -> tuple[list[Direction], list[dict[str, Any]]]:
+    cleaned_directions: list[Direction] = []
+    audit: list[dict[str, Any]] = []
+    for direction in directions:
+        cleaned_components = []
+        for component_index, component in enumerate(direction.components, start=1):
+            cleaned = component[:]
+            removed_loops = 0
+            if remove_excursions:
+                candidate, removed_loops = _remove_corridor_excursions(component)
+                if len(candidate) >= max(24, int(len(component) * 0.55)):
+                    cleaned = candidate
+            simplified = _rdp(cleaned, rdp_tolerance_m)
+            if len(simplified) < 12:
+                simplified = _rdp(cleaned, max(6.0, rdp_tolerance_m / 2))
+            cleaned_components.append(simplified)
+            audit.append({
+                "direction": direction.index,
+                "component": component_index,
+                "reason": reason,
+                "source_points": len(component),
+                "removed_loop_points": removed_loops,
+                "matching_anchor_points": len(simplified),
+            })
+        cleaned_directions.append(Direction(direction.index, direction.name, cleaned_components))
+    return cleaned_directions, audit
+
+
 def _apply_reference_overrides(
     route: RouteDefinition, directions: list[Direction]
 ) -> tuple[list[Direction], list[dict[str, Any]]]:
     """Apply user-reviewed, local corridor corrections without touching other geometry."""
+    if route.code in NARANJA_CODES:
+        return _clean_directions_for_corridor_matching(
+            directions,
+            reason="pdf_guided_naranja_osm_matching",
+            rdp_tolerance_m=12.0,
+            remove_excursions=False,
+        )
+
     if route.slug == "12-cafe-1-lago":
         # The ArcGIS export splits one continuous return corridor at a
         # duplicated marker. Matching both halves independently leaves a
@@ -222,76 +281,14 @@ def _apply_reference_overrides(
         }]
 
     if route.slug == "13-cafe-oro-2-leandro-valle":
-        cleaned_directions: list[Direction] = []
-        audit: list[dict[str, Any]] = []
-        for direction in directions:
-            cleaned_components = []
-            for component_index, component in enumerate(direction.components, start=1):
-                cleaned, removed_loops = _remove_corridor_excursions(component)
-                # ArcGIS adds dense points around divided avenues. A wider
-                # anchor spacing prevents Meili from treating each carriageway
-                # correction as a mandatory out-and-back detour.
-                simplified = _rdp(cleaned, 35.0)
-                cleaned_components.append(simplified)
-                audit.append({
-                    "direction": direction.index,
-                    "component": component_index,
-                    "reason": "pdf_guided_osm_matching_without_local_excursions",
-                    "source_points": len(component),
-                    "removed_loop_points": removed_loops,
-                    "matching_anchor_points": len(simplified),
-                })
-            cleaned_directions.append(
-                Direction(direction.index, direction.name, cleaned_components)
-            )
-        return cleaned_directions, audit
+        return _clean_directions_for_corridor_matching(
+            directions,
+            reason="pdf_guided_osm_matching_without_local_excursions",
+            rdp_tolerance_m=35.0,
+        )
 
     corrected: list[Direction] = []
     audit: list[dict[str, Any]] = []
-
-    if route.slug == "46-naranja-3-trico-metropolis" and len(directions) == 2:
-        dir1_comps = [comp[:] for comp in directions[0].components]
-        dir2_comps = [comp[:] for comp in directions[1].components]
-        if len(dir1_comps) >= 1:
-            c = dir1_comps[0]
-            # Remove Pipila loop
-            c_no_pipila = c[:120] + c[142:]
-            # Remove/replace Salamanca crossover loop on the Periférico Paseo de la República (staying on south side lateral)
-            COORDS_BYPASS = [
-                (-101.182818, 19.733857),  # equivalent to c_no_pipila[300]
-                (-101.182749, 19.734747),
-                (-101.182719, 19.735073),
-                (-101.182635, 19.735606),
-                (-101.182549, 19.735936),
-                (-101.182417, 19.736250),
-                (-101.182280, 19.736450),
-                (-101.182052, 19.736720),
-                (-101.181809, 19.736980),
-                (-101.181545, 19.737178),
-                (-101.181282, 19.737324),
-                (-101.180735, 19.737581),
-                (-101.180189, 19.737839),
-                (-101.179642, 19.738096),
-                (-101.179095, 19.738353),
-                (-101.178509, 19.738648),  # equivalent to c_no_pipila[340]
-            ]
-            dir1_comps[0] = c_no_pipila[:301] + COORDS_BYPASS[1:-1] + c_no_pipila[340:]
-            audit.append({
-                "direction": 1,
-                "component": 1,
-                "reason": "user_reviewed_remove_cloverleaf_loop_ida_and_salamanca_crossover"
-            })
-        if len(dir2_comps) >= 1:
-            c = dir2_comps[0]
-            dir2_comps[0] = c[:482] + c[507:]
-            audit.append({
-                "direction": 2,
-                "component": 1,
-                "reason": "user_reviewed_remove_cloverleaf_loop_vuelta"
-            })
-        corrected.append(Direction(directions[0].index, directions[0].name, dir1_comps))
-        corrected.append(Direction(directions[1].index, directions[1].name, dir2_comps))
-        return corrected, audit
 
     if route.slug == "23-crema-2a":
         dir1_comps = [comp[:] for comp in directions[0].components]

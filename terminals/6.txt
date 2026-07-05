@@ -1,0 +1,45 @@
+---
+pid: 19824
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia\\apps\\mobile; npm test -- --passWithNoTests"
+started_at: 2026-07-04T23:27:16.166Z
+running_for_ms: 8419995  
+---
+
+> mx.gob.morelia.simum@0.0.1 test
+> jest --passWithNoTests
+
+FAIL __tests__/App.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module '@babel/runtime/helpers/interopRequireDefault' from '../../packages/transit-core/dist/geo.js'
+
+    Require stack:
+      C:/RutasMorelia/packages/transit-core/dist/geo.js
+      C:/RutasMorelia/packages/transit-core/dist/index.js
+      src/components/RouteDrawer.tsx
+      src/screens/MapScreen.tsx
+      App.tsx
+      __tests__/App.test.tsx
+
+      1 | "use strict";
+      2 | Object.defineProperty(exports, "__esModule", { value: true });
+    > 3 | exports.getGeometryBounds = getGeometryBounds;
+        |                              ^
+      4 | exports.findClosestPointOnLine = findClosestPointOnLine;
+      5 | exports.haversineDistanceKm = haversineDistanceKm;
+      6 | function getGeometryBounds(geometry) {
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.<anonymous> (../../packages/transit-core/dist/geo.js:3:30)
+      at Object.require (../../packages/transit-core/src/index.ts:3:1)
+      at Object.require (src/components/RouteDrawer.tsx:13:1)
+      at Object.require (src/screens/MapScreen.tsx:19:1)
+      at Object.require (App.tsx:10:1)
+      at Object.require (__tests__/App.test.tsx:7:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        83.371 s
+Ran all test suites.

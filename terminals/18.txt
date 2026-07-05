@@ -1,0 +1,19 @@
+---
+pid: 17188
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia; npm test -w mx.gob.morelia.simum"
+started_at: 2026-07-05T00:24:12.378Z
+running_for_ms: 5005008  
+---
+
+> mx.gob.morelia.simum@0.0.1 test
+> jest
+
+PASS __tests__/App.test.tsx (14.75 s)
+  √ renders correctly (47 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        14.895 s, estimated 115 s
+Ran all test suites.

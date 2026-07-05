@@ -1,0 +1,42 @@
+---
+pid: 33292
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia\\packages\\transit-core; npm run build; cd C:\\RutasMorelia\\apps\\web; npm run build"
+started_at: 2026-07-04T23:34:19.147Z
+running_for_ms: 7995011  
+---
+
+> @rutas-morelia/transit-core@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> web@0.1.0 build
+> next build
+
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 11.9s
+  Running TypeScript ...
+  Finished TypeScript in 13.2s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/6) ...
+  Generating static pages using 7 workers (1/6) 
+  Generating static pages using 7 workers (2/6) 
+  Generating static pages using 7 workers (4/6) 
+✓ Generating static pages using 7 workers (6/6) in 1453ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/transit/traffic
+└ ƒ /auth/callback
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

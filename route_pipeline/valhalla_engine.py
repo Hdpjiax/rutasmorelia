@@ -50,7 +50,7 @@ def _trace_request(points: list[Coordinate], radius_m: int, thresholds: QualityT
         # costing then invents kilometre-long detours. Keep bus-accessible road
         # edges while allowing the matcher to follow the KML orientation.
         "costing": "auto",
-        "costing_options": {"auto": {"ignore_oneways": False}},
+        "costing_options": {"auto": {"ignore_oneways": thresholds.ignore_oneways}},
         "shape_match": "map_snap",
         "trace_options": {
             "search_radius": radius_m,

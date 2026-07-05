@@ -1,0 +1,19 @@
+---
+pid: 2636
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia\\apps\\mobile; npm test -- --passWithNoTests"
+started_at: 2026-07-04T23:31:09.465Z
+running_for_ms: 8184996  
+---
+
+> mx.gob.morelia.simum@0.0.1 test
+> jest --passWithNoTests
+
+PASS __tests__/App.test.tsx (114.705 s)
+  √ renders correctly (302 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        116.41 s
+Ran all test suites.

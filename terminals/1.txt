@@ -1,0 +1,24 @@
+---
+pid: 37004
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia\\apps\\mobile; npm test -- --passWithNoTests 2>&1 | Select-Object -Last 15"
+started_at: 2026-07-04T23:07:41.350Z
+running_for_ms: 9595010  
+---
+
+node.exe : PASS __tests__/App.test.tsx (32.558 s)
+> mx.gob.morelia.simum@0.0.1 test
+> jest --passWithNoTests
+
+En l�nea: 1 Car�cter: 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\Antonio Garcia\AppData ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS __tests__/App.test.tsx (32.558 s):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  √ renders correctly (86 ms)
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        33.277 s
+Ran all test suites.

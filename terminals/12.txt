@@ -1,0 +1,96 @@
+---
+pid: 2752
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia\\apps\\web; npm run dev"
+started_at: 2026-07-04T23:41:18.240Z
+running_for_ms: 7594996  
+---
+
+> web@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.5.0.2:3000
+- Environments: .env.local
+✓ Ready in 416ms
+
+⨯ Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '4259711184'
+}
+⨯ Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '476605631'
+}
+ Server  Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>:1:18) {
+  environmentName: 'Server',
+  digest: '476605631'
+}
+⨯ Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>:1:18) {
+  environmentName: 'Server',
+  digest: '476605631'
+}
+⨯ Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>:1:18) {
+  environmentName: 'Server',
+  digest: '476605631',
+  page: '/'
+}
+ GET / 500 in 7.8s (next.js: 824ms, proxy.ts: 516ms, application-code: 6.5s)
+○ Compiling /_error ...
+⨯ SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+⨯ Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '4259711184'
+}
+⨯ Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '476605631'
+}
+ Server  Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>:1:18) {
+  environmentName: 'Server',
+  digest: '476605631'
+}
+⨯ Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>:1:18) {
+  environmentName: 'Server',
+  digest: '476605631'
+}
+⨯ Error: Could not find the module "[project]/apps/web/node_modules/next/dist/client/components/builtin/global-error.js#default" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>:1:18) {
+  environmentName: 'Server',
+  digest: '476605631',
+  page: '/'
+}
+⨯ Error: Failed to load external module @swc/helpers-a0de6bd0cb8eca46/_/_interop_require_default: Error: Cannot find module '@swc/helpers-a0de6bd0cb8eca46/_/_interop_require_default'
+Require stack:
+- C:\RutasMorelia\apps\web\.next\dev\server\chunks\ssr\[root-of-the-server]__08e_lfq._.js
+- C:\RutasMorelia\apps\web\.next\dev\server\chunks\ssr\[turbopack]_runtime.js
+- C:\RutasMorelia\apps\web\.next\dev\server\app\page.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\require.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\load-components.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\build\utils.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\lib\router-server.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\lib\start-server.js
+    at module evaluation (C:\RutasMorelia\apps\web\.next\dev\server\chunks\ssr\[root-of-the-server]__08e_lfq._.js:28:35)
+    at Object.<anonymous> (C:\RutasMorelia\apps\web\.next\dev\server\pages\_document.js:3:3)
+ GET / 500 in 13.6s (next.js: 13.1s, proxy.ts: 25ms, application-code: 423ms)
+[browser] Uncaught Error: Failed to load external module @swc/helpers-a0de6bd0cb8eca46/_/_interop_require_default: Error: Cannot find module '@swc/helpers-a0de6bd0cb8eca46/_/_interop_require_default'
+Require stack:
+- C:\RutasMorelia\apps\web\.next\dev\server\chunks\ssr\[root-of-the-server]__08e_lfq._.js
+- C:\RutasMorelia\apps\web\.next\dev\server\chunks\ssr\[turbopack]_runtime.js
+- C:\RutasMorelia\apps\web\.next\dev\server\app\page.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\require.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\load-components.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\build\utils.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\lib\router-server.js
+- C:\RutasMorelia\apps\web\node_modules\next\dist\server\lib\start-server.js
+    at module evaluation (.next\dev\server\chunks\ssr\[root-of-the-server]__08e_lfq._.js:28:35)
+    at Object.<anonymous> (.next\dev\server\pages\_document.js:3:3)

@@ -1,0 +1,46 @@
+---
+pid: 10700
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia; npm run dev:web"
+started_at: 2026-07-05T00:27:58.110Z
+running_for_ms: 4794990  
+---
+
+> rutas-morelia@0.1.0 dev:web
+> npm run dev -w web
+
+
+> web@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.5.0.2:3000
+- Environments: .env.local
+✓ Ready in 396ms
+
+ GET / 200 in 3.3s (next.js: 2.8s, proxy.ts: 166ms, application-code: 408ms)
+
+-----
+FATAL: An unexpected Turbopack error occurred. A panic log has been written to C:\Users\ANTONI~1\AppData\Local\Temp\next-panic-3d7fd0fe91a9e9cf46f41434e2d8b0e1.log.
+
+To help make Turbopack better, report this error by clicking here.
+-----
+
+Error: Turbopack build failed with 1 errors:
+./apps/web/src/app
+Error: Next.js inferred your workspace root, but it may not be correct.
+    We couldn't find the Next.js package (next/package.json) from the project directory: C:\RutasMorelia\apps\web\src\app
+     To fix this, set turbopack.root in your Next.js config, or ensure the Next.js package is resolvable from this directory.
+    Note: For security and performance reasons, files outside of the project directory will not be compiled.
+    See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+
+    at ignore-listed frames
+
+npm error Lifecycle script `dev` failed with error:
+npm error code 1
+npm error path C:\RutasMorelia\apps\web
+npm error workspace web@0.1.0
+npm error location C:\RutasMorelia\apps\web
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c next dev

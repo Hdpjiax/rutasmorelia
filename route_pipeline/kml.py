@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import xml.etree.ElementTree as ET
 import zipfile
@@ -70,3 +71,39 @@ def parse_kml(path: Path) -> list[Direction]:
     if not directions:
         raise ValueError(f"El KML no contiene LineString válidos: {path}")
     return directions
+
+
+def parse_geojson(path: Path) -> list[Direction]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    features = payload.get("features") or []
+    directions: list[Direction] = []
+    for feature in features:
+        geometry = feature.get("geometry") or {}
+        properties = feature.get("properties") or {}
+        name = str(properties.get("route_name") or properties.get("name") or "Dirección")
+        geom_type = geometry.get("type")
+        components: list[list[Coordinate]] = []
+        if geom_type == "LineString":
+            raw = geometry.get("coordinates") or []
+            line = [(float(pt[0]), float(pt[1])) for pt in raw if isinstance(pt, (list, tuple)) and len(pt) >= 2]
+            if len(line) >= 2:
+                components.append(deduplicate(line))
+        elif geom_type == "MultiLineString":
+            for raw in geometry.get("coordinates") or []:
+                line = [(float(pt[0]), float(pt[1])) for pt in raw if isinstance(pt, (list, tuple)) and len(pt) >= 2]
+                if len(line) >= 2:
+                    components.append(deduplicate(line))
+        if components:
+            directions.append(Direction(len(directions) + 1, name, components))
+    if not directions:
+        raise ValueError(f"El GeoJSON no contiene líneas válidas: {path}")
+    return directions
+
+
+def parse_shape_file(path: Path) -> list[Direction]:
+    suffix = path.suffix.lower()
+    if suffix == ".geojson":
+        return parse_geojson(path)
+    if suffix in {".kml", ".kmz"}:
+        return parse_kml(path)
+    raise ValueError(f"Formato de fuente no soportado: {path}")

@@ -1,0 +1,39 @@
+---
+pid: 30484
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia; npm install; npm run lint -w web"
+started_at: 2026-07-05T00:29:06.885Z
+running_for_ms: 4709991  
+---
+
+added 4 packages, removed 2 packages, changed 1 package, and audited 1488 packages in 26s
+npm warn allow-scripts 4 packages have install scripts not yet covered by allowScripts:
+npm warn allow-scripts   @scarf/scarf@1.4.0 (postinstall: node ./report.js)
+npm warn allow-scripts   esbuild@0.28.1 (postinstall: node install.js)
+npm warn allow-scripts   sharp@0.34.5 (install: node install/check.js || npm run build)
+npm warn allow-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+npm warn allow-scripts
+npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+
+296 packages are looking for funding
+  run `npm fund` for details
+
+15 vulnerabilities (9 moderate, 6 high)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> web@0.1.0 lint
+> eslint
+
+
+C:\RutasMorelia\apps\web\src\components\map-canvas.tsx
+  377:6  warning  React Hook useEffect has a missing dependency: 'showTraffic'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\RutasMorelia\apps\web\src\components\transit-app.tsx
+  313:6  warning  React Hook useEffect has a missing dependency: 'mapCenter'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 2 problems (0 errors, 2 warnings)
+

@@ -1,0 +1,16 @@
+---
+pid: 37696
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia; .\\.venv-valhalla\\Scripts\\python.exe tools\\extract_rutasdecombi_shapes.py"
+started_at: 2026-07-05T00:55:38.868Z
+running_for_ms: 3115003  
+---
+38 Naranja 1 ISSSTE: 366 puntos desde Naranja 1 [Issste].pdf
+39 Naranja 1 [La Soledad]: 442 puntos desde Naranja 1 [La Soledad].pdf
+40 Naranja 2 [3 De Agosto]: 487 puntos desde Naranja 2 [3 De Agosto].pdf
+41 Naranja 2 Santa Fe: 516 puntos desde NARANJA 2 (↔ Santa Fe).pdf
+42 Naranja 3 [Centro - Puerta Del Sol]: 675 puntos desde Naranja 3 [Centro - Puerta Del Sol].pdf
+44 Naranja 3 [Sta. María - Erandeni]: 813 puntos desde Naranja 3 [Sta. María - Erandeni].pdf
+45 Naranja 3 [Sta. María - Ita]: 746 puntos desde Naranja 3 [Sta. María - Ita].pdf
+46 Naranja 3 [Trico - Metrópolis]: 712 puntos desde Naranja 3 [Trico - Metrópolis].pdf
+Manifest: C:\RutasMorelia\rutasdecombi\routes.json

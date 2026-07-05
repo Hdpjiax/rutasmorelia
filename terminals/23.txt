@@ -1,0 +1,29 @@
+---
+pid: 23000
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia; if (Test-Path \"apps\\web\\.next\") { Remove-Item -Recurse -Force \"apps\\web\\.next\" }; npm run dev:web"
+started_at: 2026-07-05T00:30:20.563Z
+running_for_ms: 4650009  
+---
+
+> rutas-morelia@0.1.0 dev:web
+> npm run dev -w web
+
+
+> web@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.5.0.2:3000
+- Environments: .env.local
+✓ Ready in 446ms
+
+ GET / 200 in 3.4s (next.js: 2.9s, proxy.ts: 158ms, application-code: 370ms)
+⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.5.0.2:3000
+- Environments: .env.local
+✓ Ready in 353ms
+

@@ -1,0 +1,98 @@
+---
+pid: 36776
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia\\apps\\web; npm run build"
+started_at: 2026-07-04T23:40:07.879Z
+running_for_ms: 7650004  
+---
+
+> web@0.1.0 build
+> next build
+
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./src/components/map-canvas.tsx:3:1
+Module not found: Can't resolve '@rutas-morelia/transit-core'
+  1 | "use client";
+  2 |
+> 3 | import { getContrastCasingColor } from "@rutas-morelia/transit-core";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { useEffect, useRef, useState } from "react";
+  5 | import mapboxgl, { type Map } from "maplibre-gl";
+  6 |
+
+Import map: aliased to relative '../../packages/transit-core/dist/index.js' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/map-canvas.tsx [Client Component Browser]
+    ./src/components/transit-app.tsx [Client Component Browser]
+    ./src/components/transit-app.tsx [Server Component]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/map-canvas.tsx [Client Component SSR]
+    ./src/components/transit-app.tsx [Client Component SSR]
+    ./src/components/transit-app.tsx [Server Component]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./src/components/transit-app.tsx:3:1
+Module not found: Can't resolve '@rutas-morelia/transit-core'
+   1 | "use client";
+   2 |
+>  3 | import {
+     | ^^^^^^^
+>  4 |   buildPhotonSearchUrl,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+>  5 |   contrastColor,
+     | ^^^^^^^^^^^^^^^^
+>  6 |   expandSearchQuery,
+     | ^^^^^^^^^^^^^^^^^^^^
+>  7 |   filterJourneyOptions,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+>  8 |   haversineDistanceKm,
+     | ^^^^^^^^^^^^^^^^^^^^^^
+>  9 |   isCombiTransportType,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 10 |   LOCAL_FAVORITES_KEY,
+     | ^^^^^^^^^^^^^^^^^^^^^^
+> 11 |   mapPhotonFeatures,
+     | ^^^^^^^^^^^^^^^^^^^^
+> 12 |   scoreRoutesByQuery,
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 13 |   type Coordinates,
+     | ^^^^^^^^^^^^^^^^^^^
+> 14 |   type FavoriteItem,
+     | ^^^^^^^^^^^^^^^^^^^^
+> 15 |   type JourneyOption,
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 16 | } from "@rutas-morelia/transit-core";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  17 | import { useCallback, useEffect, useMemo, useState } from "react";
+  18 | import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+  19 | import {
+
+Import map: aliased to relative '../../packages/transit-core/dist/index.js' inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./src/components/transit-app.tsx
+    ./src/app/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./src/components/map-canvas.tsx:3:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./src/components/transit-app.tsx:3:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

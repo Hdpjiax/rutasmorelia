@@ -1,0 +1,7 @@
+---
+pid: 7352
+cwd: "C:\RutasMorelia"
+command: "git log --all -S \"NARANJA_39\" --oneline -5"
+started_at: 2026-07-05T01:32:19.428Z
+running_for_ms: 915000   
+---

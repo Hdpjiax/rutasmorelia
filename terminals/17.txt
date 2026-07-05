@@ -1,0 +1,55 @@
+---
+pid: 13344
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia; npm run lint -w web; npm run build -w web"
+started_at: 2026-07-05T00:22:56.927Z
+running_for_ms: 5079998  
+---
+
+> web@0.1.0 lint
+> eslint
+
+
+C:\RutasMorelia\apps\web\src\components\map-canvas.tsx
+  377:6  warning  React Hook useEffect has a missing dependency: 'showTraffic'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\RutasMorelia\apps\web\src\components\transit-app.tsx
+  312:6  warning  React Hook useEffect has a missing dependency: 'mapCenter'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 2 problems (0 errors, 2 warnings)
+
+
+> web@0.1.0 build
+> next build
+
+⚠ Found lockfile missing swc dependencies, patching...
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+⚠ Found lockfile missing swc dependencies, patching...
+⚠ Lockfile was successfully patched, please run "npm install" to ensure @next/swc dependencies are downloaded
+⚠ Lockfile was successfully patched, please run "npm install" to ensure @next/swc dependencies are downloaded
+✓ Compiled successfully in 4.6s
+  Running TypeScript ...
+Failed to type check.
+
+./src/components/transit-app.tsx:301:13
+Type error: Type '{ entity_id: string | number; label: string; subtitle: string | undefined; latitude: number; longitude: number; }[]' is not assignable to type 'Suggestion[]'.
+  Property 'entity_type' is missing in type '{ entity_id: string | number; label: string; subtitle: string | undefined; latitude: number; longitude: number; }' but required in type 'Suggestion'.
+
+  299 |               );
+  300 |             }
+> 301 |             results = mapped;
+      |             ^
+  302 |           }
+  303 |         }
+  304 |         if (!cancelled) setSuggestions(results);
+Next.js build worker exited with code: 1 and signal: null
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\RutasMorelia\apps\web
+npm error workspace web@0.1.0
+npm error location C:\RutasMorelia\apps\web
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c next build
