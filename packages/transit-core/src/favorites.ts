@@ -4,7 +4,12 @@ export function findRouteFavorite(
   favorites: FavoriteItem[],
   routeId: string | number,
 ): FavoriteItem | undefined {
-  return favorites.find(f => String(f.route_id) === String(routeId));
+  const code = String(routeId);
+  return favorites.find(
+    f =>
+      (f.route?.code != null && String(f.route.code) === code) ||
+      (f.route_id != null && String(f.route_id) === code),
+  );
 }
 
 export function findPlaceFavorite(

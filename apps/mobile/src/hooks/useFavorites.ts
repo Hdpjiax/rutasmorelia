@@ -4,6 +4,7 @@ import {
   createLocalPlaceFavorite,
   createLocalRouteFavorite,
   favoritesToSuggestions,
+  findRouteFavorite,
   isPlaceFavorited as isPlaceFavoritedCore,
   isRouteFavorited as isRouteFavoritedCore,
   LOCAL_FAVORITES_KEY,
@@ -11,65 +12,96 @@ import {
   removeFavoriteById,
 } from '@rutas-morelia/transit-core';
 import {useCallback, useEffect, useMemo, useState} from 'react';
+import type {SetMessageFn} from './useToast';
 import {supabase} from '../lib/supabase';
 import type {Coordinates} from '../store/transit-store';
 import type {FavoriteItem} from '../types/transit';
+
+const FAVORITES_SELECT = '*, place:places(id, name, location), route:routes(id, code)';
 
 async function persistLocalFavorites(favorites: FavoriteItem[]) {
   await AsyncStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify(favorites));
 }
 
-export function useFavorites(setMessage: (msg: string) => void) {
+async function readLocalFavorites(): Promise<FavoriteItem[]> {
+  try {
+    const stored = await AsyncStorage.getItem(LOCAL_FAVORITES_KEY);
+    if (stored) return JSON.parse(stored) as FavoriteItem[];
+  } catch {}
+  return [];
+}
+
+export function useFavorites(setMessage: SetMessageFn) {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    async function loadFavorites() {
-      const client = supabase;
-      let local: FavoriteItem[] = [];
-      try {
-        const stored = await AsyncStorage.getItem(LOCAL_FAVORITES_KEY);
-        if (stored) local = JSON.parse(stored) as FavoriteItem[];
-      } catch {}
+  const loadFavorites = useCallback(async () => {
+    const client = supabase;
+    const local = await readLocalFavorites();
 
-      if (!client) {
+    if (!client) {
+      setFavorites(local);
+      setUser(null);
+      return;
+    }
+
+    try {
+      const {
+        data: {user: currentUser},
+      } = await client.auth.getUser();
+      setUser(currentUser);
+
+      if (!currentUser) {
         setFavorites(local);
         return;
       }
 
-      try {
-        const {
-          data: {user: currentUser},
-        } = await client.auth.getUser();
-        setUser(currentUser);
-        if (currentUser) {
-          const {data, error} = await client.from('favorites').select('*').eq('user_id', currentUser.id);
-          if (!error && data) {
-            setFavorites(mergeLocalFavorites(data as FavoriteItem[], local));
-            return;
-          }
-        }
-      } catch {}
-      setFavorites(local);
-    }
-    void loadFavorites();
+      const {data, error} = await client
+        .from('favorites')
+        .select(FAVORITES_SELECT)
+        .eq('user_id', currentUser.id);
+
+      if (!error && data) {
+        setFavorites(mergeLocalFavorites(data as FavoriteItem[], local));
+        return;
+      }
+    } catch {}
+
+    setFavorites(local);
   }, []);
+
+  useEffect(() => {
+    void loadFavorites();
+
+    const client = supabase;
+    if (!client) return;
+
+    const {
+      data: {subscription},
+    } = client.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      void loadFavorites();
+    });
+
+    return () => subscription.unsubscribe();
+  }, [loadFavorites]);
 
   const removeFavorite = useCallback(
     async (existing: FavoriteItem, messages: {remote: string; local: string}) => {
       const client = supabase;
-      if (client && user) {
-        const {error} = await client.from('favorites').delete().eq('id', existing.id);
-        if (!error) {
-          setFavorites(prev => removeFavoriteById(prev, existing.id));
-          setMessage(messages.remote);
-        }
-        return;
-      }
       const updated = removeFavoriteById(favorites, existing.id);
       setFavorites(updated);
       await persistLocalFavorites(updated);
-      setMessage(messages.local);
+
+      if (client && user && !existing.is_local) {
+        const {error} = await client.from('favorites').delete().eq('id', existing.id);
+        if (!error) {
+          setMessage(messages.remote, 'success');
+          return;
+        }
+      }
+
+      setMessage(messages.local, 'success');
     },
     [favorites, setMessage, user],
   );
@@ -110,23 +142,25 @@ export function useFavorites(setMessage: (msg: string) => void) {
             const {data: favData, error: favError} = await client
               .from('favorites')
               .insert({user_id: user.id, place_id: placeData.id, custom_name: label})
-              .select()
+              .select(FAVORITES_SELECT)
               .single();
             if (!favError && favData) {
-              setFavorites(prev => [...prev, favData as FavoriteItem]);
-              setMessage('Guardado en favoritos');
+              const updated = [...favorites, favData as FavoriteItem];
+              setFavorites(updated);
+              await persistLocalFavorites(updated);
+              setMessage('Guardado en favoritos', 'success');
+              return;
             }
           }
         } catch (e) {
           if (__DEV__) console.warn('Supabase favorite failed, saving locally:', e);
         }
-        return;
       }
 
       const updated = [...favorites, createLocalPlaceFavorite(label, coords)];
       setFavorites(updated);
       await persistLocalFavorites(updated);
-      setMessage('Guardado en favoritos locales');
+      setMessage('Guardado en favoritos locales', 'info');
     },
     [favorites, removeFavorite, setMessage, user],
   );
@@ -134,7 +168,7 @@ export function useFavorites(setMessage: (msg: string) => void) {
   const toggleRouteFavorite = useCallback(
     async (routeId: string) => {
       const client = supabase;
-      const existing = favorites.find(f => String(f.route_id) === String(routeId));
+      const existing = findRouteFavorite(favorites, routeId);
 
       if (existing) {
         await removeFavorite(existing, {
@@ -145,22 +179,28 @@ export function useFavorites(setMessage: (msg: string) => void) {
       }
 
       if (client && user) {
-        const {data, error} = await client
-          .from('favorites')
-          .insert({user_id: user.id, route_id: parseInt(routeId, 10)})
-          .select()
-          .single();
-        if (!error && data) {
-          setFavorites(prev => [...prev, data as FavoriteItem]);
-          setMessage('Ruta guardada en favoritos');
+        const {data: routeData} = await client.from('routes').select('id, code').eq('code', String(routeId)).limit(1);
+        const dbRouteId = routeData?.[0]?.id;
+        if (dbRouteId) {
+          const {data, error} = await client
+            .from('favorites')
+            .insert({user_id: user.id, route_id: dbRouteId})
+            .select(FAVORITES_SELECT)
+            .single();
+          if (!error && data) {
+            const updated = [...favorites, data as FavoriteItem];
+            setFavorites(updated);
+            await persistLocalFavorites(updated);
+            setMessage('Ruta guardada en favoritos', 'success');
+            return;
+          }
         }
-        return;
       }
 
       const updated = [...favorites, createLocalRouteFavorite(routeId)];
       setFavorites(updated);
       await persistLocalFavorites(updated);
-      setMessage('Ruta guardada en favoritos locales');
+      setMessage('Ruta guardada en favoritos locales', 'info');
     },
     [favorites, removeFavorite, setMessage, user],
   );
@@ -187,5 +227,6 @@ export function useFavorites(setMessage: (msg: string) => void) {
     isPlaceFavorited,
     isRouteFavorited,
     favoriteSuggestions,
+    reloadFavorites: loadFavorites,
   };
 }

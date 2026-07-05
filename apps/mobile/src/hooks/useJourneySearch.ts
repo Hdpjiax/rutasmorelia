@@ -5,6 +5,7 @@ import {selectInitialJourneyRouteId, selectInitialJourneyTab} from '@rutas-morel
 import {getAccurateNativePosition, MORELIA_CENTER} from '../lib/location';
 import {resolveSuggestionCoords, searchPlaceByName} from '../lib/places';
 import {supabase} from '../lib/supabase';
+import type {SetMessageFn} from './useToast';
 import type {Coordinates} from '../store/transit-store';
 import type {FavoriteItem, JourneyOption, Suggestion} from '../types/transit';
 
@@ -16,7 +17,7 @@ type UseJourneySearchOptions = {
   setOrigin: (label: string, coordinates?: Coordinates | null) => void;
   setDestination: (label: string, coordinates?: Coordinates | null) => void;
   setActiveRouteId: (id: string) => void;
-  setMessage: (msg: string) => void;
+  setMessage: SetMessageFn;
   camera: React.RefObject<CameraRef | null>;
   favorites: FavoriteItem[];
   originInputRef: React.RefObject<TextInput | null>;
@@ -63,7 +64,7 @@ export function useJourneySearch({
     if (origin) return origin;
     if (originLabel !== 'Mi ubicación') return null;
 
-    setMessage('Buscando tu ubicación…');
+    setMessage('Buscando tu ubicación…', 'info');
     try {
       const position = await getAccurateNativePosition(4000, 150);
       const coords = {latitude: position.coords.latitude, longitude: position.coords.longitude};
@@ -73,7 +74,7 @@ export function useJourneySearch({
       if (__DEV__) console.warn('[ViaMorelia] Fast location lookup failed, using center fallback:', err);
       const coords = {...MORELIA_CENTER};
       setOrigin('Mi ubicación (respaldo Centro)', coords);
-      setMessage('No se obtuvo GPS preciso; usando Centro Histórico.');
+      setMessage('No se obtuvo GPS preciso; usando Centro Histórico.', 'info');
       return coords;
     }
   }, [origin, originLabel, setMessage, setOrigin]);
@@ -82,12 +83,12 @@ export function useJourneySearch({
     async (customOrigin: Coordinates | null, customDestination: Coordinates | null) => {
       dismissSearchUi();
       if (!destinationLabel.trim()) {
-        setMessage('Escribe un destino para buscar rutas.');
+        setMessage('Escribe un destino para buscar rutas.', 'error');
         return;
       }
       setIsMenuOpen(true);
       if (!supabase || !customOrigin || !customDestination) {
-        setMessage(`Mostrando rutas relacionadas con ${destinationLabel}.`);
+        setMessage(`Rutas hacia ${destinationLabel}.`, 'info');
         return;
       }
 
@@ -101,17 +102,17 @@ export function useJourneySearch({
         const options = (data?.data ?? []) as JourneyOption[];
         if (!error && options.length > 0) {
           setJourneyOptions(options);
-          setMessage(`${options.length} opciones encontradas.`);
+          setMessage(`${options.length} opciones encontradas.`, 'success');
           setJourneyTab(selectInitialJourneyTab(options));
           const routeId = selectInitialJourneyRouteId(options);
           if (routeId) setActiveRouteId(routeId);
         } else {
           setJourneyOptions([]);
-          setMessage(error ? 'No pudimos calcular el viaje.' : 'Aún no hay una ruta directa.');
+          setMessage(error ? 'No pudimos calcular el viaje.' : 'Aún no hay una ruta directa.', 'error');
         }
       } catch {
         setJourneyOptions([]);
-        setMessage('Error de red al calcular el viaje.');
+        setMessage('Error de red al calcular el viaje.', 'error');
       } finally {
         setLoading(false);
       }
@@ -154,7 +155,7 @@ export function useJourneySearch({
     dismissSearchUi();
 
     if (!destinationLabel.trim()) {
-      setMessage('Escribe un destino para buscar rutas.');
+      setMessage('Escribe un destino para buscar rutas.', 'error');
       return;
     }
 
@@ -170,19 +171,19 @@ export function useJourneySearch({
       currentOrigin = await resolveEndpoint(originLabel, currentOrigin, true);
 
       if (!currentDestination) {
-        setMessage('No pudimos ubicar el destino. Elige una sugerencia o escribe un lugar conocido.');
+        setMessage('No pudimos ubicar el destino. Elige una sugerencia o escribe un lugar conocido.', 'error');
         return;
       }
 
       if (!currentOrigin) {
-        setMessage('No pudimos ubicar el origen. Elige una sugerencia o usa tu ubicación.');
+        setMessage('No pudimos ubicar el origen. Elige una sugerencia o usa tu ubicación.', 'error');
         return;
       }
 
       await planJourneyWithCoords(currentOrigin, currentDestination);
     } catch (e) {
       if (__DEV__) console.error('[ViaMorelia] Error in planJourney prep:', e);
-      setMessage('Ocurrió un error al preparar el viaje.');
+      setMessage('Ocurrió un error al preparar el viaje.', 'error');
     }
   }, [
     destination,
@@ -202,12 +203,16 @@ export function useJourneySearch({
       const nextOrigin = activeInput === 'origin' ? coords : origin;
       const nextDestination = activeInput === 'destination' ? coords : destination;
 
-      if (activeInput === 'origin') setOrigin(suggestion.label, coords);
-      else {
-        setDestination(suggestion.label, coords);
-        if (suggestion.entity_type === 'route') setActiveRouteId(String(suggestion.entity_id));
+      if (activeInput === 'origin') {
+        setOrigin(suggestion.label, coords);
+        dismissSearchUi();
+        return;
       }
+
+      setDestination(suggestion.label, coords);
+      if (suggestion.entity_type === 'route') setActiveRouteId(String(suggestion.entity_id));
       dismissSearchUi();
+      setIsMenuOpen(true);
 
       let currentOrigin = nextOrigin;
       if (!currentOrigin && originLabel === 'Mi ubicación') {
@@ -216,6 +221,11 @@ export function useJourneySearch({
 
       if (currentOrigin && nextDestination) {
         await planJourneyWithCoords(currentOrigin, nextDestination);
+        return;
+      }
+
+      if (nextDestination) {
+        setMessage(`Rutas hacia ${suggestion.label}.`, 'info');
       }
     },
     [
@@ -242,7 +252,7 @@ export function useJourneySearch({
         buttonNegative: 'Ahora no',
       });
       if (result !== PermissionsAndroid.RESULTS.GRANTED) {
-        setMessage('Activa el permiso de ubicación para ver paradas cercanas.');
+        setMessage('Activa el permiso de ubicación para ver paradas cercanas.', 'error');
         return;
       }
     }
@@ -250,7 +260,7 @@ export function useJourneySearch({
     if (origin) {
       camera.current?.flyTo({center: [origin.longitude, origin.latitude], zoom: 16, duration: 700});
     }
-    setMessage('Buscando tu ubicación…');
+    setMessage('Buscando tu ubicación…', 'info');
 
     try {
       const position = await getAccurateNativePosition(5000, 150, updatePosition => {
@@ -261,14 +271,14 @@ export function useJourneySearch({
       const coordinates = {latitude: position.coords.latitude, longitude: position.coords.longitude};
       setOrigin('Mi ubicación', coordinates);
       camera.current?.flyTo({center: [coordinates.longitude, coordinates.latitude], zoom: 16, duration: 700});
-      setMessage(`Ubicación actualizada (precisión ±${Math.round(position.coords.accuracy)} m)`);
+      setMessage(`Ubicación actualizada (precisión ±${Math.round(position.coords.accuracy)} m)`, 'success');
     } catch (error) {
       if (__DEV__) console.warn('No precise GPS location available:', error);
       if (origin) {
         camera.current?.flyTo({center: [origin.longitude, origin.latitude], zoom: 16, duration: 700});
-        setMessage('Mostrando última ubicación conocida.');
+        setMessage('Mostrando última ubicación conocida.', 'info');
       } else {
-        setMessage('La señal GPS no tiene suficiente precisión. Activa Ubicación precisa e inténtalo de nuevo.');
+        setMessage('La señal GPS no tiene suficiente precisión. Activa Ubicación precisa e inténtalo de nuevo.', 'error');
       }
     }
   }, [camera, origin, setMessage, setOrigin]);

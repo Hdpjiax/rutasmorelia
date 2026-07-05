@@ -16,3 +16,11 @@ export const LOCAL_API_BASE_URL = buildLocalDevUrl(4000, '', platform);
 export function isLocalBaseUrl(base: string): boolean {
   return isLocalDevUrl(base);
 }
+
+/** En producción va directo al CDN publicado; en dev prueba el servidor local primero. */
+export function getRouteFetchBases(): string[] {
+  if (__DEV__) {
+    return [LOCAL_ROUTES_BASE_URL, PUBLISHED_ROUTES_BASE_URL];
+  }
+  return [PUBLISHED_ROUTES_BASE_URL];
+}

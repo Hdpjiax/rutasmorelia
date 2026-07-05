@@ -2,7 +2,7 @@ import {mapRouteFromIndex, ROUTES_CACHE_KEY} from '@rutas-morelia/transit-core';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useState} from 'react';
 import {ROUTES} from '../data/demo';
-import {isLocalBaseUrl, LOCAL_ROUTES_BASE_URL, PUBLISHED_ROUTES_BASE_URL} from '../lib/routes-config';
+import {getRouteFetchBases, isLocalBaseUrl} from '../lib/routes-config';
 import {useTransitStore} from '../store/transit-store';
 import type {RouteItem} from '../types/transit';
 
@@ -41,14 +41,19 @@ export function useRouteCatalog() {
     }
 
     async function loadRoutes() {
-      const cachedRoutesPromise = AsyncStorage.getItem(ROUTES_CACHE_KEY).catch(() => null);
-      let routesData: Record<string, unknown>[] = [];
-
       try {
-        routesData = await fetchRoutesFromBase(LOCAL_ROUTES_BASE_URL);
-      } catch {
+        const cachedValue = await AsyncStorage.getItem(ROUTES_CACHE_KEY);
+        if (cachedValue) {
+          const cached = JSON.parse(cachedValue) as {routes: RouteItem[]};
+          applyRoutes(cached.routes);
+        }
+      } catch {}
+
+      let routesData: Record<string, unknown>[] = [];
+      for (const base of getRouteFetchBases()) {
         try {
-          routesData = await fetchRoutesFromBase(PUBLISHED_ROUTES_BASE_URL);
+          routesData = await fetchRoutesFromBase(base);
+          if (routesData.length > 0) break;
         } catch {}
       }
 
@@ -65,15 +70,6 @@ export function useRouteCatalog() {
         AsyncStorage.setItem(ROUTES_CACHE_KEY, JSON.stringify({savedAt: Date.now(), routes: mapped})).catch(
           () => undefined,
         );
-        return;
-      }
-
-      const cachedValue = await cachedRoutesPromise;
-      if (cachedValue) {
-        try {
-          const cached = JSON.parse(cachedValue) as {routes: RouteItem[]};
-          applyRoutes(cached.routes);
-        } catch {}
       }
     }
 

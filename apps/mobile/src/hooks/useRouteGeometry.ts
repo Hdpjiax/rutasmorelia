@@ -1,7 +1,12 @@
-import {adjustRouteColorForDarkTheme, getGeometryBounds} from '@rutas-morelia/transit-core';
+import {
+  adjustRouteColorForDarkTheme,
+  GEOMETRY_CACHE_PREFIX,
+  getGeometryBounds,
+} from '@rutas-morelia/transit-core';
 import type {CameraRef} from '@maplibre/maplibre-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useRef, useState} from 'react';
-import {isLocalBaseUrl, LOCAL_ROUTES_BASE_URL, PUBLISHED_ROUTES_BASE_URL} from '../lib/routes-config';
+import {getRouteFetchBases, isLocalBaseUrl} from '../lib/routes-config';
 import type {AppColorScheme} from '../lib/color-scheme';
 import type {CachedGeometry, RouteGeometry, RouteItem} from '../types/transit';
 
@@ -13,6 +18,57 @@ type UseRouteGeometryOptions = {
   routeRequestVersion: number;
 };
 
+type RawCachedGeometry = {
+  rawGeojson: GeoJSON.FeatureCollection;
+  bounds: [number, number, number, number];
+};
+
+function normalizeGeojson(
+  geojson: GeoJSON.FeatureCollection,
+  activeRouteId: string,
+  selected: RouteItem | undefined,
+  colorScheme: AppColorScheme,
+): GeoJSON.FeatureCollection {
+  return {
+    ...geojson,
+    features: geojson.features.map(feature => ({
+      ...feature,
+      properties: {
+        ...feature.properties,
+        id: activeRouteId,
+        color:
+          colorScheme === 'dark'
+            ? adjustRouteColorForDarkTheme(
+                String(feature.properties?.color || selected?.color || '#FFC800'),
+              )
+            : String(feature.properties?.color || selected?.color || '#FFC800'),
+      },
+    })),
+  };
+}
+
+function geometryCacheKey(geometryId: string) {
+  return `${GEOMETRY_CACHE_PREFIX}${geometryId}`;
+}
+
+async function readDiskCache(geometryId: string): Promise<RawCachedGeometry | null> {
+  try {
+    const stored = await AsyncStorage.getItem(geometryCacheKey(geometryId));
+    if (!stored) return null;
+    const parsed = JSON.parse(stored) as RawCachedGeometry;
+    if (!parsed.rawGeojson || !parsed.bounds) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+async function writeDiskCache(geometryId: string, cached: RawCachedGeometry) {
+  try {
+    await AsyncStorage.setItem(geometryCacheKey(geometryId), JSON.stringify(cached));
+  } catch {}
+}
+
 export function useRouteGeometry({
   activeRouteId,
   routesList,
@@ -23,35 +79,25 @@ export function useRouteGeometry({
   const [activeRouteGeoJSON, setActiveRouteGeoJSON] = useState<GeoJSON.FeatureCollection | null>(null);
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
-  const routeGeometryCache = useRef(new Map<string, CachedGeometry>());
+  const routeGeometryCache = useRef(new Map<string, RawCachedGeometry>());
 
   useEffect(() => {
     if (!activeRouteId) return;
     const controller = new AbortController();
 
-    function showGeometry(cached: CachedGeometry, duration: number) {
-      setActiveRouteGeoJSON(cached.geojson);
+    const selected = routesList.find(route => route.id === activeRouteId);
+    const geometryId = selected?.geometryId || activeRouteId;
+
+    function showGeometry(cached: RawCachedGeometry, duration: number) {
+      setActiveRouteGeoJSON(normalizeGeojson(cached.rawGeojson, activeRouteId, selected, colorScheme));
       camera.current?.fitBounds(cached.bounds, {
         padding: {top: 132, right: 32, bottom: 72, left: 32},
         duration,
       });
     }
 
-    async function loadRouteGeometry() {
-      setRouteLoading(true);
-      setRouteError(null);
-      setActiveRouteGeoJSON(null);
-
-      const selected = routesList.find(route => route.id === activeRouteId);
-      const geometryId = selected?.geometryId || activeRouteId;
-      if (!geometryId) {
-        setRouteError('Esta ruta no tiene un recorrido disponible.');
-        setRouteLoading(false);
-        return;
-      }
-
-      const bases = [LOCAL_ROUTES_BASE_URL, PUBLISHED_ROUTES_BASE_URL];
-      let loaded = false;
+    async function fetchGeometry(): Promise<RawCachedGeometry | null> {
+      const bases = getRouteFetchBases();
 
       for (const base of bases) {
         const url = `${base}/${encodeURIComponent(geometryId)}.geojson`;
@@ -87,51 +133,63 @@ export function useRouteGeometry({
             [Infinity, Infinity, -Infinity, -Infinity],
           );
 
-          const normalized: GeoJSON.FeatureCollection = {
-            ...geojson,
-            features: geojson.features.map(feature => ({
-              ...feature,
-              properties: {
-                ...feature.properties,
-                id: activeRouteId,
-                color:
-                  colorScheme === 'dark'
-                    ? adjustRouteColorForDarkTheme(
-                        String(feature.properties?.color || selected?.color || '#FFC800'),
-                      )
-                    : String(feature.properties?.color || selected?.color || '#FFC800'),
-              },
-            })),
-          };
-
-          const nextCached = {geojson: normalized, bounds};
-          routeGeometryCache.current.set(activeRouteId, nextCached);
-          if (routeGeometryCache.current.size > 12) {
-            const oldestKey = routeGeometryCache.current.keys().next().value;
-            if (oldestKey) routeGeometryCache.current.delete(oldestKey);
-          }
-
-          showGeometry(nextCached, 380);
-          loaded = true;
-          break;
+          return {rawGeojson: geojson, bounds};
         } catch {
           clearTimeout(timeoutId);
         }
       }
 
-      setRouteLoading(false);
-      if (!loaded && !controller.signal.aborted) {
-        setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
-      }
+      return null;
     }
 
-    const cached = routeGeometryCache.current.get(activeRouteId);
-    if (cached) {
-      routeGeometryCache.current.delete(activeRouteId);
-      routeGeometryCache.current.set(activeRouteId, cached);
+    async function loadRouteGeometry() {
+      setRouteLoading(true);
+      setRouteError(null);
+
+      if (!geometryId) {
+        setRouteError('Esta ruta no tiene un recorrido disponible.');
+        setRouteLoading(false);
+        return;
+      }
+
+      let cached = routeGeometryCache.current.get(geometryId);
+      if (!cached) {
+        cached = (await readDiskCache(geometryId)) ?? undefined;
+        if (cached) routeGeometryCache.current.set(geometryId, cached);
+      }
+
+      if (cached) {
+        showGeometry(cached, 220);
+        setRouteLoading(false);
+        return;
+      }
+
+      const fetched = await fetchGeometry();
+      if (controller.signal.aborted) return;
+
+      if (!fetched) {
+        setRouteError('No pudimos cargar esta ruta. Toca para reintentar.');
+        setRouteLoading(false);
+        return;
+      }
+
+      routeGeometryCache.current.set(geometryId, fetched);
+      if (routeGeometryCache.current.size > 16) {
+        const oldestKey = routeGeometryCache.current.keys().next().value;
+        if (oldestKey) routeGeometryCache.current.delete(oldestKey);
+      }
+      void writeDiskCache(geometryId, fetched);
+      showGeometry(fetched, 320);
+      setRouteLoading(false);
+    }
+
+    const memoryCached = routeGeometryCache.current.get(geometryId);
+    if (memoryCached) {
+      routeGeometryCache.current.delete(geometryId);
+      routeGeometryCache.current.set(geometryId, memoryCached);
       setRouteLoading(false);
       setRouteError(null);
-      showGeometry(cached, 280);
+      showGeometry(memoryCached, 180);
       return () => controller.abort();
     }
 

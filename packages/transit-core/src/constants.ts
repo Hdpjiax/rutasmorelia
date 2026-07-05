@@ -20,3 +20,5 @@ export const PERIPHERAL_ROAD_NAMES = [
 export const LOCAL_FAVORITES_KEY = 'local_favorites';
 
 export const ROUTES_CACHE_KEY = '@viamorelia/routes-v4';
+
+export const GEOMETRY_CACHE_PREFIX = '@viamorelia/geometry-v1-';

@@ -1,9 +1,9 @@
 import {OPENFREEMAP_STYLE_URLS, PERIPHERAL_ROAD_NAMES} from './constants';
 import type {DarkMapPalette, MapStyleJson, MapStyleLayer} from './types';
 
-const DEFAULT_DARK_PALETTE: DarkMapPalette = {
-  bg: '#0F172A',
-  ink: '#F8FAFC',
+export const DEFAULT_DARK_PALETTE: DarkMapPalette = {
+  bg: '#2B303B',
+  ink: '#C8CDD6',
 };
 
 function isRoadLineLayer(layer: MapStyleLayer): boolean {
@@ -34,26 +34,38 @@ function customizeDarkLayer(layer: MapStyleLayer, palette: DarkMapPalette): void
     if (!layer.paint) layer.paint = {};
     if (layer.type === 'fill') {
       layer.paint['fill-color'] = palette.bg;
+      layer.paint['fill-opacity'] = 0.95;
     } else if (layer.type === 'line') {
       layer.paint['line-color'] = palette.bg;
     }
     return;
   }
 
+  if (
+    layer.type === 'fill' &&
+    (id.includes('landuse') || id.includes('park') || id.includes('landcover') || id.includes('building'))
+  ) {
+    if (!layer.paint) layer.paint = {};
+    layer.paint['fill-color'] = id.includes('building') ? '#323845' : '#30353F';
+    layer.paint['fill-opacity'] = id.includes('building') ? 0.35 : 0.55;
+    return;
+  }
+
   if (isRoadLineLayer(layer)) {
     const isCasing = id.includes('case') || id.includes('casing') || id.includes('outline');
     if (!layer.paint) layer.paint = {};
-    layer.paint['line-color'] = isCasing ? '#111317' : '#2A2E3D';
-    layer.paint['line-opacity'] = isCasing ? 0.8 : 1.0;
+    layer.paint['line-color'] = isCasing ? '#252932' : '#4A5160';
+    layer.paint['line-opacity'] = isCasing ? 0.55 : 0.82;
     return;
   }
 
   const isLabel = layer.type === 'symbol' && layer.layout && layer.layout['text-field'];
-  if (isLabel && (id.includes('road') || id.includes('street') || id.includes('way') || id.includes('name'))) {
+  if (isLabel) {
     if (!layer.paint) layer.paint = {};
     layer.paint['text-color'] = palette.ink;
     layer.paint['text-halo-color'] = palette.bg;
-    layer.paint['text-halo-width'] = 2.0;
+    layer.paint['text-halo-width'] = 1.2;
+    layer.paint['text-opacity'] = 0.75;
   }
 }
 

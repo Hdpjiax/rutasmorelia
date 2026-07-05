@@ -49,7 +49,7 @@ export function MapScreen({navigation}: Props) {
   const {originLabel, destinationLabel, origin, destination, activeRouteId, setOrigin, setDestination, setActiveRouteId} =
     useTransitStore();
 
-  const {message, setMessage} = useToast();
+  const {message, toastKind, setMessage} = useToast();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeInput, setActiveInput] = useState<'origin' | 'destination' | null>(null);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
@@ -188,7 +188,7 @@ export function MapScreen({navigation}: Props) {
     setActiveRouteGeoJSON(null);
     clearSuggestions();
     resetJourney();
-    setMessage('Mapa limpio.');
+    setMessage('Mapa limpio.', 'success');
   }, [clearSuggestions, resetJourney, setActiveRouteGeoJSON, setActiveRouteId, setDestination, setMessage, setOrigin]);
 
   if (!customMapStyle) {
@@ -229,8 +229,8 @@ export function MapScreen({navigation}: Props) {
             type="line"
             style={{
               lineColor: ['get', 'color'],
-              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 5.0, 14, 10.0, 18, 14.0],
-              lineOpacity: 0.45,
+              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 4.5, 14, 8.5, 18, 12.0],
+              lineOpacity: colorScheme === 'dark' ? 0.22 : 0.45,
               lineCap: 'round',
               lineJoin: 'round',
               visibility: colorScheme === 'dark' ? 'visible' : 'none',
@@ -254,9 +254,9 @@ export function MapScreen({navigation}: Props) {
             id="route-lines-casing"
             type="line"
             style={{
-              lineColor: colorScheme === 'dark' ? '#111317' : '#FFFFFF',
-              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 3.0, 14, 4.5, 18, 6.0],
-              lineOpacity: colorScheme === 'dark' ? 0.9 : 1.0,
+              lineColor: colorScheme === 'dark' ? '#3D4451' : '#FFFFFF',
+              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 3.4, 14, 5.2, 18, 6.8],
+              lineOpacity: colorScheme === 'dark' ? 0.75 : 1.0,
               lineCap: 'round',
               lineJoin: 'round',
             }}
@@ -267,8 +267,8 @@ export function MapScreen({navigation}: Props) {
             type="line"
             style={{
               lineColor: ['get', 'color'],
-              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 1.8, 14, 2.8, 18, 3.8],
-              lineOpacity: 1.0,
+              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 2.2, 14, 3.4, 18, 4.6],
+              lineOpacity: colorScheme === 'dark' ? 0.94 : 1.0,
               lineCap: 'round',
               lineJoin: 'round',
             }}
@@ -512,10 +512,38 @@ export function MapScreen({navigation}: Props) {
         <View
           style={[
             styles.toastContainer,
-            {backgroundColor: colors.surface, borderColor: colors.line, bottom: insets.bottom + 16},
+            {
+              backgroundColor:
+                toastKind === 'error'
+                  ? colorScheme === 'dark'
+                    ? '#4A2C2C'
+                    : '#FEE2E2'
+                  : toastKind === 'success'
+                    ? colorScheme === 'dark'
+                      ? '#2C3D2A'
+                      : '#ECFCCB'
+                    : colors.surfaceStrong,
+              borderColor:
+                toastKind === 'error' ? '#F87171' : toastKind === 'success' ? colors.primary : colors.line,
+              bottom: insets.bottom + 16,
+            },
           ]}
         >
-          <Text style={[styles.toastText, {color: colors.ink}]}>{message}</Text>
+          <Text
+            style={[
+              styles.toastText,
+              {
+                color:
+                  toastKind === 'error'
+                    ? colorScheme === 'dark'
+                      ? '#FECACA'
+                      : '#991B1B'
+                    : colors.ink,
+              },
+            ]}
+          >
+            {message}
+          </Text>
         </View>
       ) : null}
     </View>
@@ -583,19 +611,20 @@ const styles = StyleSheet.create({
   toastContainer: {
     position: 'absolute',
     alignSelf: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 14,
     borderWidth: 1,
     shadowColor: '#000000',
-    shadowOffset: {width: 0, height: 3},
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 5,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    elevation: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    maxWidth: '85%',
+    maxWidth: '90%',
+    minWidth: '55%',
     zIndex: 9999,
   },
-  toastText: {fontSize: 13, fontWeight: '600', textAlign: 'center'},
+  toastText: {flex: 1, fontSize: 14, fontWeight: '600', textAlign: 'center', lineHeight: 19},
 });

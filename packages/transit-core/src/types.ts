@@ -72,6 +72,10 @@ export type FavoriteItem = {
     name: string;
     location?: {type: string; coordinates: number[]} | null;
   } | null;
+  route?: {
+    id: string | number;
+    code: string;
+  } | null;
 };
 
 export type MapStyleLayer = {
