@@ -26,6 +26,7 @@ type SearchCardProps = {
   destination: {latitude: number; longitude: number} | null;
   isOriginFavorited: boolean;
   isDestinationFavorited: boolean;
+  isPlaceFavorited: (label: string) => boolean;
   displayedSuggestions: Suggestion[];
   activeInput: 'origin' | 'destination' | null;
   browsingFavorites: boolean;
@@ -41,6 +42,7 @@ type SearchCardProps = {
   onSwap: () => void;
   onToggleOriginFavorite: () => void;
   onToggleDestinationFavorite: () => void;
+  onToggleSuggestionFavorite: (suggestion: Suggestion) => void;
   onSelectSuggestion: (suggestion: Suggestion) => void;
   onSearch: () => void;
 };
@@ -54,6 +56,7 @@ export function SearchCard({
   destination,
   isOriginFavorited,
   isDestinationFavorited,
+  isPlaceFavorited,
   displayedSuggestions,
   activeInput,
   browsingFavorites,
@@ -69,21 +72,23 @@ export function SearchCard({
   onSwap,
   onToggleOriginFavorite,
   onToggleDestinationFavorite,
+  onToggleSuggestionFavorite,
   onSelectSuggestion,
   onSearch,
 }: SearchCardProps) {
   const colors: ThemeColors = colorScheme === 'dark' ? dark : light;
   const suggestionsAnim = useRef(new Animated.Value(0)).current;
+  const showSuggestionsPanel =
+    Boolean(activeInput) && (browsingFavorites || displayedSuggestions.length > 0);
 
   useEffect(() => {
-    const shouldShow = displayedSuggestions.length > 0 && Boolean(activeInput);
     Animated.spring(suggestionsAnim, {
-      toValue: shouldShow ? 1 : 0,
+      toValue: showSuggestionsPanel ? 1 : 0,
       useNativeDriver: true,
       friction: 8,
       tension: 80,
     }).start();
-  }, [activeInput, displayedSuggestions.length, suggestionsAnim]);
+  }, [showSuggestionsPanel, suggestionsAnim]);
 
   const suggestionsStyle = {
     opacity: suggestionsAnim,
@@ -96,6 +101,8 @@ export function SearchCard({
       },
     ],
   };
+
+  const accentColor = activeInput === 'origin' ? ORIGIN_COLOR : DESTINATION_COLOR;
 
   return (
     <View style={[styles.floatingSearchCard, {backgroundColor: colors.surface, borderColor: colors.line, top}]}>
@@ -184,7 +191,7 @@ export function SearchCard({
           </View>
         </View>
 
-        {displayedSuggestions.length > 0 && activeInput ? (
+        {showSuggestionsPanel ? (
           <Animated.View
             style={[
               styles.suggestions,
@@ -192,32 +199,60 @@ export function SearchCard({
               suggestionsStyle,
             ]}
           >
-            {browsingFavorites && displayedSuggestions.length > 0 ? (
+            {browsingFavorites ? (
               <Text style={[styles.suggestionsHeading, {color: colors.muted}]}>LUGARES FAVORITOS</Text>
             ) : null}
+
+            {browsingFavorites && displayedSuggestions.length === 0 ? (
+              <Text style={[styles.suggestionsEmpty, {color: colors.muted}]}>
+                Aún no tienes direcciones guardadas. Busca un lugar y tócala ★ para guardarla aquí.
+              </Text>
+            ) : null}
+
             {displayedSuggestions.map(suggestion => {
-              const isFav = suggestion.subtitle?.toLowerCase().includes('favorit');
-              const iconColor = activeInput === 'origin' ? ORIGIN_COLOR : DESTINATION_COLOR;
+              const isFav = isPlaceFavorited(suggestion.label);
+              const canFavorite =
+                suggestion.latitude != null &&
+                suggestion.longitude != null &&
+                !(suggestion.latitude === 0 && suggestion.longitude === 0);
               return (
-                <Pressable
+                <View
                   key={`${suggestion.entity_type}-${suggestion.entity_id}-${suggestion.label}`}
-                  onPress={() => onSelectSuggestion(suggestion)}
-                  style={[styles.suggestion, {borderBottomColor: colors.line}]}
+                  style={[styles.suggestionRow, {borderBottomColor: colors.line}]}
                 >
-                  {isFav ? (
-                    <Heart size={17} color={iconColor} weight="fill" />
-                  ) : (
-                    <MapPin size={17} color={iconColor} />
-                  )}
-                  <View style={styles.suggestionCopy}>
-                    <Text numberOfLines={1} style={[styles.suggestionTitle, {color: colors.ink}]}>
-                      {isFav ? `★ ${suggestion.label}` : suggestion.label}
-                    </Text>
-                    <Text numberOfLines={1} style={[styles.suggestionSubtitle, {color: colors.muted}]}>
-                      {suggestion.subtitle || 'Morelia'}
-                    </Text>
-                  </View>
-                </Pressable>
+                  <Pressable
+                    onPress={() => onSelectSuggestion(suggestion)}
+                    style={styles.suggestionMain}
+                  >
+                    {isFav ? (
+                      <Heart size={17} color={accentColor} weight="fill" />
+                    ) : (
+                      <MapPin size={17} color={accentColor} />
+                    )}
+                    <View style={styles.suggestionCopy}>
+                      <Text numberOfLines={1} style={[styles.suggestionTitle, {color: colors.ink}]}>
+                        {isFav ? `★ ${suggestion.label}` : suggestion.label}
+                      </Text>
+                      <Text numberOfLines={1} style={[styles.suggestionSubtitle, {color: colors.muted}]}>
+                        {suggestion.subtitle || 'Morelia'}
+                      </Text>
+                    </View>
+                  </Pressable>
+                  {canFavorite ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={isFav ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+                      onPress={() => onToggleSuggestionFavorite(suggestion)}
+                      style={styles.suggestionFavBtn}
+                    >
+                      <Heart
+                        size={18}
+                        color={isFav ? accentColor : colors.muted}
+                        weight={isFav ? 'fill' : 'regular'}
+                      />
+                    </Pressable>
+                  ) : null}
+                </View>
               );
             })}
           </Animated.View>
@@ -282,6 +317,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     elevation: 8,
     zIndex: 100,
+    maxHeight: 280,
   },
   suggestionsHeading: {
     fontSize: 11,
@@ -293,14 +329,27 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: 'rgba(128,128,128,0.25)',
   },
-  suggestion: {
+  suggestionsEmpty: {
+    fontSize: 12,
+    lineHeight: 17,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  suggestionRow: {
     minHeight: 50,
     borderBottomWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  suggestionMain: {
+    flex: 1,
+    minHeight: 50,
     paddingHorizontal: 11,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 9,
   },
+  suggestionFavBtn: {paddingHorizontal: 12, paddingVertical: 10},
   suggestionCopy: {flex: 1},
   suggestionTitle: {fontSize: 13, fontWeight: '700'},
   suggestionSubtitle: {fontSize: 11, marginTop: 2},

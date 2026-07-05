@@ -28,10 +28,17 @@ import {useRouteCatalog} from '../hooks/useRouteCatalog';
 import {useRouteGeometry} from '../hooks/useRouteGeometry';
 import {useToast} from '../hooks/useToast';
 import {useTraffic} from '../hooks/useTraffic';
-import {DEFAULT_ORIGIN_LABEL, findClosestPointOnLine, shouldShowFavoriteSuggestions} from '@rutas-morelia/transit-core';
+import {
+  DEFAULT_ORIGIN_LABEL,
+  findClosestPointOnLine,
+  isCombiRoute,
+  isRouteFavorited as isRouteFavoritedCore,
+  scoreRoutesByQuery,
+  shouldShowFavoriteSuggestions,
+} from '@rutas-morelia/transit-core';
 import {useTransitStore} from '../store/transit-store';
 import {dark, light} from '../theme';
-import {EMPTY_GEOJSON, type DrawerItem} from '../types/transit';
+import {EMPTY_GEOJSON, type DrawerItem, type Suggestion} from '../types/transit';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Map'>;
 
@@ -53,6 +60,8 @@ export function MapScreen({navigation}: Props) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeInput, setActiveInput] = useState<'origin' | 'destination' | null>(null);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [routeTransportFilter, setRouteTransportFilter] = useState<'combi' | 'camion'>('combi');
+  const [routeSearchQuery, setRouteSearchQuery] = useState('');
   const [showTraffic, setShowTraffic] = useState(false);
   const [routeRequestVersion, setRouteRequestVersion] = useState(0);
 
@@ -130,13 +139,29 @@ export function MapScreen({navigation}: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const showCatalogControls = journeyOptions.length === 0 || showOnlyFavorites;
+
   const visibleRoutes = useMemo(() => {
-    const query = destinationLabel.trim().toLocaleLowerCase('es-MX');
-    if (!query) return routesList;
-    return routesList.filter(route =>
-      `${route.name} ${route.detail}`.toLocaleLowerCase('es-MX').includes(query),
-    );
-  }, [destinationLabel, routesList]);
+    let list = routesList;
+
+    if (showOnlyFavorites) {
+      list = list.filter(route => isRouteFavoritedCore(favorites, route.id));
+    }
+
+    if (showCatalogControls) {
+      list = list.filter(route =>
+        routeTransportFilter === 'combi' ? isCombiRoute(route) : !isCombiRoute(route),
+      );
+      const query = routeSearchQuery.trim();
+      if (query) {
+        list = scoreRoutesByQuery(list, query, 0.2);
+      } else {
+        list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'es-MX'));
+      }
+    }
+
+    return list;
+  }, [favorites, journeyOptions.length, routeSearchQuery, routeTransportFilter, routesList, showCatalogControls, showOnlyFavorites]);
 
   const drawerItems = useDrawerItems({
     visibleRoutes,
@@ -187,6 +212,17 @@ export function MapScreen({navigation}: Props) {
       setIsMenuOpen(false);
     },
     [setActiveRouteId],
+  );
+
+  const toggleSuggestionFavorite = useCallback(
+    (suggestion: Suggestion) => {
+      if (suggestion.latitude == null || suggestion.longitude == null) return;
+      void toggleFavoritePlace(suggestion.label, {
+        latitude: suggestion.latitude,
+        longitude: suggestion.longitude,
+      });
+    },
+    [toggleFavoritePlace],
   );
 
   const clearMap = useCallback(() => {
@@ -413,6 +449,7 @@ export function MapScreen({navigation}: Props) {
             destination={destination}
             isOriginFavorited={isPlaceFavorited(originLabel)}
             isDestinationFavorited={isPlaceFavorited(destinationLabel)}
+            isPlaceFavorited={isPlaceFavorited}
             displayedSuggestions={displayedSuggestions}
             activeInput={activeInput}
             browsingFavorites={browsingFavorites}
@@ -434,6 +471,7 @@ export function MapScreen({navigation}: Props) {
             onSwap={swapLocations}
             onToggleOriginFavorite={() => void toggleFavoritePlace(originLabel, origin)}
             onToggleDestinationFavorite={() => void toggleFavoritePlace(destinationLabel, destination)}
+            onToggleSuggestionFavorite={toggleSuggestionFavorite}
             onSelectSuggestion={suggestion => void selectSuggestion(suggestion)}
             onSearch={() => void planJourney()}
           />
@@ -506,6 +544,9 @@ export function MapScreen({navigation}: Props) {
         journeyOptions={journeyOptions}
         journeyTab={journeyTab}
         showOnlyFavorites={showOnlyFavorites}
+        showCatalogControls={showCatalogControls}
+        routeTransportFilter={routeTransportFilter}
+        routeSearchQuery={routeSearchQuery}
         drawerItems={drawerItems}
         activeRouteId={activeRouteId}
         isRouteFavorited={isRouteFavorited}
@@ -515,6 +556,8 @@ export function MapScreen({navigation}: Props) {
           navigation.navigate('Account');
         }}
         onToggleFavoritesFilter={() => setShowOnlyFavorites(prev => !prev)}
+        onRouteTransportFilterChange={setRouteTransportFilter}
+        onRouteSearchQueryChange={setRouteSearchQuery}
         onJourneyTabChange={setJourneyTab}
         onSelectItem={selectDrawerItem}
         onToggleRouteFavorite={routeId => void toggleRouteFavorite(routeId)}

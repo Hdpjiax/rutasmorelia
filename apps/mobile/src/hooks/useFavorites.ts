@@ -4,6 +4,7 @@ import {
   createLocalPlaceFavorite,
   createLocalRouteFavorite,
   favoritesToSuggestions,
+  findPlaceFavorite,
   findRouteFavorite,
   isPlaceFavorited as isPlaceFavoritedCore,
   isRouteFavorited as isRouteFavoritedCore,
@@ -108,11 +109,14 @@ export function useFavorites(setMessage: SetMessageFn) {
 
   const toggleFavoritePlace = useCallback(
     async (label: string, coords: Coordinates | null) => {
-      if (!coords) return;
+      const trimmed = label.trim();
+      if (!coords || !trimmed) {
+        setMessage('Primero elige un lugar con coordenadas válidas.', 'error');
+        return;
+      }
+
       const client = supabase;
-      const existing = favorites.find(
-        f => f.custom_name === label && (f.place_id != null || f.stop_id != null || f.latitude != null),
-      );
+      const existing = findPlaceFavorite(favorites, trimmed);
 
       if (existing) {
         await removeFavorite(existing, {
@@ -122,6 +126,12 @@ export function useFavorites(setMessage: SetMessageFn) {
         return;
       }
 
+      const localFavorite = createLocalPlaceFavorite(trimmed, coords);
+      let nextFavorite: FavoriteItem = localFavorite;
+      const optimistic = [...favorites, localFavorite];
+      setFavorites(optimistic);
+      await persistLocalFavorites(optimistic);
+
       if (client && user) {
         try {
           const {data: cityData} = await client.from('cities').select('id').eq('name', 'Morelia').limit(1);
@@ -130,7 +140,7 @@ export function useFavorites(setMessage: SetMessageFn) {
             .from('places')
             .insert({
               city_id: cityId,
-              name: label,
+              name: trimmed,
               category: 'Favorito',
               address: 'Morelia, Michoacán',
               location: `POINT(${coords.longitude} ${coords.latitude})`,
@@ -141,11 +151,13 @@ export function useFavorites(setMessage: SetMessageFn) {
           if (!placeError && placeData) {
             const {data: favData, error: favError} = await client
               .from('favorites')
-              .insert({user_id: user.id, place_id: placeData.id, custom_name: label})
+              .insert({user_id: user.id, place_id: placeData.id, custom_name: trimmed})
               .select(FAVORITES_SELECT)
               .single();
             if (!favError && favData) {
-              const updated = [...favorites, favData as FavoriteItem];
+              nextFavorite = favData as FavoriteItem;
+              const synced = removeFavoriteById(optimistic, localFavorite.id);
+              const updated = [...synced, nextFavorite];
               setFavorites(updated);
               await persistLocalFavorites(updated);
               setMessage('Guardado en favoritos', 'success');
@@ -153,14 +165,11 @@ export function useFavorites(setMessage: SetMessageFn) {
             }
           }
         } catch (e) {
-          if (__DEV__) console.warn('Supabase favorite failed, saving locally:', e);
+          if (__DEV__) console.warn('Supabase favorite failed, keeping local copy:', e);
         }
       }
 
-      const updated = [...favorites, createLocalPlaceFavorite(label, coords)];
-      setFavorites(updated);
-      await persistLocalFavorites(updated);
-      setMessage('Guardado en favoritos locales', 'info');
+      setMessage('Guardado en favoritos', 'success');
     },
     [favorites, removeFavorite, setMessage, user],
   );
@@ -220,8 +229,14 @@ export function useFavorites(setMessage: SetMessageFn) {
     [favorites],
   );
 
+  const placeFavorites = useMemo(
+    () => favorites.filter(f => f.place_id || f.stop_id || f.latitude != null || f.place?.location),
+    [favorites],
+  );
+
   return {
     favorites,
+    placeFavorites,
     toggleFavoritePlace,
     toggleRouteFavorite,
     isPlaceFavorited,

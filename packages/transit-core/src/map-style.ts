@@ -41,13 +41,21 @@ function customizeDarkLayer(layer: MapStyleLayer, palette: DarkMapPalette): void
     return;
   }
 
+  if (layer.type === 'fill' && id.includes('building')) {
+    if (!layer.paint) layer.paint = {};
+    layer.paint['fill-color'] = '#3A3F48';
+    layer.paint['fill-opacity'] = 0.14;
+    layer.paint['fill-outline-color'] = 'rgba(58,63,72,0.08)';
+    return;
+  }
+
   if (
     layer.type === 'fill' &&
-    (id.includes('landuse') || id.includes('park') || id.includes('landcover') || id.includes('building'))
+    (id.includes('landuse') || id.includes('park') || id.includes('landcover'))
   ) {
     if (!layer.paint) layer.paint = {};
-    layer.paint['fill-color'] = id.includes('building') ? '#323845' : '#30353F';
-    layer.paint['fill-opacity'] = id.includes('building') ? 0.5 : 0.72;
+    layer.paint['fill-color'] = '#30353F';
+    layer.paint['fill-opacity'] = 0.72;
     return;
   }
 
@@ -70,8 +78,17 @@ function customizeDarkLayer(layer: MapStyleLayer, palette: DarkMapPalette): void
 }
 
 function customizeLightLayer(layer: MapStyleLayer): void {
-  if (!isRoadLineLayer(layer)) return;
   const id = (layer.id || '').toLowerCase();
+
+  if (layer.type === 'fill' && id.includes('building')) {
+    if (!layer.paint) layer.paint = {};
+    layer.paint['fill-color'] = '#D8D5CE';
+    layer.paint['fill-opacity'] = 0.1;
+    layer.paint['fill-outline-color'] = 'rgba(180,176,168,0.06)';
+    return;
+  }
+
+  if (!isRoadLineLayer(layer)) return;
   const isCasing = id.includes('case') || id.includes('casing') || id.includes('outline');
   if (!layer.paint) layer.paint = {};
   layer.paint['line-color'] = [

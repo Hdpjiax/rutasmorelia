@@ -7,12 +7,15 @@ import {
   createLocalRouteFavorite,
   expandSearchQuery,
   favoriteCoords,
+  favoritesToSuggestions,
+  hydrateFavoriteCoords,
   filterFavoriteSuggestions,
   filterJourneyOptions,
   findFavoriteBySuggestion,
   findPlaceFavorite,
   findRouteFavorite,
   mergeLocalFavorites,
+  shouldShowFavoriteSuggestions,
   haversineDistanceKm,
   isCombiTransportType,
   isPlaceFavorited,
@@ -159,7 +162,7 @@ export function TransitApp() {
       const local = stored ? (JSON.parse(stored) as FavoriteItem[]) : [];
 
       if (!userId) {
-        setFavorites(local);
+        setFavorites(hydrateFavoriteCoords(local));
         return;
       }
 
@@ -169,11 +172,11 @@ export function TransitApp() {
         .eq("user_id", userId);
 
       if (!error && data) {
-        setFavorites(mergeLocalFavorites(data as FavoriteItem[], local));
+        setFavorites(hydrateFavoriteCoords(mergeLocalFavorites(data as FavoriteItem[], local)));
         return;
       }
 
-      setFavorites(local);
+      setFavorites(hydrateFavoriteCoords(local));
     };
 
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -277,7 +280,7 @@ export function TransitApp() {
               .select("*, place:places(id, name, location)")
               .single();
             if (!error && data) {
-              newFav = data;
+              newFav = {...data, latitude: lat, longitude: lon};
             } else if (process.env.NODE_ENV === "development") {
               console.warn("[ViaMorelia] No se pudo crear el favorito en Supabase:", error);
             }
@@ -291,10 +294,15 @@ export function TransitApp() {
     }
   }, [favorites]);
 
-  const query = (activeSearch === "origin" ? origin : destination).trim();
+  const searchQuery = (activeSearch === "origin" ? origin : destination).trim();
+  const browsingFavorites = shouldShowFavoriteSuggestions(activeSearch, searchQuery);
+  const placeFavoriteSuggestions = useMemo(
+    () => favoritesToSuggestions(favorites),
+    [favorites],
+  );
   const matchingFavs = useMemo(
-    () => filterFavoriteSuggestions(favorites, query),
-    [favorites, query],
+    () => (browsingFavorites ? placeFavoriteSuggestions : filterFavoriteSuggestions(favorites, searchQuery)),
+    [browsingFavorites, favorites, placeFavoriteSuggestions, searchQuery],
   );
 
   useEffect(() => {
@@ -324,7 +332,12 @@ export function TransitApp() {
   useEffect(() => {
     if (!activeSearch) return;
     const query = (activeSearch === "origin" ? origin : destination).trim();
-    if (query.length < 2 || (activeSearch === "origin" && query === "Mi ubicación")) return;
+    if (shouldShowFavoriteSuggestions(activeSearch, query)) {
+      setSuggestions([]);
+      setIsSearchingPlaces(false);
+      setHasSearchedPlaces(false);
+      return;
+    }
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       setIsSearchingPlaces(true);
@@ -590,51 +603,55 @@ export function TransitApp() {
             </button>
             {activeSearch && (
               <div className={`address-suggestions ${activeSearch}`} role="listbox" aria-label="Sugerencias de direcciones">
-                {(activeSearch === "origin" ? origin : destination).trim().length < 2 ? (
-                  favorites.filter((f) => f.place_id || f.latitude || f.custom_name || f.place?.location).length > 0 ? (
+                {browsingFavorites ? (
+                  placeFavoriteSuggestions.length > 0 ? (
                     <>
                       <div className="suggestion-section-title" style={{ padding: "8px 12px", fontSize: "11px", fontWeight: "bold", color: "var(--muted)", borderBottom: "1px solid var(--line)" }}>
                         LUGARES FAVORITOS
                       </div>
-                      {favorites.filter((f) => f.place_id || f.latitude || f.custom_name || f.place?.location).map((fav) => {
-                        const label = fav.custom_name || (fav.place && fav.place.name) || "Lugar favorito";
-                        const coords = favoriteCoords(fav);
-                        if (!coords) return null;
-                        const { latitude: lat, longitude: lon } = coords;
-                        return (
-                          <div key={`fav-place-${fav.id}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
-                            <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion({ entity_type: "place", entity_id: fav.place_id ?? fav.id, label, subtitle: "Lugar favorito", latitude: lat, longitude: lon })}>
-                              <MagnifyingGlassIcon size={17} style={{ color: "var(--accent)" }} />
-                              <span><strong>{label}</strong><small>Lugar favorito</small></span>
-                            </button>
-                            <button
-                              type="button"
-                              className="suggestion-fav-btn"
-                              onClick={(e) => { e.stopPropagation(); togglePlaceFavorite(label, lat, lon); }}
-                              style={{
-                                padding: "10px 14px",
-                                background: "transparent",
-                                border: 0,
-                                cursor: "pointer",
-                                fontSize: "22px",
-                                color: "var(--accent)",
-                                flexShrink: 0
-                              }}
-                              title="Eliminar de favoritos"
-                            >
-                              ★
-                            </button>
-                          </div>
-                        );
-                      })}
+                      {placeFavoriteSuggestions.map((suggestion) => (
+                        <div key={`fav-browse-${suggestion.entity_id}-${suggestion.label}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
+                          <button type="button" className="suggestion-row" style={{ flex: 1, minWidth: 0, borderBottom: 0 }} onClick={() => selectSuggestion(suggestion)}>
+                            <MagnifyingGlassIcon size={17} style={{ color: "var(--accent)" }} />
+                            <span><strong>★ {suggestion.label}</strong><small>{suggestion.subtitle || "Lugar favorito"}</small></span>
+                          </button>
+                          <button
+                            type="button"
+                            className="suggestion-fav-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (suggestion.latitude != null && suggestion.longitude != null) {
+                                togglePlaceFavorite(suggestion.label, suggestion.latitude, suggestion.longitude);
+                              }
+                            }}
+                            style={{
+                              padding: "10px 14px",
+                              background: "transparent",
+                              border: 0,
+                              cursor: "pointer",
+                              fontSize: "22px",
+                              color: "var(--accent)",
+                              flexShrink: 0
+                            }}
+                            title="Eliminar de favoritos"
+                          >
+                            ★
+                          </button>
+                        </div>
+                      ))}
                     </>
                   ) : (
-                    <div className="suggestion-state">Escribe para buscar o marca favoritos en tus búsquedas.</div>
+                    <div className="suggestion-state">Aún no tienes direcciones guardadas. Busca un lugar y tócala ★ para guardarla aquí.</div>
                   )
                 ) : isSearchingPlaces ? (
                   <div className="suggestion-state">Buscando direcciones…</div>
                 ) : (suggestions.length || matchingFavs.length) ? (
                   <>
+                    {matchingFavs.length > 0 ? (
+                      <div className="suggestion-section-title" style={{ padding: "8px 12px", fontSize: "11px", fontWeight: "bold", color: "var(--muted)", borderBottom: "1px solid var(--line)" }}>
+                        LUGARES FAVORITOS
+                      </div>
+                    ) : null}
                     {matchingFavs.map((suggestion) => {
                       return (
                         <div key={`fav-match-${suggestion.entity_id}`} className="suggestion-row-container" style={{ display: "flex", width: "100%", alignItems: "center", borderBottom: "1px solid var(--line)" }}>

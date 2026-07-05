@@ -11,6 +11,11 @@ export function formatRouteNumber(id: string | number, transportType?: string): 
   return `${prefix}${idStr.replace(/\D/g, '') || idStr}`;
 }
 
+export function isCombiRoute(route: Pick<RouteItem, 'detail' | 'transportType'>): boolean {
+  if (route.transportType) return isCombiTransportType(route.transportType);
+  return route.detail.toLocaleLowerCase('es-MX').includes('combi');
+}
+
 export function mapRouteFromIndex(route: RouteIndexEntry): RouteItem {
   const id = String(route.id);
   const isCombi = isCombiTransportType(route.transportType);
@@ -22,5 +27,6 @@ export function mapRouteFromIndex(route: RouteIndexEntry): RouteItem {
     detail: isCombi ? 'Combi' : 'Camión',
     time: 'Ver recorrido',
     color: route.color || '#FFA500',
+    transportType: route.transportType,
   };
 }

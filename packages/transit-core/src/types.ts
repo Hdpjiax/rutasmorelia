@@ -23,6 +23,7 @@ export type RouteItem = {
   detail: string;
   time: string;
   color: string;
+  transportType?: string;
 };
 
 export type RouteGeometry = LineString | MultiLineString;

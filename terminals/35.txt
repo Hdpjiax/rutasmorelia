@@ -3,7 +3,7 @@ pid: 37160
 cwd: "C:\RutasMorelia"
 command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\"; npm run typecheck 2>&1; npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output \"$env:TEMP\\simum-test.bundle\" --assets-dest \"$env:TEMP\\simum-assets\" 2>&1 | Select-Object -Last 20"
 started_at: 2026-07-05T03:07:34.896Z
-running_for_ms: 535005   
+running_for_ms: 4030002  
 ---
 
 > mx.gob.morelia.simum@0.0.1 typecheck

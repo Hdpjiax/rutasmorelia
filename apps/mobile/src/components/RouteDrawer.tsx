@@ -1,4 +1,4 @@
-import {Heart, MapPin, UserCircle} from 'phosphor-react-native';
+import {Heart, MagnifyingGlass, MapPin, UserCircle} from 'phosphor-react-native';
 import {
   ActivityIndicator,
   FlatList,
@@ -7,6 +7,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import {BrandMark} from './BrandMark';
@@ -16,6 +17,7 @@ import type {DrawerItem, JourneyOption} from '../types/transit';
 import {dark, light} from '../theme';
 
 type ThemeColors = typeof light;
+type RouteTransportFilter = 'combi' | 'camion';
 
 type RouteDrawerProps = {
   visible: boolean;
@@ -25,6 +27,9 @@ type RouteDrawerProps = {
   journeyOptions: JourneyOption[];
   journeyTab: 'direct' | 'transfer';
   showOnlyFavorites: boolean;
+  showCatalogControls: boolean;
+  routeTransportFilter: RouteTransportFilter;
+  routeSearchQuery: string;
   drawerItems: DrawerItem[];
   activeRouteId: string;
   isRouteFavorited: (routeId: string) => boolean;
@@ -32,6 +37,8 @@ type RouteDrawerProps = {
   onNavigateAccount: () => void;
   onToggleFavoritesFilter: () => void;
   onJourneyTabChange: (tab: 'direct' | 'transfer') => void;
+  onRouteTransportFilterChange: (filter: RouteTransportFilter) => void;
+  onRouteSearchQueryChange: (query: string) => void;
   onSelectItem: (item: DrawerItem) => void;
   onToggleRouteFavorite: (routeId: string) => void;
 };
@@ -44,6 +51,9 @@ export function RouteDrawer({
   journeyOptions,
   journeyTab,
   showOnlyFavorites,
+  showCatalogControls,
+  routeTransportFilter,
+  routeSearchQuery,
   drawerItems,
   activeRouteId,
   isRouteFavorited,
@@ -51,6 +61,8 @@ export function RouteDrawer({
   onNavigateAccount,
   onToggleFavoritesFilter,
   onJourneyTabChange,
+  onRouteTransportFilterChange,
+  onRouteSearchQueryChange,
   onSelectItem,
   onToggleRouteFavorite,
 }: RouteDrawerProps) {
@@ -186,11 +198,46 @@ export function RouteDrawer({
               </View>
             ) : (
               <>
+                {showCatalogControls ? (
+                  <>
+                    <View style={[styles.routeSearchRow, {borderColor: colors.line, backgroundColor: colors.surface}]}>
+                      <MagnifyingGlass size={18} color={colors.muted} />
+                      <TextInput
+                        value={routeSearchQuery}
+                        onChangeText={onRouteSearchQueryChange}
+                        placeholder="Buscar ruta por nombre o número"
+                        placeholderTextColor={colors.muted}
+                        style={[styles.routeSearchInput, {color: colors.ink}]}
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                      />
+                    </View>
+                    <View style={[styles.journeyTabs, {backgroundColor: colors.surface}]} accessibilityRole="tablist">
+                      {(['combi', 'camion'] as const).map(tabValue => {
+                        const selected = routeTransportFilter === tabValue;
+                        return (
+                          <Pressable
+                            key={tabValue}
+                            accessibilityRole="tab"
+                            accessibilityState={{selected}}
+                            onPress={() => onRouteTransportFilterChange(tabValue)}
+                            style={[styles.journeyTab, selected && {backgroundColor: colors.bg}]}
+                          >
+                            <Text style={[styles.journeyTabLabel, {color: selected ? colors.ink : colors.muted}]}>
+                              {tabValue === 'combi' ? 'Combis' : 'Camiones'}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </>
+                ) : null}
+
                 {journeyOptions.length > 0 && !showOnlyFavorites ? (
                   <View style={[styles.journeyTabs, {backgroundColor: colors.surface}]} accessibilityRole="tablist">
                     {(['direct', 'transfer'] as const).map(tabValue => {
                       const selected = journeyTab === tabValue;
-                        const count = countJourneyOptions(journeyOptions, tabValue);
+                      const count = countJourneyOptions(journeyOptions, tabValue);
                       return (
                         <Pressable
                           key={tabValue}
@@ -226,9 +273,13 @@ export function RouteDrawer({
                   removeClippedSubviews={Platform.OS === 'android'}
                   ListEmptyComponent={
                     <Text style={[styles.empty, {color: colors.muted}]}>
-                      {journeyOptions.length > 0 && journeyTab === 'transfer'
-                        ? 'No necesitas un transbordo que reduzca significativamente la caminata.'
-                        : 'No encontramos rutas. Prueba con una colonia o punto conocido.'}
+                      {showOnlyFavorites
+                        ? 'No tienes rutas favoritas guardadas.'
+                        : showCatalogControls && routeSearchQuery.trim()
+                          ? 'No encontramos rutas con ese nombre.'
+                          : journeyOptions.length > 0 && journeyTab === 'transfer'
+                            ? 'No necesitas un transbordo que reduzca significativamente la caminata.'
+                            : 'No encontramos rutas. Prueba con otra búsqueda.'}
                     </Text>
                   }
                 />
@@ -289,6 +340,19 @@ const styles = StyleSheet.create({
   loadingState: {flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 60},
   loadingTitle: {fontSize: 14, marginTop: 16, fontWeight: '600', textAlign: 'center'},
   loadingSubtitle: {fontSize: 11, marginTop: 6, textAlign: 'center', paddingHorizontal: 20},
+  routeSearchRow: {
+    marginHorizontal: 14,
+    marginTop: 12,
+    marginBottom: 8,
+    minHeight: 42,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  routeSearchInput: {flex: 1, fontSize: 14, paddingVertical: 8},
   journeyTabs: {flexDirection: 'row', gap: 4, marginHorizontal: 14, marginBottom: 10, padding: 4, borderRadius: 12},
   journeyTab: {
     flex: 1,
@@ -303,7 +367,7 @@ const styles = StyleSheet.create({
   journeyTabLabel: {fontSize: 12, fontWeight: '700'},
   journeyTabCount: {minWidth: 20, height: 20, paddingHorizontal: 5, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
   journeyTabCountText: {fontSize: 10, fontWeight: '800'},
-  drawerList: {flex: 1, marginTop: 12},
+  drawerList: {flex: 1, marginTop: 4},
   drawerListContent: {paddingHorizontal: 12, paddingBottom: 24},
   routeRow: {minHeight: 68, borderRadius: 12, borderWidth: 1, padding: 10, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 11},
   routeNumberCircle: {width: 40, height: 40, borderRadius: 11, alignItems: 'center', justifyContent: 'center'},

@@ -12,6 +12,15 @@ export function shouldShowFavoriteSuggestions(
   return trimmed.length < 2 || (activeInput === 'origin' && trimmed === DEFAULT_ORIGIN_LABEL);
 }
 
+export function hydrateFavoriteCoords(favorites: FavoriteItem[]): FavoriteItem[] {
+  return favorites.map(favorite => {
+    if (favorite.latitude != null && favorite.longitude != null) return favorite;
+    const coords = favoriteCoords(favorite);
+    if (!coords) return favorite;
+    return {...favorite, latitude: coords.latitude, longitude: coords.longitude};
+  });
+}
+
 export function favoriteCoords(favorite: FavoriteItem): Coordinates | null {
   if (favorite.latitude != null && favorite.longitude != null) {
     return {latitude: favorite.latitude, longitude: favorite.longitude};
