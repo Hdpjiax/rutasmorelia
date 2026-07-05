@@ -3,7 +3,7 @@ pid: 28740
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia\\apps\\mobile; npm test -- --passWithNoTests 2>&1 | Select-Object -Last 8"
 started_at: 2026-07-04T23:22:01.642Z
-running_for_ms: 8734996  
+running_for_ms: 11875000 
 ---
       at Object.require (App.tsx:10:1)
       at Object.require (__tests__/App.test.tsx:7:1)

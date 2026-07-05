@@ -1,0 +1,11 @@
+---
+pid: 21952
+cwd: "C:\RutasMorelia"
+command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\"; npm run typecheck 2>&1"
+started_at: 2026-07-05T03:07:56.885Z
+running_for_ms: 510003   
+---
+
+> mx.gob.morelia.simum@0.0.1 typecheck
+> tsc --noEmit
+

@@ -1,0 +1,32 @@
+---
+pid: 38596
+cwd: "C:\RutasMorelia"
+command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\\android\"; .\\gradlew.bat clean :app:assembleRelease --no-daemon 2>&1 | Select-Object -Last 25"
+started_at: 2026-07-05T03:08:33.033Z
+running_for_ms: 475003   
+---
+> Task :app:optimizeReleaseResources
+> Task :app:mergeReleaseJavaResource
+> Task :react-native-community_geolocation:lintVitalAnalyzeRelease
+> Task :react-native-async-storage_async-storage:lintVitalAnalyzeRelease
+> Task :react-native-safe-area-context:lintVitalAnalyzeRelease
+> Task :react-native-svg:lintVitalAnalyzeRelease
+> Task :maplibre_maplibre-react-native:lintVitalAnalyzeRelease
+> Task :react-native-screens:lintVitalAnalyzeRelease
+> Task :app:lintVitalAnalyzeRelease
+> Task :app:lintVitalReportRelease
+> Task :app:lintVitalRelease
+> Task :app:packageRelease
+> Task :app:createReleaseApkListingFileRedirect
+> Task :app:assembleRelease
+
+[Incubating] Problems report is available at: file:///C:/RutasMorelia/apps/mobile/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 3m 44s
+318 actionable tasks: 283 executed, 35 up-to-date

@@ -1,0 +1,37 @@
+---
+pid: 11304
+cwd: "C:\RutasMorelia"
+command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\\android\"; .\\gradlew.bat :app:assembleRelease --no-daemon 2>&1 | Select-Object -Last 30"
+started_at: 2026-07-05T02:50:29.981Z
+running_for_ms: 1560009  
+---
+> Task :app:dexBuilderRelease
+> Task :app:mergeReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:generateReleaseLintVitalReportModel
+> Task :app:processReleaseJavaRes
+> Task :app:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-community_geolocation:lintVitalAnalyzeRelease
+> Task :react-native-async-storage_async-storage:lintVitalAnalyzeRelease
+> Task :react-native-safe-area-context:lintVitalAnalyzeRelease
+> Task :react-native-svg:lintVitalAnalyzeRelease
+> Task :maplibre_maplibre-react-native:lintVitalAnalyzeRelease
+> Task :app:mergeDexRelease
+> Task :app:compileReleaseArtProfile
+> Task :react-native-screens:lintVitalAnalyzeRelease
+> Task :app:lintVitalAnalyzeRelease
+> Task :app:lintVitalReportRelease
+> Task :app:lintVitalRelease
+> Task :app:packageRelease
+> Task :app:createReleaseApkListingFileRedirect
+> Task :app:assembleRelease
+
+[Incubating] Problems report is available at: file:///C:/RutasMorelia/apps/mobile/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 47s
+306 actionable tasks: 49 executed, 257 up-to-date

@@ -3,7 +3,7 @@ pid: 24444
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia\\apps\\web; npm run build"
 started_at: 2026-07-04T23:41:43.040Z
-running_for_ms: 7554991  
+running_for_ms: 10694998 
 ---
 
 > web@0.1.0 build

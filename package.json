@@ -18,5 +18,10 @@
   },
   "devDependencies": {
     "next": "16.2.9"
+  },
+  "overrides": {
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-test-renderer": "19.2.7"
   }
 }

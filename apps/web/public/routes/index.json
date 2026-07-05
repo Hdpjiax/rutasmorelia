@@ -142,8 +142,9 @@
       "transportType": "Camión",
       "colorName": "#FFC800",
       "colorLetter": "?",
-      "geojsonFile": "/routes/F8.geojson?v=46971ca48f33",
-      "artifactSha256": "46971ca48f336710b363c8103d2cc40c33cd0aedeae76f86d24c1a90f66410df"
+      "geojsonFile": "/routes/F8.geojson?v=285744dda11a",
+      "artifactSha256": "285744dda11a85ce1c40041587391293a8b2f340b5914dc23fb5cc6cb74d930d",
+      "algorithm": "official-kml-explicit-coordinates"
     },
     {
       "id": "13",
@@ -494,8 +495,9 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/25.geojson?v=9bacd58c545d",
-      "artifactSha256": "9bacd58c545df64ca71da2bd0c9eeb6eb6afa5ac50aeca3dce0b3ccd4b2d69b7"
+      "geojsonFile": "/routes/25.geojson?v=b77935ab90f4",
+      "artifactSha256": "b77935ab90f45b3593e754dc1010b1d05e6122d58a118bb457ff0719e41d434a",
+      "algorithm": "official-kml-explicit-coordinates"
     },
     {
       "id": "26",
@@ -524,8 +526,9 @@
       "transportType": "Combi",
       "colorName": "Amarillo",
       "colorLetter": "C",
-      "geojsonFile": "/routes/28.geojson?v=a88e6bcc18f4",
-      "artifactSha256": "a88e6bcc18f443e57b5eb3ae5cff021d6a60a96b9f8965802aa5f106eb6044a4"
+      "geojsonFile": "/routes/28.geojson?v=c45e229e9c8e",
+      "artifactSha256": "c45e229e9c8eb94ec87cd993362695f33f8a8ea576aa9385477b307981c69151",
+      "algorithm": "official-kml-explicit-coordinates"
     },
     {
       "id": "29",

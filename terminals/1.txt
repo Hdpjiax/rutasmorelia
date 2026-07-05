@@ -3,7 +3,7 @@ pid: 37004
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia\\apps\\mobile; npm test -- --passWithNoTests 2>&1 | Select-Object -Last 15"
 started_at: 2026-07-04T23:07:41.350Z
-running_for_ms: 9595010  
+running_for_ms: 12735004 
 ---
 
 node.exe : PASS __tests__/App.test.tsx (32.558 s)

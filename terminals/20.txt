@@ -3,7 +3,7 @@ pid: 10700
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia; npm run dev:web"
 started_at: 2026-07-05T00:27:58.110Z
-running_for_ms: 4794990  
+running_for_ms: 7934995  
 ---
 
 > rutas-morelia@0.1.0 dev:web

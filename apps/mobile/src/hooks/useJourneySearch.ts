@@ -253,7 +253,11 @@ export function useJourneySearch({
     setMessage('Buscando tu ubicación…');
 
     try {
-      const position = await getAccurateNativePosition();
+      const position = await getAccurateNativePosition(5000, 150, updatePosition => {
+        const coordinates = {latitude: updatePosition.coords.latitude, longitude: updatePosition.coords.longitude};
+        setOrigin('Mi ubicación', coordinates);
+        camera.current?.flyTo({center: [coordinates.longitude, coordinates.latitude], zoom: 16, duration: 500});
+      });
       const coordinates = {latitude: position.coords.latitude, longitude: position.coords.longitude};
       setOrigin('Mi ubicación', coordinates);
       camera.current?.flyTo({center: [coordinates.longitude, coordinates.latitude], zoom: 16, duration: 700});

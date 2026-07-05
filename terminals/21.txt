@@ -3,7 +3,7 @@ pid: 36248
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia; npm run lint -w web; npm run build -w web"
 started_at: 2026-07-05T00:28:28.092Z
-running_for_ms: 4750003  
+running_for_ms: 7890010  
 ---
 
 > web@0.1.0 lint

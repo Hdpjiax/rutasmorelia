@@ -45,29 +45,63 @@ type RouteData = {
   geojsonFile: string;
 };
 
-function getAccuratePosition(maxWaitMs = 15000, requiredAccuracyM = 80): Promise<GeolocationPosition> {
+function getAccuratePosition(
+  maxWaitMs = 6000,
+  requiredAccuracyM = 150,
+  onUpdate?: (position: GeolocationPosition) => void,
+): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) return reject(new Error('Geolocalización no disponible'));
+
     let best: GeolocationPosition | null = null;
     let settled = false;
     let watchId = 0;
 
-    const finish = (position?: GeolocationPosition, error?: GeolocationPositionError | Error) => {
+    const publish = (position: GeolocationPosition) => {
+      if (!best || position.coords.accuracy < best.coords.accuracy) {
+        best = position;
+        onUpdate?.(position);
+      }
+    };
+
+    const finish = (
+      position: GeolocationPosition | null | undefined,
+      error?: GeolocationPositionError | Error,
+      acceptBest = false,
+    ) => {
       if (settled) return;
       settled = true;
       navigator.geolocation.clearWatch(watchId);
       window.clearTimeout(timer);
-      if (position && (position.coords.accuracy <= requiredAccuracyM || error === undefined)) resolve(position);
-      else reject(error || new Error('La señal GPS no tiene suficiente precisión'));
+
+      const candidate = position ?? best;
+      if (candidate && (acceptBest || candidate.coords.accuracy <= requiredAccuracyM)) {
+        resolve(candidate);
+        return;
+      }
+      reject(error || new Error('La señal GPS no tiene suficiente precisión'));
     };
-    const timer = window.setTimeout(() => finish(best || undefined), maxWaitMs);
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        publish(position);
+        if (position.coords.accuracy <= requiredAccuracyM) finish(position, undefined, true);
+      },
+      () => {},
+      { enableHighAccuracy: false, timeout: 2500, maximumAge: 60_000 },
+    );
+
+    const timer = window.setTimeout(() => finish(best, undefined, true), maxWaitMs);
     watchId = navigator.geolocation.watchPosition(
       position => {
-        if (!best || position.coords.accuracy < best.coords.accuracy) best = position;
-        if (position.coords.accuracy <= 25) finish(position);
+        publish(position);
+        if (position.coords.accuracy <= requiredAccuracyM) finish(position, undefined, true);
       },
-      error => finish(undefined, error),
-      {enableHighAccuracy: true, timeout: maxWaitMs, maximumAge: 0},
+      error => {
+        if (best) finish(best, undefined, true);
+        else finish(undefined, error);
+      },
+      { enableHighAccuracy: true, timeout: maxWaitMs, maximumAge: 10_000 },
     );
   });
 }
@@ -342,12 +376,19 @@ export function TransitApp() {
       setMapCenter({ ...originCoordinates, timestamp: Date.now() });
     }
     setMessage("Buscando tu ubicación…");
-    try {
-      const {coords} = await getAccuratePosition();
-      const point = {latitude: coords.latitude, longitude: coords.longitude};
+
+    const applyPosition = (coords: GeolocationCoordinates) => {
+      const point = { latitude: coords.latitude, longitude: coords.longitude };
       setOrigin("Mi ubicación");
       setOriginCoordinates(point);
-      setMapCenter({...point, timestamp: Date.now()});
+      setMapCenter({ ...point, timestamp: Date.now() });
+    };
+
+    try {
+      const { coords } = await getAccuratePosition(6000, 150, (position) => {
+        applyPosition(position.coords);
+      });
+      applyPosition(coords);
       setMessage(`Ubicación actualizada (precisión ±${Math.round(coords.accuracy)} m).`);
     } catch {
       if (originCoordinates) {
@@ -442,7 +483,11 @@ export function TransitApp() {
       } else if (origin === "Mi ubicación") {
         if (navigator.geolocation) {
           setMessage("Obteniendo tu ubicación para calcular la ruta…");
-          getAccuratePosition(15000).then(
+          getAccuratePosition(6000, 150, (position) => {
+            const startPoint = { latitude: position.coords.latitude, longitude: position.coords.longitude };
+            setOriginCoordinates(startPoint);
+            setMapCenter({ ...startPoint, timestamp: Date.now() });
+          }).then(
             ({coords}) => {
               const startPoint = { latitude: coords.latitude, longitude: coords.longitude };
               setOriginCoordinates(startPoint);

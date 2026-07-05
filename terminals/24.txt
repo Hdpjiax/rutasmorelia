@@ -3,7 +3,7 @@ pid: 37696
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia; .\\.venv-valhalla\\Scripts\\python.exe tools\\extract_rutasdecombi_shapes.py"
 started_at: 2026-07-05T00:55:38.868Z
-running_for_ms: 3115003  
+running_for_ms: 6259998  
 ---
 38 Naranja 1 ISSSTE: 366 puntos desde Naranja 1 [Issste].pdf
 39 Naranja 1 [La Soledad]: 442 puntos desde Naranja 1 [La Soledad].pdf

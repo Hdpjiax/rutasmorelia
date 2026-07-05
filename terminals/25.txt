@@ -3,7 +3,7 @@ pid: 28476
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia; .\\.venv-valhalla\\Scripts\\python.exe tools\\build_naranja_routes.py"
 started_at: 2026-07-05T00:58:54.997Z
-running_for_ms: 2920005  
+running_for_ms: 6065009  
 ---
 38 Naranja 1 ISSSTE: 366 puntos desde Naranja 1 [Issste].pdf
 39 Naranja 1 [La Soledad]: 442 puntos desde Naranja 1 [La Soledad].pdf

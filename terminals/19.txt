@@ -3,7 +3,7 @@ pid: 26156
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia; npm install"
 started_at: 2026-07-05T00:24:37.086Z
-running_for_ms: 4980003  
+running_for_ms: 8120008  
 ---
 
 removed 2053 packages, and audited 1486 packages in 32s

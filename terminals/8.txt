@@ -3,7 +3,7 @@ pid: 2636
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia\\apps\\mobile; npm test -- --passWithNoTests"
 started_at: 2026-07-04T23:31:09.465Z
-running_for_ms: 8184996  
+running_for_ms: 11330003 
 ---
 
 > mx.gob.morelia.simum@0.0.1 test

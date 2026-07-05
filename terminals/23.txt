@@ -3,7 +3,7 @@ pid: 23000
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia; if (Test-Path \"apps\\web\\.next\") { Remove-Item -Recurse -Force \"apps\\web\\.next\" }; npm run dev:web"
 started_at: 2026-07-05T00:30:20.563Z
-running_for_ms: 4650009  
+running_for_ms: 7790009  
 ---
 
 > rutas-morelia@0.1.0 dev:web

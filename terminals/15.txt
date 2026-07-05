@@ -3,7 +3,7 @@ pid: 36188
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia; npm install"
 started_at: 2026-07-05T00:19:37.859Z
-running_for_ms: 5279995  
+running_for_ms: 8420004  
 ---
 npm error code EUNSUPPORTEDPROTOCOL
 npm error Unsupported URL Type "workspace:": workspace:*

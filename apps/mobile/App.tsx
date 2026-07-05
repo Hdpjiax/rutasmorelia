@@ -12,7 +12,9 @@ import {MapScreen} from './src/screens/MapScreen';
 export type RootStackParamList = {Map: undefined; Account: undefined};
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function AuthLinkHandler() {
+export default function App() {
+  const darkMode = useColorScheme() === 'dark';
+
   useEffect(() => {
     const client = supabase;
     if (!client) return;
@@ -30,16 +32,11 @@ function AuthLinkHandler() {
     });
     return () => subscription.remove();
   }, []);
-  return null;
-}
 
-export default function App() {
-  const darkMode = useColorScheme() === 'dark';
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} translucent backgroundColor="transparent" />
       <NavigationContainer>
-        <AuthLinkHandler />
         <Stack.Navigator screenOptions={{headerShown: false, animation: 'fade'}}>
           <Stack.Screen name="Map" component={MapScreen} />
           <Stack.Screen name="Account" component={AccountScreen} />

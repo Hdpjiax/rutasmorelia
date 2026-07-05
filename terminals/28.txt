@@ -1,0 +1,37 @@
+---
+pid: 6740
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia\\apps\\mobile\\android; .\\gradlew.bat tasks --no-daemon 2>&1 | Select-Object -Last 30"
+started_at: 2026-07-05T02:16:12.516Z
+running_for_ms: 1425001  
+---
+connectedCheck - Runs all device checks on currently connected devices.
+connectedDebugAndroidTest - Installs and runs the tests for debug on connected devices.
+deviceAndroidTest - Installs and runs instrumentation tests using all Device Providers.
+deviceCheck - Runs all device checks using Device Providers and Test Servers.
+lint - Runs lint on the default variant.
+lintDebug - Print text output from the corresponding lint report task
+lintDebugOptimized - Print text output from the corresponding lint report task
+lintFix - Runs lint on the default variant and applies any safe suggestions to the source code.
+lintRelease - Print text output from the corresponding lint report task
+lintVitalRelease - Print text output from the corresponding lint report task
+test - Run unit tests for all variants.
+testDebugOptimizedUnitTest - Run unit tests for the debugOptimized build.
+testDebugUnitTest - Run unit tests for the debug build.
+testReleaseUnitTest - Run unit tests for the release build.
+updateLintBaseline - Updates the lint baseline using the default variant.
+
+To see all tasks and more detail, run gradlew tasks --all
+
+To see more detail about a task, run gradlew help --task <task>
+
+[Incubating] Problems report is available at: file:///C:/RutasMorelia/apps/mobile/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 18s
+11 actionable tasks: 1 executed, 10 up-to-date

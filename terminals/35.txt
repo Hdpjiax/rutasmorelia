@@ -1,0 +1,40 @@
+---
+pid: 37160
+cwd: "C:\RutasMorelia"
+command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\"; npm run typecheck 2>&1; npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output \"$env:TEMP\\simum-test.bundle\" --assets-dest \"$env:TEMP\\simum-assets\" 2>&1 | Select-Object -Last 20"
+started_at: 2026-07-05T03:07:34.896Z
+running_for_ms: 535005   
+---
+
+> mx.gob.morelia.simum@0.0.1 typecheck
+> tsc --noEmit
+
+App.tsx(22,47): error TS2345: Argument of type 'SupabaseClient<any, "public", "public", any, any> | null' is not assignable to parameter of type 'SupabaseClient<any, "public", "public", any, any>'.
+  Type 'null' is not assignable to type 'SupabaseClient<any, "public", "public", any, any>'.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path C:\RutasMorelia\apps\mobile
+npm error workspace mx.gob.morelia.simum@0.0.1
+npm error location C:\RutasMorelia\apps\mobile
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c tsc --noEmit
+transform[stderr]: (node:29400) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:13940) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:13764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:32176) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:4632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:22504) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:17600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:21648) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+LOG:Writing bundle output to: C:\Users\ANTONI~1\AppData\Local\Temp\simum-test.bundle
+LOG:Done writing bundle output
+Copying 22 asset files
+Done copying assets

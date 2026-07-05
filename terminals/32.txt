@@ -1,0 +1,82 @@
+---
+pid: 19276
+cwd: "C:\RutasMorelia"
+command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\\android\"; .\\gradlew.bat :app:buildCMakeRelWithDebInfo[arm64-v8a] --stacktrace 2>&1 | Select-Object -Last 100"
+started_at: 2026-07-05T02:42:49.368Z
+running_for_ms: 2020004  
+---
+>>> referenced by stdexcept:163 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:163)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::out_of_range::out_of_range[abi:ne180000](cha
+r const*))
+>>> referenced by stdexcept:152 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:152)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::length_error::length_error[abi:ne180000](cha
+r const*))
+ld.lld: error: undefined symbol: vtable for std::out_of_range
+>>> referenced by stdexcept:163 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:163)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::out_of_range::out_of_range[abi:ne180000](cha
+r const*))
+>>> referenced by stdexcept:163 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:163)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::out_of_range::out_of_range[abi:ne180000](cha
+r const*))
+>>> the vtable symbol may be undefined because the class is missing its key function (see 
+https://lld.llvm.org/missingkeyfunction)
+ld.lld: error: undefined symbol: typeinfo for std::length_error
+>>> referenced by stdexcept:241 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:241)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__ndk1::__throw_length_error[abi:ne180000](c
+har const*))
+>>> referenced by stdexcept:241 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:241)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__ndk1::__throw_length_error[abi:ne180000](c
+har const*))
+ld.lld: error: undefined symbol: std::length_error::~length_error()
+>>> referenced by stdexcept:241 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:241)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__ndk1::__throw_length_error[abi:ne180000](c
+har const*))
+>>> referenced by stdexcept:241 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:241)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__ndk1::__throw_length_error[abi:ne180000](c
+har const*))
+ld.lld: error: undefined symbol: vtable for std::length_error
+>>> referenced by stdexcept:152 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:152)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::length_error::length_error[abi:ne180000](cha
+r const*))
+>>> referenced by stdexcept:152 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pr
+ebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:152)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::length_error::length_error[abi:ne180000](cha
+r const*))
+>>> the vtable symbol may be undefined because the class is missing its key function (see 
+https://lld.llvm.org/missingkeyfunction)
+ld.lld: error: undefined symbol: std::bad_array_new_length::bad_array_new_length()
+>>> referenced by new:174 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt
+/windows-x86_64/sysroot/usr/include/c++/v1/new:174)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/5d5da4df36b9ca0ead158f0
+c9720a67c/components/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__throw_bad_array_new_length[abi:ne180000]()
+)
+ld.lld: error: too many errors emitted, stopping now (use --error-limit=0 to see all errors)
+CLANG_~1: error: linker command failed with exit code 1 (use -v to see invocation)
+[2/29] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/8b7981c34753f9119df5a80e23
+bde1cf/source/codegen/jni/react/renderer/components/rnscreens/States.cpp.o
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+27 actionable tasks: 7 executed, 20 up-to-date

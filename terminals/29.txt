@@ -1,0 +1,841 @@
+---
+pid: 26068
+cwd: "C:\RutasMorelia"
+command: "cd C:\\RutasMorelia\\apps\\mobile\\android; .\\gradlew.bat --no-daemon assembleDebug 2>&1"
+started_at: 2026-07-05T02:25:36.690Z
+running_for_ms: 860001   
+---
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon JVM discovery is an incubating feature.
+Daemon will be stopped at the end of the build 
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:shared:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar
+> Task :gradle-plugin:settings-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:processResources
+> Task :gradle-plugin:settings-plugin:classes
+> Task :gradle-plugin:settings-plugin:jar
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:processResources
+> Task :gradle-plugin:react-native-gradle-plugin:classes
+> Task :gradle-plugin:react-native-gradle-plugin:jar
+> Task :app:generateAutolinkingNewArchitectureFiles UP-TO-DATE
+> Task :app:generateAutolinkingPackageList UP-TO-DATE
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:generateReactNativeEntryPoint UP-TO-DATE
+> Task :maplibre_maplibre-react-native:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :maplibre_maplibre-react-native:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :maplibre_maplibre-react-native:preBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preBuild UP-TO-DATE
+> Task :react-native-community_geolocation:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-community_geolocation:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-community_geolocation:preBuild UP-TO-DATE
+> Task :react-native-safe-area-context:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-safe-area-context:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-safe-area-context:preBuild UP-TO-DATE
+> Task :react-native-screens:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-screens:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-screens:preBuild UP-TO-DATE
+> Task :react-native-svg:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-svg:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-svg:preBuild UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :maplibre_maplibre-react-native:preDebugBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preDebugBuild UP-TO-DATE
+> Task :react-native-community_geolocation:preDebugBuild UP-TO-DATE
+> Task :react-native-safe-area-context:preDebugBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:writeDebugAarMetadata
+> Task :maplibre_maplibre-react-native:writeDebugAarMetadata
+> Task :react-native-community_geolocation:writeDebugAarMetadata
+> Task :react-native-screens:preDebugBuild UP-TO-DATE
+> Task :react-native-safe-area-context:writeDebugAarMetadata
+> Task :react-native-svg:preDebugBuild UP-TO-DATE
+> Task :react-native-screens:writeDebugAarMetadata
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :react-native-svg:writeDebugAarMetadata
+> Task :maplibre_maplibre-react-native:generateDebugResValues
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :maplibre_maplibre-react-native:generateDebugResources
+> Task :maplibre_maplibre-react-native:packageDebugResources
+> Task :react-native-async-storage_async-storage:generateDebugResValues
+> Task :react-native-async-storage_async-storage:generateDebugResources
+> Task :react-native-async-storage_async-storage:packageDebugResources
+> Task :react-native-community_geolocation:generateDebugResValues
+> Task :react-native-community_geolocation:generateDebugResources
+> Task :react-native-community_geolocation:packageDebugResources
+> Task :react-native-safe-area-context:generateDebugResValues
+> Task :react-native-safe-area-context:generateDebugResources
+> Task :react-native-safe-area-context:packageDebugResources
+> Task :react-native-screens:generateDebugResValues
+> Task :react-native-screens:generateDebugResources
+> Task :react-native-screens:packageDebugResources
+> Task :react-native-svg:generateDebugResValues
+> Task :react-native-svg:generateDebugResources
+> Task :react-native-svg:packageDebugResources
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :maplibre_maplibre-react-native:extractDeepLinksDebug
+> Task :react-native-async-storage_async-storage:extractDeepLinksDebug
+> Task :react-native-community_geolocation:extractDeepLinksDebug
+> Task :react-native-safe-area-context:extractDeepLinksDebug
+> Task :react-native-screens:extractDeepLinksDebug
+> Task :react-native-svg:extractDeepLinksDebug
+
+> Task :react-native-safe-area-context:processDebugManifest
+package="com.th3rdwave.safeareacontext" found in source AndroidManifest.xml: C:\RutasMorelia\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.th3rdwave.safeareacontext" from the source AndroidManifest.xml: C:\RutasMorelia\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-async-storage_async-storage:processDebugManifest
+
+> Task :react-native-community_geolocation:processDebugManifest
+package="com.reactnativecommunity.geolocation" found in source AndroidManifest.xml: C:\RutasMorelia\node_modules\@react-native-community\geolocation\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.reactnativecommunity.geolocation" from the source AndroidManifest.xml: C:\RutasMorelia\node_modules\@react-native-community\geolocation\android\src\main\AndroidManifest.xml.
+
+> Task :maplibre_maplibre-react-native:processDebugManifest
+> Task :react-native-screens:processDebugManifest
+> Task :react-native-async-storage_async-storage:compileDebugLibraryResources
+> Task :react-native-svg:processDebugManifest
+> Task :react-native-async-storage_async-storage:parseDebugLocalResources
+> Task :maplibre_maplibre-react-native:parseDebugLocalResources
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :maplibre_maplibre-react-native:compileDebugLibraryResources
+> Task :react-native-community_geolocation:compileDebugLibraryResources
+> Task :react-native-community_geolocation:parseDebugLocalResources
+> Task :react-native-safe-area-context:compileDebugLibraryResources
+> Task :react-native-safe-area-context:parseDebugLocalResources
+> Task :react-native-async-storage_async-storage:generateDebugRFile
+> Task :maplibre_maplibre-react-native:generateDebugRFile
+> Task :react-native-community_geolocation:generateDebugRFile
+> Task :react-native-safe-area-context:generateDebugRFile
+> Task :react-native-svg:compileDebugLibraryResources
+> Task :maplibre_maplibre-react-native:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-svg:parseDebugLocalResources
+> Task :react-native-screens:parseDebugLocalResources
+> Task :maplibre_maplibre-react-native:generateDebugBuildConfig
+> Task :react-native-svg:generateDebugRFile
+> Task :react-native-screens:generateDebugRFile
+> Task :react-native-screens:compileDebugLibraryResources
+> Task :react-native-async-storage_async-storage:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :maplibre_maplibre-react-native:javaPreCompileDebug
+> Task :react-native-async-storage_async-storage:generateDebugBuildConfig
+> Task :react-native-community_geolocation:generateDebugBuildConfig
+> Task :react-native-safe-area-context:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-community_geolocation:javaPreCompileDebug
+> Task :react-native-safe-area-context:generateDebugBuildConfig
+> Task :react-native-async-storage_async-storage:javaPreCompileDebug
+
+> Task :react-native-community_geolocation:compileDebugJavaWithJavac
+
+> Task :app:processDebugResources
+.\gradlew.bat : Note: Some input files use or override a deprecated API.
+En l�nea: 1 Car�cter: 41
++ ... lia\apps\mobile\android; .\gradlew.bat --no-daemon assembleDebug 2>&1
++                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Note: Some inpu...deprecated API.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Note: Recompile with -Xlint:deprecation for details.
+> Task :react-native-community_geolocation:bundleLibCompileToJarDebug
+> Task :react-native-screens:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-safe-area-context:javaPreCompileDebug
+> Task :react-native-screens:generateDebugBuildConfig
+> Task :react-native-screens:javaPreCompileDebug
+> Task :react-native-svg:generateDebugBuildConfig
+> Task :react-native-svg:javaPreCompileDebug
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:kspDebugKotlin
+
+> Task :react-native-safe-area-context:compileDebugKotlin
+w: file:///C:/RutasMorelia/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaProviderManager.kt:39:19 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:8:8 'class UIManagerModule : ReactContextBaseJavaModule, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:45:54 'class UIManagerModule : ReactContextBaseJavaModule, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaViewShadowNode.kt:9:32 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. This class is part of Legacy Architecture and will be removed in a future release.
+w: file:///C:/RutasMorelia/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaViewShadowNode.kt:110:61 'class NativeViewHierarchyOptimizer : Any' is deprecated. This class is part of Legacy Architecture and will be removed in a future release.
+
+Note: Some input files use or override a deprecated API.
+> Task :react-native-svg:compileDebugJavaWithJavac
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :react-native-async-storage_async-storage:compileDebugKotlin
+w: file:///C:/RutasMorelia/node_modules/@react-native-async-storage/async-storage/android/src/main/kotlin/org/asyncstorage/legacy_storage/LegacyStorageSupplier.kt:63:69 Java type mismatch: inferred type is 'String?', but 'String' was expected.
+w: file:///C:/RutasMorelia/node_modules/@react-native-async-storage/async-storage/android/src/main/kotlin/org/asyncstorage/legacy_storage/LegacyStorageSupplier.kt:91:26 The corresponding parameter in the supertype 'Migration' is named 'db'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/@react-native-async-storage/async-storage/android/src/main/kotlin/org/asyncstorage/legacy_storage/LegacyStorageSupplier.kt:202:17 Unchecked cast of 'ArrayList<Any?>' to 'List<String>'.
+
+> Task :react-native-safe-area-context:compileDebugJavaWithJavac
+> Task :react-native-async-storage_async-storage:compileDebugJavaWithJavac
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :react-native-async-storage_async-storage:bundleLibCompileToJarDebug
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :react-native-safe-area-context:bundleLibCompileToJarDebug
+> Task :maplibre_maplibre-react-native:mergeDebugShaders
+> Task :maplibre_maplibre-react-native:compileDebugShaders NO-SOURCE
+> Task :maplibre_maplibre-react-native:generateDebugAssets UP-TO-DATE
+> Task :maplibre_maplibre-react-native:mergeDebugAssets
+> Task :react-native-async-storage_async-storage:mergeDebugShaders
+> Task :react-native-svg:bundleLibCompileToJarDebug
+> Task :react-native-async-storage_async-storage:compileDebugShaders NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateDebugAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeDebugAssets
+> Task :react-native-community_geolocation:mergeDebugShaders
+> Task :react-native-community_geolocation:compileDebugShaders NO-SOURCE
+> Task :react-native-community_geolocation:generateDebugAssets UP-TO-DATE
+> Task :react-native-community_geolocation:mergeDebugAssets
+> Task :react-native-safe-area-context:mergeDebugShaders
+> Task :react-native-safe-area-context:compileDebugShaders NO-SOURCE
+> Task :react-native-safe-area-context:generateDebugAssets UP-TO-DATE
+> Task :react-native-safe-area-context:mergeDebugAssets
+> Task :react-native-screens:mergeDebugShaders
+> Task :react-native-screens:compileDebugShaders NO-SOURCE
+> Task :react-native-screens:generateDebugAssets UP-TO-DATE
+> Task :react-native-screens:mergeDebugAssets
+> Task :react-native-svg:mergeDebugShaders
+> Task :react-native-svg:compileDebugShaders NO-SOURCE
+> Task :react-native-svg:generateDebugAssets UP-TO-DATE
+> Task :react-native-svg:mergeDebugAssets
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :react-native-safe-area-context:bundleLibRuntimeToJarDebug
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToJarDebug
+> Task :react-native-community_geolocation:bundleLibRuntimeToJarDebug
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :react-native-async-storage_async-storage:processDebugJavaRes
+> Task :react-native-community_geolocation:processDebugJavaRes NO-SOURCE
+> Task :react-native-safe-area-context:processDebugJavaRes
+> Task :react-native-svg:bundleLibRuntimeToJarDebug
+> Task :react-native-svg:processDebugJavaRes NO-SOURCE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :maplibre_maplibre-react-native:compileDebugKotlin
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :react-native-safe-area-context:bundleLibRuntimeToDirDebug
+> Task :react-native-community_geolocation:bundleLibRuntimeToDirDebug
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToDirDebug
+> Task :react-native-svg:bundleLibRuntimeToDirDebug
+
+> Task :app:configureCMakeDebug[arm64-v8a]
+[CXX5304] This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+[CXX5304] This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
+> Task :react-native-screens:compileDebugKotlin
+
+> Task :maplibre_maplibre-react-native:compileDebugKotlin
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/AbstractEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/AbstractEvent.kt:12:5 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/AbstractEvent.kt:15:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/AbstractEvent.kt:15:44 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/AbstractEvent.kt:16:25 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/AbstractEventEmitter.kt:5:8 'object MapBuilder : Any' is deprecated. Use Kotlin's built-in collections extensions.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/AbstractEventEmitter.kt:58:17 'object MapBuilder : Any' is deprecated. Use Kotlin's built-in collections extensions.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/camera/MLRNCamera.kt:84:36 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt:116:18 'fun execute(vararg p0: (Mutable)Map.(Mutable)Entry<String!, ImageEntry!>!): AsyncTask<(Mutable)Map.(Mutable)Entry<String!, ImageEntry!>!, Void!, (Mutable)List<(Mutable)Map.(Mutable)Entry<String!, DownloadedImage!>!>!>!' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt:129:14 'fun execute(vararg p0: (Mutable)Map.(Mutable)Entry<String!, ImageEntry!>!): AsyncTask<(Mutable)Map.(Mutable)Entry<String!, ImageEntry!>!, Void!, (Mutable)List<(Mutable)Map.(Mutable)Entry<String!, DownloadedImage!>!>!>!' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/images/MLRNImages.kt:139:36 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/layer/style/MLRNStyle.kt:58:14 'fun execute(vararg p0: (Mutable)Map.(Mutable)Entry<String!, ImageEntry!>!): AsyncTask<(Mutable)Map.(Mutable)Entry<String!, ImageEntry!>!, Void!, (Mutable)List<(Mutable)Map.(Mutable)Entry<String!, DownloadedImage!>!>!>!' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/location/LocationComponentManager.kt:156:22 'fun padding(p0: IntArray?): LocationComponentOptions.Builder' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/location/LocationComponentManager.kt:156:36 'fun getPadding(): IntArray' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt:183:36 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapView.kt:1346:23 'fun setPadding(p0: Int, p1: Int, p2: Int, p3: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapViewManager.kt:10:8 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. This class is part of Legacy Architecture and will be removed in a future release.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapViewManager.kt:37:46 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. This class is part of Legacy Architecture and will be removed in a future release.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapViewManager.kt:39:50 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. This class is part of Legacy Architecture and will be removed in a future release.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/mapview/MLRNMapViewManager.kt:254:9 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. This class is part of Legacy Architecture and will be removed in a future release.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/sources/MLRNSource.kt:36:36 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/sources/imagesource/MLRNImageSource.kt:27:13 'constructor(id: String?, coordinates: LatLngQuad?, url: URL): ImageSource' is deprecated. use {@link ImageSource#ImageSource(String, LatLngQuad, URI)} instead.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/components/sources/imagesource/MLRNImageSource.kt:39:26 'fun getInstance(): ResourceDrawableIdHelper' is deprecated. Use .instance instead, this API is for backward compat.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolver.kt:63:41 Unchecked cast of 'View?' to 'V (of fun <V> withViewResolved)'.
+w: file:///C:/RutasMorelia/node_modules/@maplibre/maplibre-react-native/android/src/main/java/org/maplibre/reactnative/utils/ReactTagResolver.kt:77:41 Unchecked cast of 'View' to 'V (of fun <V> withViewResolved)'.
+
+Note: Some input files use or override a deprecated API.
+> Task :maplibre_maplibre-react-native:compileDebugJavaWithJavac
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :maplibre_maplibre-react-native:bundleLibCompileToJarDebug
+> Task :maplibre_maplibre-react-native:bundleLibRuntimeToJarDebug
+> Task :maplibre_maplibre-react-native:processDebugJavaRes
+
+> Task :react-native-screens:compileDebugKotlin
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:66:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'name'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:67:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'reactContext'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:79:17 'constructor(name: String, className: String, canOverrideExistingModule: Boolean, needsEagerInit: Boolean, hasConstants: Boolean, isCxxModule: Boolean, isTurboModule: Boolean): ReactModuleInfo' is deprecated. This constructor is deprecated and will be removed in the future. Use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)].
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:53:77 Unchecked cast of '(CoordinatorLayout.Behavior<View!>?..CoordinatorLayout.Behavior<*>?)' to 'BottomSheetBehavior<Screen>'.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:58:33 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:515:14 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt:250:18 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt:260:18 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFragment.kt:225:37 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFragment.kt:242:14 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFragment.kt:258:22 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFragment.kt:327:22 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenModalFragment.kt:180:22 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStack.kt:106:14 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:169:18 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:226:31 'var targetElevation: Float' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:229:13 'fun setHasOptionsMenu(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:439:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:446:22 'fun onPrepareOptionsMenu(p0: Menu): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:449:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:454:22 'fun onCreateOptionsMenu(p0: Menu, p1: MenuInflater): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt:181:14 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt:191:14 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:48:42 'fun replaceSystemWindowInsets(p0: Int, p1: Int, p2: Int, p3: Int): @NonNull() WindowInsetsCompat' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:49:39 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:51:39 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:52:39 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensModule.kt:100:14 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarView.kt:137:29 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:7:8 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:25:13 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:32:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'left'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:33:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'top'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:34:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'right'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:35:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'bottom'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:71:9 The corresponding parameter in the supertype 'RootView' is named 'childView'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:72:9 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:79:46 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:83:9 The corresponding parameter in the supertype 'RootView' is named 'childView'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:84:9 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:95:34 The corresponding parameter in the supertype 'RootView' is named 't'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:64:9 The corresponding parameter in the supertype 'ReactCompoundView' is named 'touchX'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:65:9 The corresponding parameter in the supertype 'ReactCompoundView' is named 'touchY'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:69:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is named 'touchX'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:70:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is named 'touchY'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/gamma/common/event/BaseEventEmitter.kt:12:38 'fun getEventDispatcherForReactTag(context: ReactContext, reactTag: Int): EventDispatcher?' is deprecated. reactTag is no longer needed.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/gamma/tabs/host/TabsHostViewManager.kt:44:9 The corresponding parameter in the supertype 'TabsHostViewManager' is named 'view'. This may cause problems when calling this function with named arguments.
+w: file:///C:/RutasMorelia/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/SafeAreaView.kt:143:45 'fun consumeDisplayCutout(): @NonNull() WindowInsetsCompat' is deprecated. Deprecated in Java.
+
+> Task :maplibre_maplibre-react-native:bundleLibRuntimeToDirDebug
+> Task :app:buildCMakeDebug[arm64-v8a]
+> Task :react-native-screens:compileDebugJavaWithJavac
+> Task :react-native-screens:processDebugJavaRes
+> Task :react-native-screens:bundleLibRuntimeToJarDebug
+> Task :react-native-screens:bundleLibCompileToJarDebug
+> Task :react-native-screens:bundleLibRuntimeToDirDebug
+> Task :app:configureCMakeDebug[x86_64]
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:buildCMakeDebug[x86_64]
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :maplibre_maplibre-react-native:mergeDebugJniLibFolders
+> Task :maplibre_maplibre-react-native:mergeDebugNativeLibs NO-SOURCE
+> Task :maplibre_maplibre-react-native:copyDebugJniLibsProjectOnly
+> Task :react-native-async-storage_async-storage:mergeDebugJniLibFolders
+> Task :react-native-async-storage_async-storage:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-async-storage_async-storage:copyDebugJniLibsProjectOnly
+> Task :react-native-community_geolocation:mergeDebugJniLibFolders
+> Task :react-native-community_geolocation:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-community_geolocation:copyDebugJniLibsProjectOnly
+> Task :react-native-safe-area-context:mergeDebugJniLibFolders
+> Task :react-native-safe-area-context:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-safe-area-context:copyDebugJniLibsProjectOnly
+> Task :react-native-screens:configureCMakeDebug[arm64-v8a]
+
+> Task :react-native-screens:buildCMakeDebug[arm64-v8a] FAILED
+C/C++: ninja: Entering directory `C:\RutasMorelia\node_modules\react-native-screens\android\.cxx\Debug\6u424l59\arm64-v8a'
+C/C++: ld.lld: error: undefined symbol: operator delete(void*)
+C/C++: >>> referenced by function.h:250 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__functional/function.h:250)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(std::__ndk1::__function::__func<JNI_OnLoad::$_0, std::__ndk1::allocator<JNI_OnLoad::$_0>, void ()>::~__func())
+C/C++: >>> referenced by RNSScreenRemovalListener.h:9 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalListener.h:9)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalListener.cpp.o:(RNSScreenRemovalListener::~RNSScreenRemovalListener())
+C/C++: >>> referenced by RNScreensTurboModule.cpp:25 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:25)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::~RNScreensTurboModule())
+C/C++: >>> referenced 15 more times
+C/C++: ld.lld: error: undefined symbol: std::__ndk1::mutex::lock()
+C/C++: >>> referenced by lock_guard.h:35 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__mutex/lock_guard.h:35)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::lock_guard<std::__ndk1::mutex>::lock_guard[abi:ne180000](std::__ndk1::mutex&))
+C/C++: ld.lld: error: undefined symbol: std::__ndk1::mutex::unlock()
+C/C++: >>> referenced by lock_guard.h:41 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__mutex/lock_guard.h:41)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::lock_guard<std::__ndk1::mutex>::~lock_guard[abi:ne180000]())
+C/C++: ld.lld: error: undefined symbol: std::__ndk1::__shared_weak_count::__release_weak()
+C/C++: >>> referenced by shared_ptr.h:1396 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:1396)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::weak_ptr<facebook::react::MountingOverrideDelegate const>::~weak_ptr())
+C/C++: >>> referenced by shared_ptr.h:1396 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:1396)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::weak_ptr<facebook::react::MountingCoordinator const>::~weak_ptr())
+C/C++: >>> referenced by shared_ptr.h:184 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:184)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalListener.cpp.o:(std::__ndk1::__shared_weak_count::__release_shared[abi:ne180000]())
+C/C++: ld.lld: error: undefined symbol: std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::~basic_string()
+C/C++: >>> referenced by RNScreensTurboModule.cpp:30 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:30)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::get(facebook::jsi::Runtime&, facebook::jsi::PropNameID const&))
+C/C++: >>> referenced by RNScreensTurboModule.cpp:32 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:32)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::get(facebook::jsi::Runtime&, facebook::jsi::PropNameID const&))
+C/C++: >>> referenced by RNScreensTurboModule.cpp:34 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:34)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::get(facebook::jsi::Runtime&, facebook::jsi::PropNameID const&))
+C/C++: >>> referenced 13 more times
+C/C++: ld.lld: error: undefined symbol: operator new(unsigned long)
+C/C++: >>> referenced by Hybrid.h:226 (C:/Users/Antonio Garcia/.gradle/caches/8.13/transforms/1c50bd473f95dfa25c59ea4ee2aadfa5/transformed/fbjni-0.7.0/prefab/modules/fbjni/include/fbjni/detail/Hybrid.h:226)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(facebook::jni::basic_strong_ref<facebook::jni::detail::HybridData, facebook::jni::LocalReferenceAllocator> facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::makeCxxInstance<facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>&>(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>&))
+C/C++: >>> referenced by new:271 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/new:271)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(void* std::__ndk1::__libcpp_operator_new[abi:ne180000]<unsigned long>(unsigned long))
+C/C++: ld.lld: error: undefined symbol: vtable for __cxxabiv1::__class_type_info
+C/C++: >>> referenced by OnLoad.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(typeinfo for std::__ndk1::__function::__base<void ()>)
+C/C++: >>> referenced by OnLoad.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(typeinfo for JNI_OnLoad::$_0)
+C/C++: >>> referenced by RNSScreenRemovalListener.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalListener.cpp.o:(typeinfo for facebook::react::MountingOverrideDelegate)
+C/C++: >>> referenced 13 more times
+C/C++: >>> the vtable symbol may be undefined because the class is missing its key function (see https://lld.llvm.org/missingkeyfunction)
+C/C++: ld.lld: error: undefined symbol: vtable for __cxxabiv1::__si_class_type_info
+C/C++: >>> referenced by OnLoad.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(typeinfo for std::__ndk1::__function::__func<JNI_OnLoad::$_0, std::__ndk1::allocator<JNI_OnLoad::$_0>, void ()>)
+C/C++: >>> referenced by RNSScreenRemovalListener.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalListener.cpp.o:(typeinfo for RNSScreenRemovalListener)
+C/C++: >>> referenced by jni-adapter.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(typeinfo for std::__ndk1::__shared_ptr_emplace<RNScreens::RNScreensTurboModule, std::__ndk1::allocator<RNScreens::RNScreensTurboModule>>)
+C/C++: >>> referenced 12 more times
+C/C++: >>> the vtable symbol may be undefined because the class is missing its key function (see https://lld.llvm.org/missingkeyfunction)
+C/C++: ld.lld: error: undefined symbol: __cxa_pure_virtual
+C/C++: >>> referenced by OnLoad.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(vtable for std::__ndk1::__function::__base<void ()>)
+C/C++: >>> referenced by OnLoad.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(vtable for std::__ndk1::__function::__base<void ()>)
+C/C++: >>> referenced by OnLoad.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(vtable for std::__ndk1::__function::__base<void ()>)
+C/C++: >>> referenced 48 more times
+C/C++: ld.lld: error: undefined symbol: std::__ndk1::mutex::~mutex()
+C/C++: >>> referenced by NativeProxy.h:14 (C:/RutasMorelia/node_modules/react-native-screens/android/src/main/cpp/NativeProxy.h:14)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(rnscreens::NativeProxy::~NativeProxy())
+C/C++: ld.lld: error: undefined symbol: std::__ndk1::__shared_weak_count::~__shared_weak_count()
+C/C++: >>> referenced by shared_ptr.h:263 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:263)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_ptr_emplace<RNScreens::RNScreensTurboModule, std::__ndk1::allocator<RNScreens::RNScreensTurboModule>>::__shared_ptr_emplace[abi:ne180000]<Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_0 const&, Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_1 const&, Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_2 const&, Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_3 const&, std::__ndk1::allocator<RNScreens::RNScreensTurboModule>, 0>(std::__ndk1::allocator<RNScreens::RNScreensTurboModule>, Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_0 const&, Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_1 const&, Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_2 const&, Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_3 const&))
+C/C++: >>> referenced by shared_ptr.h:246 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:246)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_ptr_emplace<RNScreens::RNScreensTurboModule, std::__ndk1::allocator<RNScreens::RNScreensTurboModule>>::~__shared_ptr_emplace())
+C/C++: >>> referenced by shared_ptr.h:263 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:263)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::__shared_ptr_emplace<RNSScreenRemovalListener, std::__ndk1::allocator<RNSScreenRemovalListener>>::__shared_ptr_emplace[abi:ne180000]<rnscreens::NativeProxy::nativeAddMutationsListener(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, void>::_javaobject*>)::$_0, std::__ndk1::allocator<RNSScreenRemovalListener>, 0>(std::__ndk1::allocator<RNSScreenRemovalListener>, rnscreens::NativeProxy::nativeAddMutationsListener(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, void>::_javaobject*>)::$_0&&))
+C/C++: >>> referenced 1 more times
+C/C++: ld.lld: error: undefined symbol: vtable for std::__ndk1::__shared_weak_count
+C/C++: >>> referenced by shared_ptr.h:169 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:169)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_weak_count::__shared_weak_count[abi:ne180000](long))
+C/C++: >>> referenced by shared_ptr.h:169 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:169)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_weak_count::__shared_weak_count[abi:ne180000](long))
+C/C++: >>> the vtable symbol may be undefined because the class is missing its key function (see https://lld.llvm.org/missingkeyfunction)
+C/C++: ld.lld: error: undefined symbol: __cxa_allocate_exception
+C/C++: >>> referenced by RNScreensTurboModule.cpp:61 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:61)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::startTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced by RNScreensTurboModule.cpp:85 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:85)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::updateTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced by RNScreensTurboModule.cpp:96 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:96)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::finishTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced 5 more times
+C/C++: ld.lld: error: undefined symbol: __cxa_throw
+C/C++: >>> referenced by RNScreensTurboModule.cpp:61 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:61)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::startTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced by RNScreensTurboModule.cpp:85 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:85)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::updateTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced by RNScreensTurboModule.cpp:96 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:96)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::finishTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced 5 more times
+C/C++: ld.lld: error: undefined symbol: __cxa_free_exception
+C/C++: >>> referenced by RNScreensTurboModule.cpp:61 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:61)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::startTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced by RNScreensTurboModule.cpp:85 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:85)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::updateTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced by RNScreensTurboModule.cpp:96 (C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:96)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(RNScreens::RNScreensTurboModule::finishTFAILURE: Build failed with an exception.
+ransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long))
+C/C++: >>> referenced 2 more times
+C/C++: ld.lld: error: undefined symbol: vtable for std::__ndk1::__shared_count
+C/C++: >>> referenced by shared_ptr.h:145 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:145)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_count::__shared_count[abi:ne180000](long))
+C/C++: >>> referenced by shared_ptr.h:145 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:145)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_count::__shared_count[abi:ne180000](long))
+C/C++: >>> the vtable symbol may be undefined because the class is missing its key function (see https://lld.llvm.org/missingkeyfunction)
+C/C++: ld.lld: error: undefined symbol: std::__ndk1::__shared_weak_count::lock()
+C/C++: >>> referenced by shared_ptr.h:1451 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:1451)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::weak_ptr<facebook::react::MountingCoordinator const>::lock() const)
+C/C++: ld.lld: error: undefined symbol: std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::__init(char const*, unsigned long)
+C/C++: >>> referenced by string:954 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/string:954)
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::basic_string[abi:ne180000]<0>(char const*))
+C/C++: >>> referenced by string:971 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/string:971)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::basic_string[abi:ne180000](char const*, unsigned long))
+C/C++: ld.lld: error: undefined symbol: __cxa_begin_catch
+C/C++: >>> referenced by RNScreensTurboModule.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(__clang_call_terminate)
+C/C++: >>> referenced by Registration-inl.h:97 (C:/Users/Antonio Garcia/.gradle/caches/8.13/transforms/1c50bd473f95dfa25c59ea4ee2aadfa5/transformed/fbjni-0.7.0/prefab/modules/fbjni/include/fbjni/detail/Registration-inl.h:97)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(facebook::jni::detail::FunctionWrapper<facebook::jni::basic_strong_ref<facebook::jni::detail::JTypeFor<facebook::jni::detail::HybridData, facebook::jni::JObject, void>::_javaobject*, facebook::jni::LocalReferenceAllocator> (*)(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>), facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*, facebook::jni::basic_strong_ref<facebook::jni::detail::JTypeFor<facebook::jni::detail::HybridData, facebook::jni::JObject, void>::_javaobject*, facebook::jni::LocalReferenceAllocator>>::call(_JNIEnv*, _jobject*, facebook::jni::basic_strong_ref<facebook::jni::detail::JTypeFor<facebook::jni::detail::HybridData, facebook::jni::JObject, void>::_javaobject*, facebook::jni::LocalReferenceAllocator> (*)(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>)))
+C/C++: >>> referenced by Registration-inl.h:97 (C:/Users/Antonio Garcia/.gradle/caches/8.13/transforms/1c50bd473f95dfa25c59ea4ee2aadfa5/transformed/fbjni-0.7.0/prefab/modules/fbjni/include/fbjni/detail/Registration-inl.h:97)
+C/C++: >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(facebook::jni::detail::FunctionWrapper<void (*)(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>, facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, void>::_javaobject*>&&), facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*, void, facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, void>::_javaobject*>>::call(_JNIEnv*, _jobject*, facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, void>::_javaobject*, void (*)(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>, facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, void>::_javaobject*>&&)))
+C/C++: >>> referenced 4 more times
+C/C++: ld.lld: error: undefined symbol: std::terminate()
+C/C++: >>> referenced by RNScreensTurboModule.cpp
+C/C++: >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(__clang_call_terminate)
+C/C++: ld.lld: error: too many errors emitted, stopping now (use --error-limit=0 to see all errors)
+C/C++: CLANG_~1: error: linker command failed with exit code 1 (use -v to see invocation)
+C/C++: ninja: build stopped: subcommand failed.
+
+[Incubating] Problems report is available at: file:///C:/RutasMorelia/apps/mobile/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+180 actionable tasks: 131 executed, 49 up-to-date
+* What went wrong:
+Execution failed for task ':react-native-screens:buildCMakeDebug[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: ninja: Entering directory 
+`C:\RutasMorelia\node_modules\react-native-screens\android\.cxx\Debug\6u424l59\arm64-v8a'
+  [1/6] Building CXX object 
+CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o
+  [2/6] Building CXX object CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o
+  [3/6] Building CXX object 
+CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalListener.cpp.o
+  [4/6] Building CXX object CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o
+  [5/6] Building CXX object CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o
+  [6/6] Linking CXX shared library ..\..\..\..\build\intermediates\cxx\Debug\6u424l59\obj\arm64-v8a\librnscreens.so
+  FAILED: ../../../../build/intermediates/cxx/Debug/6u424l59/obj/arm64-v8a/librnscreens.so 
+  cmd.exe /C "cd . && 
+C:\Users\ANTONI~1\AppData\Local\Android\Sdk\ndk\271~1.122\TOOLCH~1\llvm\prebuilt\WINDOW~1\bin\CLANG_~1.EXE 
+--target=aarch64-none-linux-android24 --sysroot="C:/Users/Antonio 
+Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot" -fPIC -g -DANDROID 
+-fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes 
+-D__BIONIC_NO_PAGE_SIZE_MACRO -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  
+-Wl,-z,max-page-size=16384 -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings 
+-Wl,--no-undefined -Qunused-arguments -shared -Wl,-soname,librnscreens.so -o 
+..\..\..\..\build\intermediates\cxx\Debug\6u424l59\obj\arm64-v8a\librnscreens.so 
+CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o 
+CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalListener.cpp.o 
+CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o 
+CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o  "C:/Users/Antonio Garcia/.gradle/caches/8.13/transforms/3b090324050
+a037c1bec317ebc768f3a/transformed/react-android-0.86.0-debug/prefab/modules/reactnative/libs/android.arm64-v8a/libreact
+native.so"  "C:/Users/Antonio Garcia/.gradle/caches/8.13/transforms/3b090324050a037c1bec317ebc768f3a/transformed/react-
+android-0.86.0-debug/prefab/modules/jsi/libs/android.arm64-v8a/libjsi.so"  "C:/Users/Antonio Garcia/.gradle/caches/8.13
+/transforms/1c50bd473f95dfa25c59ea4ee2aadfa5/transformed/fbjni-0.7.0/prefab/modules/fbjni/libs/android.arm64-v8a/libfbj
+ni.so"  -landroid  -latomic -lm && cd ."
+  ld.lld: error: undefined symbol: operator delete(void*)
+  >>> referenced by function.h:250 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm
+/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__functional/function.h:250)
+  >>>               
+CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(std::__ndk1::__function::__func<JNI_OnLoad::$_0, 
+std::__ndk1::allocator<JNI_OnLoad::$_0>, void ()>::~__func())
+  >>> referenced by RNSScreenRemovalListener.h:9 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalListener.h:9)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalList
+ener.cpp.o:(RNSScreenRemovalListener::~RNSScreenRemovalListener())
+  >>> referenced by RNScreensTurboModule.cpp:25 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:25)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::~RNScreensTurboModule())
+  >>> referenced 15 more times
+  
+  ld.lld: error: undefined symbol: std::__ndk1::mutex::lock()
+  >>> referenced by lock_guard.h:35 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llv
+m/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__mutex/lock_guard.h:35)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::lock_guard<std::__ndk1::mutex
+>::lock_guard[abi:ne180000](std::__ndk1::mutex&))
+  
+  ld.lld: error: undefined symbol: std::__ndk1::mutex::unlock()
+  >>> referenced by lock_guard.h:41 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llv
+m/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__mutex/lock_guard.h:41)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::lock_guard<std::__ndk1::mutex
+>::~lock_guard[abi:ne180000]())
+  
+  ld.lld: error: undefined symbol: std::__ndk1::__shared_weak_count::__release_weak()
+  >>> referenced by shared_ptr.h:1396 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/l
+lvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:1396)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::weak_ptr<facebook::react::Mou
+ntingOverrideDelegate const>::~weak_ptr())
+  >>> referenced by shared_ptr.h:1396 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/l
+lvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:1396)
+  >>>               
+CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::weak_ptr<facebook::react::MountingCoordinator 
+const>::~weak_ptr())
+  >>> referenced by shared_ptr.h:184 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/ll
+vm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:184)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalList
+ener.cpp.o:(std::__ndk1::__shared_weak_count::__release_shared[abi:ne180000]())
+  
+  ld.lld: error: undefined symbol: std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, 
+std::__ndk1::allocator<char>>::~basic_string()
+  >>> referenced by RNScreensTurboModule.cpp:30 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:30)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::get(facebook::jsi::Runtime&, facebook::jsi::PropNameID const&))
+  >>> referenced by RNScreensTurboModule.cpp:32 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:32)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::get(facebook::jsi::Runtime&, facebook::jsi::PropNameID const&))
+  >>> referenced by RNScreensTurboModule.cpp:34 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:34)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::get(facebook::jsi::Runtime&, facebook::jsi::PropNameID const&))
+  >>> referenced 13 more times
+  
+  ld.lld: error: undefined symbol: operator new(unsigned long)
+  >>> referenced by Hybrid.h:226 (C:/Users/Antonio Garcia/.gradle/caches/8.13/transforms/1c50bd473f95dfa25c59ea4ee2aadf
+a5/transformed/fbjni-0.7.0/prefab/modules/fbjni/include/fbjni/detail/Hybrid.h:226)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(facebook::jni::basic_strong_ref<facebook::
+jni::detail::HybridData, facebook::jni::LocalReferenceAllocator> facebook::jni::HybridClass<rnscreens::NativeProxy, fac
+ebook::jni::detail::BaseHybridClass>::makeCxxInstance<facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook
+::jni::HybridClass<rnscreens::NativeProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, v
+oid>::_javaobject*>&>(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::Na
+tiveProxy, facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>&))
+  >>> referenced by new:271 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebui
+lt/windows-x86_64/sysroot/usr/include/c++/v1/new:271)
+  >>>               
+CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp.o:(void* 
+std::__ndk1::__libcpp_operator_new[abi:ne180000]<unsigned long>(unsigned long))
+  
+  ld.lld: error: undefined symbol: vtable for __cxxabiv1::__class_type_info
+  >>> referenced by OnLoad.cpp
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(typeinfo for 
+std::__ndk1::__function::__base<void ()>)
+  >>> referenced by OnLoad.cpp
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(typeinfo for JNI_OnLoad::$_0)
+  >>> referenced by RNSScreenRemovalListener.cpp
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalList
+ener.cpp.o:(typeinfo for facebook::react::MountingOverrideDelegate)
+  >>> referenced 13 more times
+  >>> the vtable symbol may be undefined because the class is missing its key function (see 
+https://lld.llvm.org/missingkeyfunction)
+  
+  ld.lld: error: undefined symbol: vtable for __cxxabiv1::__si_class_type_info
+  >>> referenced by OnLoad.cpp
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(typeinfo for 
+std::__ndk1::__function::__func<JNI_OnLoad::$_0, std::__ndk1::allocator<JNI_OnLoad::$_0>, void ()>)
+  >>> referenced by RNSScreenRemovalListener.cpp
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNSScreenRemovalList
+ener.cpp.o:(typeinfo for RNSScreenRemovalListener)
+  >>> referenced by jni-adapter.cpp
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(typeinfo for 
+std::__ndk1::__shared_ptr_emplace<RNScreens::RNScreensTurboModule, 
+std::__ndk1::allocator<RNScreens::RNScreensTurboModule>>)
+  >>> referenced 12 more times
+  >>> the vtable symbol may be undefined because the class is missing its key function (see 
+https://lld.llvm.org/missingkeyfunction)
+  
+  ld.lld: error: undefined symbol: __cxa_pure_virtual
+  >>> referenced by OnLoad.cpp
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(vtable for 
+std::__ndk1::__function::__base<void ()>)
+  >>> referenced by OnLoad.cpp
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(vtable for 
+std::__ndk1::__function::__base<void ()>)
+  >>> referenced by OnLoad.cpp
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/OnLoad.cpp.o:(vtable for 
+std::__ndk1::__function::__base<void ()>)
+  >>> referenced 48 more times
+  
+  ld.lld: error: undefined symbol: std::__ndk1::mutex::~mutex()
+  >>> referenced by NativeProxy.h:14 
+(C:/RutasMorelia/node_modules/react-native-screens/android/src/main/cpp/NativeProxy.h:14)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(rnscreens::NativeProxy::~NativeProxy())
+  
+  ld.lld: error: undefined symbol: std::__ndk1::__shared_weak_count::~__shared_weak_count()
+  >>> referenced by shared_ptr.h:263 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/ll
+vm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:263)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_ptr_emplace<RNScreen
+s::RNScreensTurboModule, std::__ndk1::allocator<RNScreens::RNScreensTurboModule>>::__shared_ptr_emplace[abi:ne180000]<J
+ava_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_0 const&, 
+Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_1 const&, 
+Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_2 const&, 
+Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_3 const&, 
+std::__ndk1::allocator<RNScreens::RNScreensTurboModule>, 0>(std::__ndk1::allocator<RNScreens::RNScreensTurboModule>, 
+Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_0 const&, 
+Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_1 const&, 
+Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_2 const&, 
+Java_com_swmansion_rnscreens_ScreensModule_nativeInstall::$_3 const&))
+  >>> referenced by shared_ptr.h:246 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/ll
+vm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:246)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_ptr_emplace<RNScreen
+s::RNScreensTurboModule, std::__ndk1::allocator<RNScreens::RNScreensTurboModule>>::~__shared_ptr_emplace())
+  >>> referenced by shared_ptr.h:263 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/ll
+vm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:263)
+  >>>               
+CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::__shared_ptr_emplace<RNSScreenRemovalListener, st
+d::__ndk1::allocator<RNSScreenRemovalListener>>::__shared_ptr_emplace[abi:ne180000]<rnscreens::NativeProxy::nativeAddMu
+tationsListener(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, 
+facebook::jni::JObject, void>::_javaobject*>)::$_0, std::__ndk1::allocator<RNSScreenRemovalListener>, 
+0>(std::__ndk1::allocator<RNSScreenRemovalListener>, rnscreens::NativeProxy::nativeAddMutationsListener(facebook::jni::
+alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, 
+void>::_javaobject*>)::$_0&&))
+  >>> referenced 1 more times
+  
+  ld.lld: error: undefined symbol: vtable for std::__ndk1::__shared_weak_count
+  >>> referenced by shared_ptr.h:169 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/ll
+vm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:169)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_weak_count::__shared
+_weak_count[abi:ne180000](long))
+  >>> referenced by shared_ptr.h:169 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/ll
+vm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:169)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_weak_count::__shared
+_weak_count[abi:ne180000](long))
+  >>> the vtable symbol may be undefined because the class is missing its key function (see 
+https://lld.llvm.org/missingkeyfunction)
+  
+  ld.lld: error: undefined symbol: __cxa_allocate_exception
+  >>> referenced by RNScreensTurboModule.cpp:61 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:61)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::startTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced by RNScreensTurboModule.cpp:85 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:85)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::updateTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced by RNScreensTurboModule.cpp:96 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:96)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::finishTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced 5 more times
+  
+  ld.lld: error: undefined symbol: __cxa_throw
+  >>> referenced by RNScreensTurboModule.cpp:61 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:61)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::startTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced by RNScreensTurboModule.cpp:85 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:85)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::updateTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced by RNScreensTurboModule.cpp:96 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:96)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::finishTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced 5 more times
+  
+  ld.lld: error: undefined symbol: __cxa_free_exception
+  >>> referenced by RNScreensTurboModule.cpp:61 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:61)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::startTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced by RNScreensTurboModule.cpp:85 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:85)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::updateTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced by RNScreensTurboModule.cpp:96 
+(C:/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule.cpp:96)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(RNScreens::RNScreensTurboModule::finishTransition(facebook::jsi::Runtime&, facebook::jsi::Value const&, 
+facebook::jsi::Value const*, unsigned long))
+  >>> referenced 2 more times
+  
+  ld.lld: error: undefined symbol: vtable for std::__ndk1::__shared_count
+  >>> referenced by shared_ptr.h:145 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/ll
+vm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:145)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_count::__shared_coun
+t[abi:ne180000](long))
+  >>> referenced by shared_ptr.h:145 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/ll
+vm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:145)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/jni-adapter.cpp.o:(std::__ndk1::__shared_count::__shared_coun
+t[abi:ne180000](long))
+  >>> the vtable symbol may be undefined because the class is missing its key function (see 
+https://lld.llvm.org/missingkeyfunction)
+  
+  ld.lld: error: undefined symbol: std::__ndk1::__shared_weak_count::lock()
+  >>> referenced by shared_ptr.h:1451 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/l
+lvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:1451)
+  >>>               
+CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::weak_ptr<facebook::react::MountingCoordinator 
+const>::lock() const)
+  
+  ld.lld: error: undefined symbol: std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, 
+std::__ndk1::allocator<char>>::__init(char const*, unsigned long)
+  >>> referenced by string:954 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pre
+built/windows-x86_64/sysroot/usr/include/c++/v1/string:954)
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, 
+std::__ndk1::allocator<char>>::basic_string[abi:ne180000]<0>(char const*))
+  >>> referenced by string:971 (C:/Users/Antonio Garcia/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/pre
+built/windows-x86_64/sysroot/usr/include/c++/v1/string:971)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(std::__ndk1::basic_string<char, 
+std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::basic_string[abi:ne180000](char const*, unsigned long))
+  
+  ld.lld: error: undefined symbol: __cxa_begin_catch
+  >>> referenced by RNScreensTurboModule.cpp
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(__clang_call_terminate)
+  >>> referenced by Registration-inl.h:97 (C:/Users/Antonio Garcia/.gradle/caches/8.13/transforms/1c50bd473f95dfa25c59e
+a4ee2aadfa5/transformed/fbjni-0.7.0/prefab/modules/fbjni/include/fbjni/detail/Registration-inl.h:97)
+  >>>               CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(facebook::jni::detail::FunctionWrapper<fac
+ebook::jni::basic_strong_ref<facebook::jni::detail::JTypeFor<facebook::jni::detail::HybridData, 
+facebook::jni::JObject, void>::_javaobject*, facebook::jni::LocalReferenceAllocator> 
+(*)(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, 
+facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>), 
+facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, 
+facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*, 
+facebook::jni::basic_strong_ref<facebook::jni::detail::JTypeFor<facebook::jni::detail::HybridData, 
+facebook::jni::JObject, void>::_javaobject*, facebook::jni::LocalReferenceAllocator>>::call(_JNIEnv*, _jobject*, 
+facebook::jni::basic_strong_ref<facebook::jni::detail::JTypeFor<facebook::jni::detail::HybridData, 
+facebook::jni::JObject, void>::_javaobject*, facebook::jni::LocalReferenceAllocator> 
+(*)(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, 
+facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>)))
+  >>> referenced by Registration-inl.h:97 (C:/Users/Antonio Garcia/.gradle/caches/8.13/transforms/1c50bd473f95dfa25c59e
+a4ee2aadfa5/transformed/fbjni-0.7.0/prefab/modules/fbjni/include/fbjni/detail/Registration-inl.h:97)
+  >>>               
+CMakeFiles/rnscreens.dir/src/main/cpp/NativeProxy.cpp.o:(facebook::jni::detail::FunctionWrapper<void 
+(*)(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, 
+facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>, 
+facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, 
+void>::_javaobject*>&&), facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, 
+facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*, void, 
+facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, 
+void>::_javaobject*>>::call(_JNIEnv*, _jobject*, facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, 
+facebook::jni::JObject, void>::_javaobject*, void 
+(*)(facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::jni::HybridClass<rnscreens::NativeProxy, 
+facebook::jni::detail::BaseHybridClass>::JavaPart, facebook::jni::JObject, void>::_javaobject*>, 
+facebook::jni::alias_ref<facebook::jni::detail::JTypeFor<facebook::react::JFabricUIManager, facebook::jni::JObject, 
+void>::_javaobject*>&&)))
+  >>> referenced 4 more times
+  
+  ld.lld: error: undefined symbol: std::terminate()
+  >>> referenced by RNScreensTurboModule.cpp
+  >>>               CMakeFiles/rnscreens.dir/C_/RutasMorelia/node_modules/react-native-screens/cpp/RNScreensTurboModule
+.cpp.o:(__clang_call_terminate)
+  
+  ld.lld: error: too many errors emitted, stopping now (use --error-limit=0 to see all errors)
+  CLANG_~1: error: linker command failed with exit code 1 (use -v to see invocation)
+  ninja: build stopped: subcommand failed.
+  
+  C++ build system [build] failed while executing:
+      @echo off
+      "C:\\Users\\Antonio Garcia\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        -C ^
+        "C:\\RutasMorelia\\node_modules\\react-native-screens\\android\\.cxx\\Debug\\6u424l59\\arm64-v8a" ^
+        rnscreens
+    from C:\RutasMorelia\node_modules\react-native-screens\android
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+BUILD FAILED in 3m 18s

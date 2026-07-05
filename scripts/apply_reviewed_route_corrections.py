@@ -257,8 +257,11 @@ def main() -> None:
     restore_naranja_routes(index)
     restore_route_from_kml("84", index)
     restore_route_from_kml("85", index)
+    restore_route_from_kml("28", index)
+    restore_route_from_kml("F8", index)
+    restore_route_from_kml("25", index)
     INDEX.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print("Updated reviewed routes: 78, 79, 13, 18, 31, oranges (excl. 39), 84, 85")
+    print("Updated reviewed routes: 78, 79, 13, 18, 31, oranges (excl. 39), 84, 85, 28, F8, 25")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,44 @@
+---
+pid: 32020
+cwd: "C:\RutasMorelia"
+command: "Set-Location \"C:\\RutasMorelia\\apps\\mobile\\android\"; Remove-Item -Recurse -Force \".\\app\\.cxx\" -ErrorAction SilentlyContinue; .\\gradlew.bat :app:assembleRelease --no-daemon 2>&1 | Select-Object -Last 40"
+started_at: 2026-07-05T02:46:03.048Z
+running_for_ms: 1825006  
+---
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)FAILURE: Build failed with an exception.
+
+transform[stderr]: (node:29376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:33388) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:7236) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:19692) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+LOG:Writing bundle output to: android\app\build\generated\assets\react\release\index.android.bundle
+LOG:Writing sourcemap output to: android\app\build\intermediates\sourcemaps\react\release\index.android.bundle.packager.map
+LOG:Done writing bundle output
+LOG:Done writing sourcemap output
+Copying 22 asset files
+Done copying assets
+
+> Task :app:createBundleReleaseJsAndAssets FAILED
+
+[Incubating] Problems report is available at: file:///C:/RutasMorelia/apps/mobile/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+120 actionable tasks: 16 executed, 104 up-to-date
+* What went wrong:
+Execution failed for task ':app:createBundleReleaseJsAndAssets'.
+> Couldn't determine Hermesc location. Please set `react.hermesCommand` to the path of the hermesc binary file. 
+node_modules/react-native/sdks/hermesc/%OS-BIN%/hermesc
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+BUILD FAILED in 3m 50s

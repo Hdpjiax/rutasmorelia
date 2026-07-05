@@ -3,7 +3,7 @@ pid: 33292
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia\\packages\\transit-core; npm run build; cd C:\\RutasMorelia\\apps\\web; npm run build"
 started_at: 2026-07-04T23:34:19.147Z
-running_for_ms: 7995011  
+running_for_ms: 11140004 
 ---
 
 > @rutas-morelia/transit-core@0.1.0 build

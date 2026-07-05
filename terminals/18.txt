@@ -3,7 +3,7 @@ pid: 17188
 cwd: "C:\RutasMorelia"
 command: "cd C:\\RutasMorelia; npm test -w mx.gob.morelia.simum"
 started_at: 2026-07-05T00:24:12.378Z
-running_for_ms: 5005008  
+running_for_ms: 8145000  
 ---
 
 > mx.gob.morelia.simum@0.0.1 test

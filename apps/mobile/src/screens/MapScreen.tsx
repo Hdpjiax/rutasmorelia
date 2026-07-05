@@ -212,37 +212,45 @@ export function MapScreen({navigation}: Props) {
         attribution
         accessibilityLabel="Mapa de transporte público de Morelia"
       >
-        <Camera ref={camera} initialViewState={{center: [-101.194, 19.702], zoom: 13.3}} minZoom={10} maxZoom={19} />
-        {!origin ? <UserLocation animated accuracy heading /> : null}
-        <Images images={{'route-arrow-icon': {source: {uri: ROUTE_ARROW_ICON}}}} />
+        <Camera
+          key="main-camera"
+          ref={camera}
+          initialViewState={{center: [-101.194, 19.702], zoom: 13.3}}
+          minZoom={10}
+          maxZoom={19}
+        />
+        {!origin ? <UserLocation key="user-location" animated accuracy heading /> : null}
+        <Images key="route-arrow-images" images={{'route-arrow-icon': {source: {uri: ROUTE_ARROW_ICON}}}} />
 
-        <GeoJSONSource id="routes" data={activeRouteGeoJSON || EMPTY_GEOJSON}>
-          {colorScheme === 'dark' ? (
-            <Layer
-              id="route-lines-glow"
-              type="line"
-              style={{
-                lineColor: ['get', 'color'],
-                lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 5.0, 14, 10.0, 18, 14.0],
-                lineOpacity: 0.45,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }}
-            />
-          ) : (
-            <Layer
-              id="route-lines-shadow"
-              type="line"
-              style={{
-                lineColor: '#000000',
-                lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 3.0, 14, 5.0, 18, 7.0],
-                lineOpacity: 0.12,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }}
-            />
-          )}
+        <GeoJSONSource key="routes" id="routes" data={activeRouteGeoJSON || EMPTY_GEOJSON}>
           <Layer
+            key="route-lines-glow"
+            id="route-lines-glow"
+            type="line"
+            style={{
+              lineColor: ['get', 'color'],
+              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 5.0, 14, 10.0, 18, 14.0],
+              lineOpacity: 0.45,
+              lineCap: 'round',
+              lineJoin: 'round',
+              visibility: colorScheme === 'dark' ? 'visible' : 'none',
+            }}
+          />
+          <Layer
+            key="route-lines-shadow"
+            id="route-lines-shadow"
+            type="line"
+            style={{
+              lineColor: '#000000',
+              lineWidth: ['interpolate', ['linear'], ['zoom'], 10, 3.0, 14, 5.0, 18, 7.0],
+              lineOpacity: 0.12,
+              lineCap: 'round',
+              lineJoin: 'round',
+              visibility: colorScheme === 'dark' ? 'none' : 'visible',
+            }}
+          />
+          <Layer
+            key="route-lines-casing"
             id="route-lines-casing"
             type="line"
             style={{
@@ -254,6 +262,7 @@ export function MapScreen({navigation}: Props) {
             }}
           />
           <Layer
+            key="route-lines"
             id="route-lines"
             type="line"
             style={{
@@ -265,6 +274,7 @@ export function MapScreen({navigation}: Props) {
             }}
           />
           <Layer
+            key="route-arrows"
             id="route-arrows"
             type="symbol"
             style={{
@@ -279,40 +289,9 @@ export function MapScreen({navigation}: Props) {
           />
         </GeoJSONSource>
 
-        {walkingPathsGeoJSON ? (
-          <GeoJSONSource id="walking-paths" data={walkingPathsGeoJSON}>
-            <Layer
-              id="walking-lines"
-              type="line"
-              style={{
-                lineColor: colorScheme === 'dark' ? '#94A3B8' : '#64748B',
-                lineWidth: 3,
-                lineDasharray: [2, 2],
-                lineCap: 'round',
-                lineJoin: 'round',
-              }}
-            />
-          </GeoJSONSource>
-        ) : null}
-
-        {boardingCoord ? (
-          <Marker key={`boarding-${activeRouteId}-${colorScheme}`} id="boarding-stop-marker" lngLat={boardingCoord}>
-            <View style={styles.stopMarkerGreen}>
-              <Text style={styles.stopMarkerText}>📥 Sube aquí</Text>
-            </View>
-          </Marker>
-        ) : null}
-
-        {alightingCoord ? (
-          <Marker key={`alighting-${activeRouteId}-${colorScheme}`} id="alighting-stop-marker" lngLat={alightingCoord}>
-            <View style={styles.stopMarkerRed}>
-              <Text style={styles.stopMarkerText}>🏁 Baja aquí</Text>
-            </View>
-          </Marker>
-        ) : null}
-
-        <GeoJSONSource id="traffic" data={trafficGeoJSON || EMPTY_GEOJSON}>
+        <GeoJSONSource key="traffic" id="traffic" data={trafficGeoJSON || EMPTY_GEOJSON}>
           <Layer
+            key="traffic-lines"
             id="traffic-lines"
             type="line"
             filter={['==', ['to-string', ['get', 'route_id']], String(activeRouteId)]}
@@ -327,8 +306,9 @@ export function MapScreen({navigation}: Props) {
           />
         </GeoJSONSource>
 
-        <GeoJSONSource id="stops" data={EMPTY_GEOJSON}>
+        <GeoJSONSource key="stops" id="stops" data={EMPTY_GEOJSON}>
           <Layer
+            key="stops-layer"
             id="stops-layer"
             type="circle"
             style={{
@@ -340,9 +320,41 @@ export function MapScreen({navigation}: Props) {
           />
         </GeoJSONSource>
 
+        <GeoJSONSource key="walking-paths" id="walking-paths" data={walkingPathsGeoJSON || EMPTY_GEOJSON}>
+          <Layer
+            key="walking-lines"
+            id="walking-lines"
+            type="line"
+            style={{
+              lineColor: colorScheme === 'dark' ? '#94A3B8' : '#64748B',
+              lineWidth: 3,
+              lineDasharray: [2, 2],
+              lineCap: 'round',
+              lineJoin: 'round',
+              visibility: walkingPathsGeoJSON ? 'visible' : 'none',
+            }}
+          />
+        </GeoJSONSource>
+
+        {boardingCoord ? (
+          <Marker key="boarding-stop-marker" id="boarding-stop-marker" lngLat={boardingCoord}>
+            <View style={styles.stopMarkerGreen}>
+              <Text style={styles.stopMarkerText}>📥 Sube aquí</Text>
+            </View>
+          </Marker>
+        ) : null}
+
+        {alightingCoord ? (
+          <Marker key="alighting-stop-marker" id="alighting-stop-marker" lngLat={alightingCoord}>
+            <View style={styles.stopMarkerRed}>
+              <Text style={styles.stopMarkerText}>🏁 Baja aquí</Text>
+            </View>
+          </Marker>
+        ) : null}
+
         {origin ? (
           <ViewAnnotation
-            key={`origin-${activeRouteId}-${colorScheme}`}
+            key="origin-marker"
             id="origin-marker"
             lngLat={[origin.longitude, origin.latitude]}
             draggable
@@ -361,7 +373,7 @@ export function MapScreen({navigation}: Props) {
 
         {destination ? (
           <ViewAnnotation
-            key={`destination-${activeRouteId}-${colorScheme}`}
+            key="destination-marker"
             id="destination-marker"
             lngLat={[destination.longitude, destination.latitude]}
             draggable
