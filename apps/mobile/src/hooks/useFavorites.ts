@@ -6,6 +6,7 @@ import {
   favoritesToSuggestions,
   findPlaceFavorite,
   findRouteFavorite,
+  hydrateFavoriteCoords,
   isPlaceFavorited as isPlaceFavoritedCore,
   isRouteFavorited as isRouteFavoritedCore,
   LOCAL_FAVORITES_KEY,
@@ -41,7 +42,7 @@ export function useFavorites(setMessage: SetMessageFn) {
     const local = await readLocalFavorites();
 
     if (!client) {
-      setFavorites(local);
+      setFavorites(hydrateFavoriteCoords(local));
       setUser(null);
       return;
     }
@@ -53,7 +54,7 @@ export function useFavorites(setMessage: SetMessageFn) {
       setUser(currentUser);
 
       if (!currentUser) {
-        setFavorites(local);
+        setFavorites(hydrateFavoriteCoords(local));
         return;
       }
 
@@ -63,12 +64,14 @@ export function useFavorites(setMessage: SetMessageFn) {
         .eq('user_id', currentUser.id);
 
       if (!error && data) {
-        setFavorites(mergeLocalFavorites(data as FavoriteItem[], local));
+        setFavorites(
+          hydrateFavoriteCoords(mergeLocalFavorites(data as FavoriteItem[], local)),
+        );
         return;
       }
     } catch {}
 
-    setFavorites(local);
+    setFavorites(hydrateFavoriteCoords(local));
   }, []);
 
   useEffect(() => {
@@ -155,7 +158,11 @@ export function useFavorites(setMessage: SetMessageFn) {
               .select(FAVORITES_SELECT)
               .single();
             if (!favError && favData) {
-              nextFavorite = favData as FavoriteItem;
+              nextFavorite = {
+                ...(favData as FavoriteItem),
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+              };
               const synced = removeFavoriteById(optimistic, localFavorite.id);
               const updated = [...synced, nextFavorite];
               setFavorites(updated);

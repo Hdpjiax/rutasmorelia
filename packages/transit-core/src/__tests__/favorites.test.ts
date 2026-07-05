@@ -4,6 +4,7 @@ import {
   DEFAULT_ORIGIN_LABEL,
   favoritesToSuggestions,
   filterFavoriteSuggestions,
+  hydrateFavoriteCoords,
   isPlaceFavorited,
   isRouteFavorited,
   mergeLocalFavorites,
@@ -47,5 +48,28 @@ describe('favorites', () => {
     expect(shouldShowFavoriteSuggestions('destination', '')).toBe(true);
     expect(shouldShowFavoriteSuggestions('origin', DEFAULT_ORIGIN_LABEL)).toBe(true);
     expect(shouldShowFavoriteSuggestions('origin', 'Centro Histórico')).toBe(false);
+  });
+
+  it('hydrates Supabase place favorites from EWKB location', () => {
+    const favorites: FavoriteItem[] = [
+      {
+        id: 9,
+        place_id: 24,
+        custom_name: 'Loma Real',
+        place: {
+          id: 24,
+          name: 'Loma Real',
+          location: '0101000020E61000002DC665819B4C59C082F5C99B0DBB3340',
+        },
+      },
+    ];
+
+    const hydrated = hydrateFavoriteCoords(favorites);
+    const suggestions = favoritesToSuggestions(hydrated);
+
+    expect(suggestions).toHaveLength(1);
+    expect(suggestions[0]?.label).toBe('Loma Real');
+    expect(suggestions[0]?.latitude).not.toBeNull();
+    expect(suggestions[0]?.longitude).not.toBeNull();
   });
 });
