@@ -76,11 +76,15 @@ def bootstrap(pbf: Path | None, download_url: str | None, force: bool = False) -
         extract.unlink(missing_ok=True)
     tile_dir.mkdir(parents=True, exist_ok=True)
 
-    from valhalla import get_config
+    from valhalla.config import _sanitize_config
+    from valhalla.valhalla_build_config import config as default_config
 
-    config = get_config(tile_extract="", tile_dir=tile_dir, verbose=False)
-    config["mjolnir"]["tile_extract"] = str(extract.resolve())
-    config["mjolnir"]["tile_dir"] = str(tile_dir.resolve())
+    config = _sanitize_config(default_config.copy())
+    mjolnir = config.setdefault("mjolnir", {})
+    mjolnir.setdefault("logging", {"type": "", "file_name": "valhalla.log", "long_format": False})
+    mjolnir["logging"]["type"] = ""
+    mjolnir["tile_extract"] = str(extract.resolve()) if extract else ""
+    mjolnir["tile_dir"] = str(tile_dir.resolve())
     # The Windows wheel's Spatialite crashes in `enhance` on self-intersecting
     # admin polygons present in the Mexico extract. Administrative labels are
     # irrelevant to road-axis matching, so disable that enrichment on Windows.
