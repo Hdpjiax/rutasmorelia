@@ -1,8 +1,11 @@
 import type {Coordinates, RouteItem} from '@rutas-morelia/transit-core';
+import {selectInitialJourneyRouteId} from '@rutas-morelia/transit-core';
 import {
   buildFallbackJourneyOptions,
+  effectiveRouteCatalog,
   planJourney,
   pickFallbackRoute,
+  resolveActiveRouteIdFromJourney,
 } from '../src/services/journey.service';
 import {FALLBACK_ROUTES} from '../src/services/routes.service';
 
@@ -47,6 +50,25 @@ describe('journey.service', () => {
     const result = await planJourney(client as never, origin, destination, catalog);
     expect(result.fromFallback).toBe(true);
     expect(result.options.length).toBeGreaterThan(0);
+  });
+
+  it('effectiveRouteCatalog falls back when store routes are empty', () => {
+    expect(effectiveRouteCatalog([])).toEqual(FALLBACK_ROUTES);
+  });
+
+  it('pickFallbackRoute never returns undefined with empty catalog', () => {
+    const route = pickFallbackRoute(origin, destination, []);
+    expect(route).toBeDefined();
+    expect(FALLBACK_ROUTES.some(item => item.id === route.id)).toBe(true);
+  });
+
+  it('resolveActiveRouteIdFromJourney maps display code to catalog id', async () => {
+    const singleRoute = [catalog[0]];
+    const result = await planJourney(null, origin, destination, singleRoute);
+    const raw = selectInitialJourneyRouteId(result.options);
+    const resolved = resolveActiveRouteIdFromJourney(result.options, singleRoute);
+    expect(raw).toBe('A78');
+    expect(resolved).toBe('78');
   });
 
   it('planJourney uses remote options when invoke succeeds', async () => {

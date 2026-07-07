@@ -2,7 +2,6 @@ import {
   DEFAULT_ORIGIN_LABEL,
   findFavoriteBySuggestion,
   favoriteCoords,
-  selectInitialJourneyRouteId,
   selectInitialJourneyTab,
   type Coordinates,
   type Suggestion,
@@ -11,7 +10,11 @@ import type {CameraRef} from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
 import {useCallback} from 'react';
 import {Keyboard} from 'react-native';
-import {planJourney} from '../services/journey.service';
+import {
+  effectiveRouteCatalog,
+  planJourney,
+  resolveActiveRouteIdFromJourney,
+} from '../services/journey.service';
 import {resolveSuggestionCoords, searchPlaceByName} from '../services/places.service';
 import {supabase} from '../lib/supabase';
 import {useFavoritesStore} from '../stores/favorites.store';
@@ -66,7 +69,8 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       setSheetMode('journey');
       setJourneyLoading(true);
       setJourneyOptions([]);
-      const {options, error, fromFallback} = await planJourney(supabase, from, to, routes);
+      const catalog = effectiveRouteCatalog(routes);
+      const {options, error, fromFallback} = await planJourney(supabase, from, to, catalog);
       setJourneyLoading(false);
       if (error || !options.length) {
         setMessage(error ?? 'Sin rutas disponibles', 'error');
@@ -74,7 +78,7 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       }
       setJourneyOptions(options);
       setJourneyTab(selectInitialJourneyTab(options));
-      const routeId = selectInitialJourneyRouteId(options);
+      const routeId = resolveActiveRouteIdFromJourney(options, catalog);
       if (routeId) setActiveRouteId(routeId);
       success();
       setMessage(
