@@ -7,7 +7,16 @@ from typing import Any, Protocol
 
 from .config import QualityThresholds
 import math
-from .geometry import Coordinate, deduplicate, densify, distance_m, interpolate, structural_anchors
+from .geometry import (
+    Coordinate,
+    clean_matched_geometry,
+    deduplicate,
+    densify,
+    distance_m,
+    interpolate,
+    segment_route_at_turns,
+    structural_anchors,
+)
 
 
 class TraceActor(Protocol):
@@ -172,8 +181,11 @@ def smart_densify(actor: TraceActor, points: list[Coordinate], spacing_m: float,
     return deduplicate(result)
 
 
-def match_component(actor: TraceActor, source: list[Coordinate], thresholds: QualityThresholds) -> MatchedComponent:
-    observations = smart_densify(actor, source, thresholds.densify_m)
+def _match_trace(
+    actor: TraceActor,
+    observations: list[Coordinate],
+    thresholds: QualityThresholds,
+) -> MatchedComponent:
     matched_chunks: list[MatchedComponent] = []
     for chunk in _chunks(observations, thresholds):
         last_error: Exception | None = None
@@ -204,6 +216,86 @@ def match_component(actor: TraceActor, source: list[Coordinate], thresholds: Qua
     for matched in matched_chunks[1:]:
         result = _stitch(result, matched)
     return result
+
+
+def _thresholds_for_segment(mode: str, base: QualityThresholds) -> QualityThresholds:
+    if mode == "straight":
+        return QualityThresholds(
+            densify_m=min(6.0, base.densify_m),
+            search_radii_m=tuple(min(radius, 35) for radius in base.search_radii_m),
+            p95_distance_m=min(base.p95_distance_m, 18.0),
+            max_distance_m=min(base.max_distance_m, 40.0),
+            endpoint_distance_m=base.endpoint_distance_m,
+            max_trace_points=base.max_trace_points,
+            overlap_points=base.overlap_points,
+            breakage_distance_m=base.breakage_distance_m,
+            ignore_oneways=base.ignore_oneways,
+        )
+    if mode == "roundabout":
+        return QualityThresholds(
+            densify_m=min(5.0, base.densify_m),
+            search_radii_m=base.search_radii_m,
+            p95_distance_m=max(base.p95_distance_m, 35.0),
+            max_distance_m=max(base.max_distance_m, 90.0),
+            endpoint_distance_m=max(base.endpoint_distance_m, 60.0),
+            max_trace_points=min(1200, base.max_trace_points),
+            overlap_points=base.overlap_points,
+            breakage_distance_m=min(base.breakage_distance_m, 80),
+            ignore_oneways=base.ignore_oneways,
+        )
+    return base
+
+
+def match_component(
+    actor: TraceActor,
+    source: list[Coordinate],
+    thresholds: QualityThresholds,
+    *,
+    segmented: bool = False,
+) -> MatchedComponent:
+    if not segmented or len(source) < 24:
+        observations = smart_densify(actor, source, thresholds.densify_m)
+        return _match_trace(actor, observations, thresholds)
+
+    segments = segment_route_at_turns(
+        source,
+        densify_step_m=max(5.0, thresholds.densify_m),
+        turn_threshold_deg=12.0,
+        straight_chunk_m=380.0,
+    )
+    stitched_coords: list[Coordinate] = []
+    stitched_edges: list[dict[str, Any]] = []
+    stitched_points: list[dict[str, Any]] = []
+    max_radius = 0
+    total_source_points = 0
+    anchor_indices: list[int] = []
+
+    for mode, segment_source in segments:
+        segment_thresholds = _thresholds_for_segment(mode, thresholds)
+        observations = smart_densify(actor, segment_source, segment_thresholds.densify_m)
+        matched = _match_trace(actor, observations, segment_thresholds)
+        cleaned = clean_matched_geometry(matched.coordinates, segment_source, mode)
+        if not cleaned:
+            cleaned = matched.coordinates
+        if stitched_coords and cleaned:
+            if distance_m(stitched_coords[-1], cleaned[0]) < 0.2:
+                cleaned = cleaned[1:]
+        offset = len(stitched_coords)
+        stitched_coords.extend(cleaned)
+        stitched_edges.extend(matched.edges)
+        stitched_points.extend(matched.matched_points)
+        max_radius = max(max_radius, matched.search_radius_m)
+        total_source_points += matched.source_points
+        anchor_indices.extend(index + offset for index in matched.anchor_indices)
+
+    return MatchedComponent(
+        coordinates=deduplicate(stitched_coords),
+        edges=stitched_edges,
+        matched_points=stitched_points,
+        search_radius_m=max_radius,
+        source_points=total_source_points,
+        anchor_indices=anchor_indices,
+    )
 
 
 def actor_version(actor: TraceActor) -> dict[str, Any]:

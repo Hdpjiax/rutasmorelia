@@ -16,7 +16,7 @@ PILOT_KML = ROOT / "rutastransporte" / "01_RUTAS_DE_COMBI" / "79_ALBERCA_GERTRUD
 PILOT_PDF = ROOT / "rutastransporte" / "01_RUTAS_DE_COMBI" / "79_ALBERCA_GERTRUDIS" / "MAPAS_alberca_g" / "Alberca Gertrudis.pdf"
 
 
-NARANJA_CODES = frozenset({"38", "39", "40", "41", "42", "44", "45", "46"})
+NARANJA_CODES = frozenset({"38", "39", "40", "41", "42", "43", "44", "45", "46"})
 
 
 @dataclass(frozen=True)

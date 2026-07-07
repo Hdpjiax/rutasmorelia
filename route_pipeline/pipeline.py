@@ -71,11 +71,14 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
         )
     elif route.code in NARANJA_CODES:
         thresholds = QualityThresholds(
-            p95_distance_m=45.0,
-            max_distance_m=120.0,
-            endpoint_distance_m=70.0,
-            search_radii_m=(15, 30, 50, 80),
-            densify_m=10.0,
+            p95_distance_m=28.0,
+            max_distance_m=70.0,
+            endpoint_distance_m=55.0,
+            search_radii_m=(12, 22, 35, 55),
+            densify_m=6.0,
+            max_trace_points=1800,
+            overlap_points=80,
+            breakage_distance_m=90,
         )
     matched = []
     reports = []
@@ -83,13 +86,20 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
     for direction in directions:
         direction_matches = []
         selected = _select_components(direction.index, direction.components, ignored_components)
+        use_segmented_matching = route.code in NARANJA_CODES or route.source_kind == "pdf-moovit"
         for component_index, component in selected:
-            result = match_component(actor, component, thresholds)
-            if route.code in ("13", "77"):
+            result = match_component(actor, component, thresholds, segmented=use_segmented_matching)
+            needs_spike_cleanup = route.code in ("13", "77", *tuple(NARANJA_CODES))
+            if needs_spike_cleanup:
                 cleaned_output, removed = _remove_corridor_excursions(list(result.coordinates))
                 if removed:
-                    rematch_anchors = _rdp(cleaned_output, 35.0 if route.code == "13" else 12.0)
-                    result = match_component(actor, rematch_anchors, thresholds)
+                    rematch_anchors = _rdp(cleaned_output, 35.0 if route.code == "13" else 10.0)
+                    result = match_component(
+                        actor,
+                        rematch_anchors,
+                        thresholds,
+                        segmented=use_segmented_matching,
+                    )
                     reference_overrides.append({
                         "direction": direction.index,
                         "component": component_index,
@@ -205,9 +215,9 @@ def _apply_reference_overrides(
     if route.code in NARANJA_CODES:
         return _clean_directions_for_corridor_matching(
             directions,
-            reason="pdf_guided_naranja_osm_matching",
-            rdp_tolerance_m=12.0,
-            remove_excursions=False,
+            reason="pdf_guided_naranja_axis_segmented_matching",
+            rdp_tolerance_m=8.0,
+            remove_excursions=True,
         )
 
     if route.slug == "12-cafe-1-lago":

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from route_pipeline.config import PILOT_KML, QualityThresholds
 from route_pipeline.bootstrap import _native_environment
-from route_pipeline.geometry import densify, distance_m
+from route_pipeline.geometry import clean_matched_geometry, densify, distance_m, segment_route_at_turns
 from route_pipeline.kml import parse_kml
 from route_pipeline.pipeline import _apply_reference_overrides, _select_components
 from route_pipeline.config import ROUTES
@@ -62,6 +62,27 @@ class GeometryTests(unittest.TestCase):
     def test_densify_never_exceeds_requested_spacing(self):
         line = densify([(-101.2, 19.7), (-101.2, 19.701)], 10)
         self.assertTrue(all(distance_m(a, b) <= 10.01 for a, b in zip(line, line[1:])))
+
+    def test_segment_route_splits_straights_and_turns(self):
+        line = [(-101.2, 19.7), (-101.199, 19.7), (-101.198, 19.701), (-101.197, 19.703)]
+        segments = segment_route_at_turns(line, densify_step_m=20.0, turn_threshold_deg=8.0)
+        modes = {mode for mode, _ in segments}
+        self.assertIn("turn", modes)
+        self.assertGreaterEqual(len(segments), 2)
+
+    def test_clean_matched_geometry_removes_lateral_spike(self):
+        source = [(-101.2, 19.7), (-101.19, 19.7), (-101.18, 19.7)]
+        matched = [
+            (-101.2, 19.7),
+            (-101.195, 19.705),
+            (-101.19, 19.7),
+            (-101.185, 19.7),
+            (-101.18, 19.7),
+        ]
+        cleaned = clean_matched_geometry(matched, source, "straight")
+        self.assertLess(len(cleaned), len(matched))
+        self.assertEqual(source[0], cleaned[0])
+        self.assertEqual(source[-1], cleaned[-1])
 
     def test_chunks_overlap_and_do_not_drop_points(self):
         thresholds = QualityThresholds(max_trace_points=100, overlap_points=10)

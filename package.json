@@ -17,6 +17,8 @@
     "dev:mobile-v2": "npm run start -w mobile-v2",
     "android:mobile-v2": "npm run android -w mobile-v2",
     "build:android:mobile-v2": "npm run build:android -w mobile-v2",
+    "purge:naranja": "python tools/purge_naranja_routes.py",
+    "build:naranja": "python tools/build_naranja_routes.py",
     "install:android:mobile-v2": "npm run build:android:install -w mobile-v2",
     "dev:mobile-v3": "npm run start -w mobile-v3",
     "android:mobile-v3": "npm run android -w mobile-v3",
