@@ -1,5 +1,6 @@
 import {DEFAULT_ORIGIN_LABEL, type Coordinates, type JourneyOption, type RouteItem} from '@rutas-morelia/transit-core';
 import {create} from 'zustand';
+import {effectiveRouteCatalog, resolveRouteCatalogId} from '../services/route-catalog-id';
 
 export type SheetMode = 'collapsed' | 'search' | 'routes' | 'journey' | 'favorites';
 
@@ -19,6 +20,7 @@ type TransitState = {
   setRoutes: (routes: RouteItem[]) => void;
   setRoutesLoading: (loading: boolean) => void;
   setActiveRouteId: (id: string | null) => void;
+  activateRoute: (ref: string | number | null | undefined, catalog: RouteItem[]) => void;
   setOrigin: (label: string, coords?: Coordinates | null) => void;
   setDestination: (label: string, coords?: Coordinates | null) => void;
   setJourneyOptions: (options: JourneyOption[]) => void;
@@ -46,6 +48,10 @@ export const useTransitStore = create<TransitState>((set, get) => ({
   setRoutes: routes => set({routes}),
   setRoutesLoading: routesLoading => set({routesLoading}),
   setActiveRouteId: activeRouteId => set({activeRouteId}),
+  activateRoute: (ref, catalog) => {
+    const id = resolveRouteCatalogId(ref, effectiveRouteCatalog(catalog));
+    if (id) set({activeRouteId: id});
+  },
   setOrigin: (originLabel, coords) =>
     set(coords === undefined ? {originLabel} : {originLabel, origin: coords}),
   setDestination: (destinationLabel, coords) =>

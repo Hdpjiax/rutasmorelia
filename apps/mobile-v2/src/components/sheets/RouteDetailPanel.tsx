@@ -13,7 +13,7 @@ export function RouteDetailPanel() {
   const routes = useTransitStore(s => s.routes);
   const routesLoading = useTransitStore(s => s.routesLoading);
   const activeRouteId = useTransitStore(s => s.activeRouteId);
-  const setActiveRouteId = useTransitStore(s => s.setActiveRouteId);
+  const activateRoute = useTransitStore(s => s.activateRoute);
   const geometryLoading = useUiStore(s => s.routeGeometryLoading);
   const favorites = useFavoritesStore(s => s.favorites);
   const toggleRoute = useFavoritesStore(s => s.toggleRoute);
@@ -53,7 +53,7 @@ export function RouteDetailPanel() {
                 key={route.id}
                 route={route}
                 selected={route.id === activeRouteId}
-                onPress={() => setActiveRouteId(route.id)}
+                onPress={() => activateRoute(route.id, routes)}
               />
             ))}
           </ScrollView>

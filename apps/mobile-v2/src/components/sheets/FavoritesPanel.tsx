@@ -13,7 +13,7 @@ export function FavoritesPanel() {
   const favorites = useFavoritesStore(s => s.favorites);
   const loading = useFavoritesStore(s => s.loading);
   const routes = useTransitStore(s => s.routes);
-  const setActiveRouteId = useTransitStore(s => s.setActiveRouteId);
+  const activateRoute = useTransitStore(s => s.activateRoute);
   const setDestination = useTransitStore(s => s.setDestination);
   const setSheetMode = useTransitStore(s => s.setSheetMode);
 
@@ -31,7 +31,7 @@ export function FavoritesPanel() {
   const onRoutePress = (favorite: FavoriteItem) => {
     const routeId = resolveFavoriteRouteCatalogId(favorite, routes);
     if (routeId) {
-      setActiveRouteId(routeId);
+      activateRoute(routeId, routes);
       setSheetMode('routes');
     }
   };

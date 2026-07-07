@@ -6,7 +6,8 @@ import {
 } from '@rutas-morelia/transit-core';
 import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import Animated, {FadeInRight} from 'react-native-reanimated';
-import {resolveJourneyOptionCatalogId} from '../../services/journey.service';
+
+import {resolveJourneyOptionCatalogId} from '../../services/route-catalog-id';
 import {useTransitStore} from '../../stores/transit.store';
 import {useTheme} from '../../theme/ThemeProvider';
 import {EmptyState} from '../ui/EmptyState';
@@ -19,7 +20,7 @@ export function JourneyResultsPanel() {
   const journeyTab = useTransitStore(s => s.journeyTab);
   const journeyLoading = useTransitStore(s => s.journeyLoading);
   const setJourneyTab = useTransitStore(s => s.setJourneyTab);
-  const setActiveRouteId = useTransitStore(s => s.setActiveRouteId);
+  const activateRoute = useTransitStore(s => s.activateRoute);
 
   const filtered = filterJourneyOptions(journeyOptions, journeyTab);
 
@@ -28,7 +29,7 @@ export function JourneyResultsPanel() {
       <Pressable
         onPress={() => {
           const catalogId = resolveJourneyOptionCatalogId(option, routes);
-          if (catalogId) setActiveRouteId(catalogId);
+          if (catalogId) activateRoute(catalogId, routes);
         }}
         style={[styles.card, {borderColor: theme.surfaceBorder, backgroundColor: theme.bgElevated}]}>
         <View style={[styles.badge, {backgroundColor: option.route_color || theme.accent}]}>

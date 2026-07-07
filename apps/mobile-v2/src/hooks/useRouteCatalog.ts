@@ -6,7 +6,7 @@ import {useTransitStore} from '../stores/transit.store';
 export function useRouteCatalog() {
   const setRoutes = useTransitStore(s => s.setRoutes);
   const setRoutesLoading = useTransitStore(s => s.setRoutesLoading);
-  const setActiveRouteId = useTransitStore(s => s.setActiveRouteId);
+  const activateRoute = useTransitStore(s => s.activateRoute);
   const activeRouteId = useTransitStore(s => s.activeRouteId);
 
   useEffect(() => {
@@ -17,14 +17,14 @@ export function useRouteCatalog() {
       const cached = await readCachedRoutes(asyncStorageAdapter);
       if (!cancelled && cached) {
         setRoutes(cached);
-        if (!activeRouteId && cached[0]) setActiveRouteId(cached[0].id);
+        if (!activeRouteId && cached[0]) activateRoute(cached[0].id, cached);
       }
 
       const routes = await loadRouteCatalog();
       if (cancelled) return;
       setRoutes(routes);
       setRoutesLoading(false);
-      if (!activeRouteId && routes[0]) setActiveRouteId(routes[0].id);
+      if (!activeRouteId && routes[0]) activateRoute(routes[0].id, routes);
       await writeCachedRoutes(asyncStorageAdapter, routes);
     }
 
@@ -32,5 +32,5 @@ export function useRouteCatalog() {
     return () => {
       cancelled = true;
     };
-  }, [activeRouteId, setActiveRouteId, setRoutes, setRoutesLoading]);
+  }, [activeRouteId, activateRoute, setRoutes, setRoutesLoading]);
 }

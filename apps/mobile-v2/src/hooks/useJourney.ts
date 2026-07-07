@@ -2,6 +2,7 @@ import {
   DEFAULT_ORIGIN_LABEL,
   findFavoriteBySuggestion,
   favoriteCoords,
+  selectInitialJourneyRouteId,
   selectInitialJourneyTab,
   type Coordinates,
   type Suggestion,
@@ -10,11 +11,8 @@ import type {CameraRef} from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
 import {useCallback} from 'react';
 import {Keyboard} from 'react-native';
-import {
-  effectiveRouteCatalog,
-  planJourney,
-  resolveActiveRouteIdFromJourney,
-} from '../services/journey.service';
+import {planJourney} from '../services/journey.service';
+import {effectiveRouteCatalog} from '../services/route-catalog-id';
 import {resolveSuggestionCoords, searchPlaceByName} from '../services/places.service';
 import {supabase} from '../lib/supabase';
 import {useFavoritesStore} from '../stores/favorites.store';
@@ -32,7 +30,7 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
     destination,
     setOrigin,
     setDestination,
-    setActiveRouteId,
+    activateRoute,
     setJourneyOptions,
     setJourneyTab,
     setJourneyLoading,
@@ -78,8 +76,8 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       }
       setJourneyOptions(options);
       setJourneyTab(selectInitialJourneyTab(options));
-      const routeId = resolveActiveRouteIdFromJourney(options, catalog);
-      if (routeId) setActiveRouteId(routeId);
+      const initialRef = selectInitialJourneyRouteId(options);
+      if (initialRef) activateRoute(initialRef, catalog);
       success();
       setMessage(
         fromFallback
@@ -90,7 +88,7 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
     },
     [
       dismissSearch,
-      setActiveRouteId,
+      activateRoute,
       setJourneyLoading,
       setJourneyOptions,
       setJourneyTab,
@@ -132,7 +130,7 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
         return;
       }
       setDestination(suggestion.label, coords);
-      if (suggestion.entity_type === 'route') setActiveRouteId(String(suggestion.entity_id));
+      if (suggestion.entity_type === 'route') activateRoute(suggestion.entity_id, routes);
       dismissSearch();
       if (origin) await planWithCoords(origin, coords);
       else setSheetMode('search');
@@ -143,7 +141,8 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       origin,
       planWithCoords,
       resolveCoords,
-      setActiveRouteId,
+      activateRoute,
+      routes,
       setDestination,
       setMessage,
       setOrigin,
