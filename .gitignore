@@ -54,3 +54,5 @@ update_routes_kml.sql
 
 .vercel
 .env*
+!.env.example
+!**/.env.example
