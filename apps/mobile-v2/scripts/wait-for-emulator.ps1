@@ -4,7 +4,7 @@ param(
   [int]$TimeoutSec = 300
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 $androidHome = $env:ANDROID_HOME
 if (-not $androidHome) {
   $androidHome = Join-Path $env:LOCALAPPDATA "Android\Sdk"
@@ -15,19 +15,26 @@ $emulator = Join-Path $androidHome "emulator\emulator.exe"
 if (-not (Test-Path $adb)) { throw "adb not found at $adb" }
 if (-not (Test-Path $emulator)) { throw "emulator not found at $emulator" }
 
-# Kill zombie emulator/adb state
-Get-Process emulator, "qemu-system*" -ErrorAction SilentlyContinue | Stop-Process -Force
-& $adb kill-server | Out-Null
-Start-Sleep -Seconds 2
-& $adb start-server | Out-Null
+$devicesRaw = & $adb devices 2>$null
+$existing = $devicesRaw | Select-String "emulator-\d+\s+device"
 
-$lock = Join-Path $env:USERPROFILE ".android\avd\$AvdName.avd\multiinstance.lock"
-if (Test-Path $lock) { Remove-Item $lock -Force }
-
-$existing = (& $adb devices) | Select-String "emulator-\d+\s+device"
 if (-not $existing) {
+  # Kill only zombie processes when no healthy device is connected
+  $hasQemu = Get-Process "qemu-system*" -ErrorAction SilentlyContinue
+  if ($hasQemu) {
+    Write-Host "[wait-for-emulator] Cleaning zombie emulator processes..."
+    Get-Process emulator, "qemu-system*" -ErrorAction SilentlyContinue | Stop-Process -Force
+    & $adb kill-server 2>$null | Out-Null
+    Start-Sleep -Seconds 2
+    & $adb start-server 2>$null | Out-Null
+    $lock = Join-Path $env:USERPROFILE ".android\avd\$AvdName.avd\multiinstance.lock"
+    if (Test-Path $lock) { Remove-Item $lock -Force }
+  }
+
   Write-Host "[wait-for-emulator] Starting $AvdName (cold boot)..."
   Start-Process -FilePath $emulator -ArgumentList @("-avd", $AvdName, "-no-snapshot-load") | Out-Null
+} else {
+  Write-Host "[wait-for-emulator] Emulator already online."
 }
 
 Write-Host "[wait-for-emulator] Waiting for device..."
