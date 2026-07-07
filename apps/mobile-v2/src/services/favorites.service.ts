@@ -7,9 +7,10 @@ import {
   LOCAL_FAVORITES_KEY,
   mergeLocalFavorites,
   removeFavoriteById,
+  type Coordinates,
   type FavoriteItem,
+  type RouteItem,
 } from '@rutas-morelia/transit-core';
-import type {Coordinates} from '@rutas-morelia/transit-core';
 import type {SupabaseClient} from '@supabase/supabase-js';
 import type {KeyValueStorage} from './storage/storage.interface';
 
@@ -59,6 +60,31 @@ export function toggleRouteFavoriteLocal(favorites: FavoriteItem[], routeId: str
   const existing = findRouteFavorite(favorites, routeId);
   if (existing) return removeFavoriteById(favorites, existing.id);
   return [...favorites, createLocalRouteFavorite(routeId)];
+}
+
+export function resolveFavoriteRouteCatalogId(
+  favorite: FavoriteItem,
+  routes: RouteItem[],
+): string | null {
+  const candidates = [favorite.route_id, favorite.route?.id, favorite.route?.code]
+    .filter(value => value != null)
+    .map(value => String(value));
+
+  for (const candidate of candidates) {
+    const exact = routes.find(route => route.id === candidate);
+    if (exact) return exact.id;
+
+    const digits = candidate.replace(/\D/g, '');
+    if (digits) {
+      const byDigits = routes.find(route => route.id === digits);
+      if (byDigits) return byDigits.id;
+    }
+
+    const byNumber = routes.find(route => route.number === candidate);
+    if (byNumber) return byNumber.id;
+  }
+
+  return null;
 }
 
 export function togglePlaceFavoriteLocal(

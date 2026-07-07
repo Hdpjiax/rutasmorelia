@@ -1,6 +1,7 @@
 import {Bus, MapPin} from 'phosphor-react-native';
 import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {favoriteCoords, type FavoriteItem} from '@rutas-morelia/transit-core';
+import {resolveFavoriteRouteCatalogId} from '../../services/favorites.service';
 import {useFavoritesStore} from '../../stores/favorites.store';
 import {useTransitStore} from '../../stores/transit.store';
 import {useTheme} from '../../theme/ThemeProvider';
@@ -28,7 +29,7 @@ export function FavoritesPanel() {
   };
 
   const onRoutePress = (favorite: FavoriteItem) => {
-    const routeId = String(favorite.route?.code || favorite.route_id || '');
+    const routeId = resolveFavoriteRouteCatalogId(favorite, routes);
     if (routeId) {
       setActiveRouteId(routeId);
       setSheetMode('routes');
@@ -70,7 +71,8 @@ export function FavoritesPanel() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, {color: theme.textMuted}]}>Rutas</Text>
           {routeFavorites.map(fav => {
-            const route = routes.find(r => r.id === String(fav.route_id) || r.id === String(fav.route?.code));
+            const catalogId = resolveFavoriteRouteCatalogId(fav, routes);
+            const route = catalogId ? routes.find(r => r.id === catalogId) : undefined;
             return (
               <Pressable
                 key={String(fav.id)}

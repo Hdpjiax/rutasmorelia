@@ -114,3 +114,14 @@ El `metro.config.js` bloquea `apps/web/node_modules`. No elimines esa regla.
 npm run test -w mobile-v2
 npm run typecheck -w mobile-v2
 ```
+
+## Verificación en CI / sin Android SDK
+
+En entornos sin Android SDK/JDK configurado, la verificación válida es:
+
+1. `npm install` + `npm run build:transit-core`
+2. `npm run typecheck -w mobile-v2`
+3. `npm run test -w mobile-v2` (servicios de rutas, búsqueda, viaje, geometría, favoritos)
+4. `npm run dev:mobile-v2` — confirma que **Metro Bundler** arranca (`Waiting on http://localhost:8081` o puerto alterno)
+
+`npm run dev:mobile-v2` **no** compila ni ejecuta el binario Android; eso requiere `npm run android -w mobile-v2` con emulador/dispositivo y SDK instalados. Un arranque exitoso de Metro indica que el entry point JS/TS resuelve dependencias del monorepo sin error fatal.

@@ -49,7 +49,7 @@ export function TransitMap({cameraRef}: Props) {
             zoom: 13,
           }}
         />
-        {!origin ? <UserLocation animated accuracy heading /> : null}
+        <UserLocation animated accuracy heading />
         <RouteLayers geojson={geojson} casingColor={theme.routeCasing} />
         {origin ? (
           <ViewAnnotation id="origin-marker" lngLat={[origin.longitude, origin.latitude]}>

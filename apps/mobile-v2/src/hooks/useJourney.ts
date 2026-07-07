@@ -21,6 +21,7 @@ import {useHaptics} from './useHaptics';
 
 export function useJourney(camera: React.RefObject<CameraRef | null>) {
   const favorites = useFavoritesStore(s => s.favorites);
+  const routes = useTransitStore(s => s.routes);
   const {
     originLabel,
     destinationLabel,
@@ -65,7 +66,7 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       setSheetMode('journey');
       setJourneyLoading(true);
       setJourneyOptions([]);
-      const {options, error} = await planJourney(supabase, from, to);
+      const {options, error, fromFallback} = await planJourney(supabase, from, to, routes);
       setJourneyLoading(false);
       if (error || !options.length) {
         setMessage(error ?? 'Sin rutas disponibles', 'error');
@@ -76,7 +77,12 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       const routeId = selectInitialJourneyRouteId(options);
       if (routeId) setActiveRouteId(routeId);
       success();
-      setMessage(`${options.length} opciones encontradas`, 'success');
+      setMessage(
+        fromFallback
+          ? `${options.length} opción estimada (sin Supabase)`
+          : `${options.length} opciones encontradas`,
+        fromFallback ? 'info' : 'success',
+      );
     },
     [
       dismissSearch,
@@ -87,6 +93,7 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       setMessage,
       setSheetMode,
       success,
+      routes,
     ],
   );
 
