@@ -2,12 +2,17 @@ import {
   adjustRouteColorForDarkTheme,
   GEOMETRY_CACHE_PREFIX,
   getGeometryBounds,
+  hasTransfers,
+  journeyOptionKey,
+  type JourneyOption,
   type RouteItem,
 } from '@rutas-morelia/transit-core';
-import type {FeatureCollection, LineString, MultiLineString} from 'geojson';
+import type {Feature, FeatureCollection, LineString, MultiLineString} from 'geojson';
 import type {KeyValueStorage} from './storage/storage.interface';
 import {buildGeojsonUrl, getRouteFetchBases, isLocalBaseUrl} from '../lib/routes-config';
+import {asyncStorageAdapter} from './storage/async-storage.adapter';
 import type {ColorScheme} from '../theme/tokens';
+import {effectiveRouteCatalog, resolveRouteCatalogId} from './route-catalog-id';
 
 export type CachedGeometry = {
   rawGeojson: FeatureCollection;
@@ -126,4 +131,126 @@ export async function writeCachedGeometry(
   cached: CachedGeometry,
 ): Promise<void> {
   await storage.setItem(geometryCacheKey(geometryId), JSON.stringify(cached));
+}
+
+const geometryMemoryCache = new Map<string, CachedGeometry>();
+
+export async function loadRouteGeometryByRef(
+  routeRef: string | number,
+  routes: RouteItem[],
+  scheme: ColorScheme,
+  storage: KeyValueStorage = asyncStorageAdapter,
+): Promise<{features: Feature[]; bounds: [number, number, number, number] | null}> {
+  const catalog = effectiveRouteCatalog(routes);
+  const routeId = resolveRouteCatalogId(routeRef, catalog);
+  if (!routeId) return {features: [], bounds: null};
+
+  const {geometryId, selected} = resolveGeometryIdForActiveRoute(routeId, catalog);
+  let cached = geometryMemoryCache.get(geometryId);
+  if (!cached) {
+    cached = (await readCachedGeometry(storage, geometryId)) ?? undefined;
+    if (cached) geometryMemoryCache.set(geometryId, cached);
+  }
+  if (!cached) {
+    const fetched = await loadRouteGeometry(geometryId);
+    if (!fetched) return {features: [], bounds: null};
+    geometryMemoryCache.set(geometryId, fetched);
+    void writeCachedGeometry(storage, geometryId, fetched);
+    cached = fetched;
+  }
+
+  const normalized = normalizeRouteGeojson(cached.rawGeojson, routeId, selected, scheme);
+  return {features: normalized.features, bounds: cached.bounds};
+}
+
+function distinctTransferColor(color: string): string {
+  const palette = ['#2563EB', '#DC2626', '#7C3AED', '#EA580C', '#0891B2'];
+  const lower = color.toLowerCase();
+  const next = palette.find(value => value.toLowerCase() !== lower);
+  return next ?? '#2563EB';
+}
+
+type JourneyGeometryResult = {
+  geojson: FeatureCollection;
+  bounds: [number, number, number, number] | null;
+};
+
+const journeyGeometryMemoryCache = new Map<string, JourneyGeometryResult>();
+
+function journeyGeometryCacheKey(option: JourneyOption, scheme: ColorScheme): string {
+  return `${journeyOptionKey(option)}:${scheme}`;
+}
+
+export function getCachedJourneyOptionGeometry(
+  option: JourneyOption,
+  scheme: ColorScheme,
+): JourneyGeometryResult | undefined {
+  return journeyGeometryMemoryCache.get(journeyGeometryCacheKey(option, scheme));
+}
+
+export function prefetchJourneyOptionsGeometry(
+  options: JourneyOption[],
+  routes: RouteItem[],
+  scheme: ColorScheme,
+  storage: KeyValueStorage = asyncStorageAdapter,
+): void {
+  for (const option of options) {
+    const key = journeyGeometryCacheKey(option, scheme);
+    if (journeyGeometryMemoryCache.has(key)) continue;
+    void loadJourneyOptionGeometry(option, routes, scheme, storage).then(result => {
+      journeyGeometryMemoryCache.set(key, result);
+    });
+  }
+}
+
+export async function loadJourneyOptionGeometry(
+  option: JourneyOption,
+  routes: RouteItem[],
+  scheme: ColorScheme,
+  storage: KeyValueStorage = asyncStorageAdapter,
+): Promise<JourneyGeometryResult> {
+  const cacheKey = journeyGeometryCacheKey(option, scheme);
+  const cached = journeyGeometryMemoryCache.get(cacheKey);
+  if (cached) return cached;
+  const primary = await loadRouteGeometryByRef(option.route_code || option.route_id, routes, scheme, storage);
+  const features: Feature[] = [...primary.features];
+  const boundsList: [number, number, number, number][] = primary.bounds ? [primary.bounds] : [];
+
+  if (hasTransfers(option)) {
+    const secondRef = option.second_route_code || option.second_route_id;
+    if (secondRef != null) {
+      const secondary = await loadRouteGeometryByRef(secondRef, routes, scheme, storage);
+      const primaryColor = String(primary.features[0]?.properties?.color || option.route_color || '');
+      const secondaryColor = String(secondary.features[0]?.properties?.color || option.second_route_color || '');
+      const recolorSecond =
+        primaryColor && secondaryColor && primaryColor.toLowerCase() === secondaryColor.toLowerCase();
+
+      features.push(
+        ...secondary.features.map(feature => ({
+          ...feature,
+          properties: {
+            ...feature.properties,
+            color: recolorSecond ? distinctTransferColor(secondaryColor) : feature.properties?.color,
+          },
+        })),
+      );
+      if (secondary.bounds) boundsList.push(secondary.bounds);
+    }
+  }
+
+  const mergedBounds = boundsList.length
+    ? boundsList.reduce<[number, number, number, number]>(
+        (acc, value) => [
+          Math.min(acc[0], value[0]),
+          Math.min(acc[1], value[1]),
+          Math.max(acc[2], value[2]),
+          Math.max(acc[3], value[3]),
+        ],
+        boundsList[0],
+      )
+    : null;
+
+  const result: JourneyGeometryResult = {geojson: {type: 'FeatureCollection', features}, bounds: mergedBounds};
+  journeyGeometryMemoryCache.set(cacheKey, result);
+  return result;
 }

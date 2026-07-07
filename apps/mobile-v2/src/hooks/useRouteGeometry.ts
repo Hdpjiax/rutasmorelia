@@ -1,6 +1,7 @@
 import type {CameraRef} from '@maplibre/maplibre-react-native';
 import type {FeatureCollection} from 'geojson';
 import {useEffect, useRef, useState} from 'react';
+import {mapFitDuration, mapFitPadding} from '../lib/map-camera';
 import {
   loadRouteGeometry,
   normalizeRouteGeojson,
@@ -18,6 +19,7 @@ export function useRouteGeometry(camera: React.RefObject<CameraRef | null>) {
   const activeRouteId = useTransitStore(s => s.activeRouteId);
   const routes = useTransitStore(s => s.routes);
   const setRouteGeometryLoading = useUiStore(s => s.setRouteGeometryLoading);
+  const sheetSnapIndex = useUiStore(s => s.sheetSnapIndex);
   const {scheme} = useMapStyle();
   const [geojson, setGeojson] = useState<FeatureCollection | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,11 +34,11 @@ export function useRouteGeometry(camera: React.RefObject<CameraRef | null>) {
     let cancelled = false;
     const {geometryId, selected} = resolveGeometryIdForActiveRoute(activeRouteId, routes);
 
-    const show = (cached: CachedGeometry, duration: number) => {
+    const show = (cached: CachedGeometry, fromCache: boolean) => {
       setGeojson(normalizeRouteGeojson(cached.rawGeojson, activeRouteId, selected, scheme));
       camera.current?.fitBounds(cached.bounds, {
-        padding: {top: 140, right: 28, bottom: 200, left: 28},
-        duration,
+        padding: mapFitPadding(0, true),
+        duration: mapFitDuration(fromCache),
       });
     };
 
@@ -52,7 +54,7 @@ export function useRouteGeometry(camera: React.RefObject<CameraRef | null>) {
 
       if (cached) {
         if (!cancelled) {
-          show(cached, 220);
+          show(cached, true);
           setRouteGeometryLoading(false);
         }
         return;
@@ -69,7 +71,7 @@ export function useRouteGeometry(camera: React.RefObject<CameraRef | null>) {
 
       memoryCache.current.set(geometryId, fetched);
       void writeCachedGeometry(asyncStorageAdapter, geometryId, fetched);
-      show(fetched, 320);
+      show(fetched, false);
       setRouteGeometryLoading(false);
     }
 
@@ -77,7 +79,7 @@ export function useRouteGeometry(camera: React.RefObject<CameraRef | null>) {
     return () => {
       cancelled = true;
     };
-  }, [activeRouteId, camera, routes, scheme, setRouteGeometryLoading]);
+  }, [activeRouteId, camera, routes, scheme, setRouteGeometryLoading, sheetSnapIndex]);
 
   return {geojson, error};
 }

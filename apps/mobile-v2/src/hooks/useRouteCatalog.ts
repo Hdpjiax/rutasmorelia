@@ -6,25 +6,29 @@ import {useTransitStore} from '../stores/transit.store';
 export function useRouteCatalog() {
   const setRoutes = useTransitStore(s => s.setRoutes);
   const setRoutesLoading = useTransitStore(s => s.setRoutesLoading);
-  const activateRoute = useTransitStore(s => s.activateRoute);
-  const activeRouteId = useTransitStore(s => s.activeRouteId);
-
+  const setRoutesError = useTransitStore(s => s.setRoutesError);
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       setRoutesLoading(true);
+      setRoutesError(null);
+
       const cached = await readCachedRoutes(asyncStorageAdapter);
       if (!cancelled && cached) {
         setRoutes(cached);
-        if (!activeRouteId && cached[0]) activateRoute(cached[0].id, cached);
       }
 
       const routes = await loadRouteCatalog();
       if (cancelled) return;
+
       setRoutes(routes);
       setRoutesLoading(false);
-      if (!activeRouteId && routes[0]) activateRoute(routes[0].id, routes);
+
+      if (routes.length < 50) {
+        setRoutesError('No se pudieron cargar todas las rutas. Revisa tu conexión.');
+      }
+
       await writeCachedRoutes(asyncStorageAdapter, routes);
     }
 
@@ -32,5 +36,5 @@ export function useRouteCatalog() {
     return () => {
       cancelled = true;
     };
-  }, [activeRouteId, activateRoute, setRoutes, setRoutesLoading]);
+  }, [setRoutes, setRoutesError, setRoutesLoading]);
 }

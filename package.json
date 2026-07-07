@@ -16,6 +16,10 @@
     "test:transit-core": "npm run test -w @rutas-morelia/transit-core",
     "dev:mobile-v2": "npm run start -w mobile-v2",
     "android:mobile-v2": "npm run android -w mobile-v2",
+    "build:android:mobile-v2": "npm run build:android -w mobile-v2",
+    "install:android:mobile-v2": "npm run build:android:install -w mobile-v2",
+    "dev:mobile-v3": "npm run start -w mobile-v3",
+    "android:mobile-v3": "npm run android -w mobile-v3",
     "check": "npm run build:transit-core && npm run test:transit-core && npm run lint -w web && npm run build -w web && npm run lint -w api && npm test -w api -- --runInBand && npm run build -w api && npm run typecheck -w mx.gob.morelia.simum"
   },
   "devDependencies": {

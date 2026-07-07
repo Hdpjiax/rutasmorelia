@@ -1,5 +1,7 @@
 import {
   buildPhotonSearchUrl,
+  expandSearchQuery,
+  isWithinMoreliaMetro,
   mapPhotonFeatures,
   scoreRoutesByQuery,
   type RouteItem,
@@ -9,34 +11,80 @@ import type {SupabaseClient} from '@supabase/supabase-js';
 
 export type SearchTransitClient = Pick<SupabaseClient, 'rpc' | 'functions'>;
 
+const PLACE_SEARCH_LIMIT = 25;
+
+function moreliaScopedQuery(query: string): string {
+  const lower = query.toLocaleLowerCase('es-MX');
+  if (lower.includes('morelia') || lower.includes('michoac')) return query;
+  return `${query}, Morelia`;
+}
+
+function dedupeSuggestions(items: Suggestion[]): Suggestion[] {
+  const seen = new Set<string>();
+  return items.filter(item => {
+    const key = `${item.entity_type}:${item.entity_id}:${item.label}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function filterPhotonSuggestions(suggestions: Suggestion[]): Suggestion[] {
+  return suggestions.filter(item => {
+    if (item.entity_type === 'route') return true;
+    if (item.latitude == null || item.longitude == null) return true;
+    if (!String(item.entity_id).startsWith('photon-')) return true;
+    return isWithinMoreliaMetro({latitude: item.latitude, longitude: item.longitude});
+  });
+}
+
+function placesOnly(suggestions: Suggestion[]): Suggestion[] {
+  return suggestions.filter(item => item.entity_type !== 'route' && item.label.trim().length > 0);
+}
+
 export async function searchTransitRemote(
   client: SearchTransitClient,
   query: string,
-  limit = 5,
+  limit = PLACE_SEARCH_LIMIT,
 ): Promise<Suggestion[]> {
-  const [localResult, remoteResult] = await Promise.allSettled([
-    client.rpc('search_transit', {p_query: query, p_city_id: null, p_limit: limit, p_user_id: null}),
-    client.functions.invoke('search-transit', {body: {query, limit}}),
-  ]);
+  const scopedQuery = moreliaScopedQuery(query);
+  const variants = expandSearchQuery(scopedQuery);
 
-  if (localResult.status === 'fulfilled' && !localResult.value.error && localResult.value.data) {
-    const localSuggestions = (localResult.value.data as Suggestion[]).filter(item => item.entity_type !== 'route');
-    if (localSuggestions.length > 0) return localSuggestions;
-  }
+  for (const variant of variants) {
+    const merged: Suggestion[] = [];
 
-  if (remoteResult.status === 'fulfilled' && !remoteResult.value.error) {
-    const remoteSuggestions = (remoteResult.value.data?.data ?? []) as Suggestion[];
-    if (remoteSuggestions.length > 0) return remoteSuggestions;
+    const [edgeResult, rpcResult] = await Promise.allSettled([
+      client.functions.invoke('search-transit', {
+        body: {query: variant, limit, city_id: null},
+      }),
+      client.rpc('search_transit', {
+        p_query: variant,
+        p_city_id: null,
+        p_limit: limit,
+        p_user_id: null,
+      }),
+    ]);
+
+    if (edgeResult.status === 'fulfilled' && !edgeResult.value.error) {
+      merged.push(...(((edgeResult.value.data?.data ?? []) as Suggestion[]) || []));
+    }
+
+    if (rpcResult.status === 'fulfilled' && !rpcResult.value.error && rpcResult.value.data) {
+      merged.push(...(rpcResult.value.data as Suggestion[]));
+    }
+
+    const places = placesOnly(dedupeSuggestions(merged));
+    if (places.length > 0) return places;
   }
 
   return [];
 }
 
-export async function searchPhotonFallback(query: string, limit = 10): Promise<Suggestion[]> {
-  const response = await fetch(buildPhotonSearchUrl(query, limit));
+export async function searchPhotonFallback(query: string, limit = 15): Promise<Suggestion[]> {
+  const response = await fetch(buildPhotonSearchUrl(moreliaScopedQuery(query), limit));
   if (!response.ok) return [];
   const payload = await response.json();
-  return mapPhotonFeatures(payload.features);
+  return filterPhotonSuggestions(mapPhotonFeatures(payload.features));
 }
 
 export function searchRoutesLocally(routes: RouteItem[], query: string): Suggestion[] {
@@ -53,8 +101,8 @@ export function searchRoutesLocally(routes: RouteItem[], query: string): Suggest
 export async function searchPlaces(
   client: SearchTransitClient | null,
   query: string,
-  routes: RouteItem[] = [],
-  limit = 5,
+  _routes: RouteItem[] = [],
+  limit = PLACE_SEARCH_LIMIT,
 ): Promise<Suggestion[]> {
   const trimmed = query.trim();
   if (trimmed.length < 2) return [];
@@ -69,11 +117,11 @@ export async function searchPlaces(
   }
 
   try {
-    const photon = await searchPhotonFallback(trimmed, 10);
+    const photon = await searchPhotonFallback(trimmed, 15);
     if (photon.length > 0) return photon;
   } catch {
-    // fall through to local routes
+    // no results
   }
 
-  return searchRoutesLocally(routes, trimmed);
+  return [];
 }

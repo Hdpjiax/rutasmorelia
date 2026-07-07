@@ -1,7 +1,18 @@
 import React from 'react';
 import {View} from 'react-native';
 
-export const Map = ({children}: {children?: React.ReactNode}) => <View testID="map-view">{children}</View>;
+export const Map = ({
+  children,
+  onDidFinishLoadingMap,
+}: {
+  children?: React.ReactNode;
+  onDidFinishLoadingMap?: () => void;
+}) => {
+  React.useEffect(() => {
+    onDidFinishLoadingMap?.();
+  }, [onDidFinishLoadingMap]);
+  return <View testID="map-view">{children}</View>;
+};
 export const Camera = React.forwardRef(function Camera(_props, _ref) {
   return <View testID="map-camera" />;
 });

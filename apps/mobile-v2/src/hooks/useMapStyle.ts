@@ -3,8 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useState} from 'react';
 import {useTheme} from '../theme/ThemeProvider';
 
-const NIGHT_PALETTE = {bg: '#070B12', ink: '#8FA3BC'};
-
 export function useMapStyle() {
   const {scheme} = useTheme();
   const [mapStyle, setMapStyle] = useState<MapStyleJson | string>(getMapStyleUrl(scheme));
@@ -12,7 +10,7 @@ export function useMapStyle() {
   useEffect(() => {
     let active = true;
     const url = getMapStyleUrl(scheme);
-    const cacheKey = `rm_v2_map_style_${scheme}`;
+    const cacheKey = 'rm_v2_map_style_web_light_v1';
 
     async function loadStyle() {
       try {
@@ -26,7 +24,7 @@ export function useMapStyle() {
         const response = await fetch(url);
         if (!response.ok) throw new Error('style fetch failed');
         const styleJson = (await response.json()) as MapStyleJson;
-        const customized = customizeMapStyle(styleJson, scheme, scheme === 'dark' ? NIGHT_PALETTE : undefined);
+        const customized = customizeMapStyle(styleJson, 'light');
         if (active) {
           setMapStyle(customized);
           await AsyncStorage.setItem(cacheKey, JSON.stringify(customized));

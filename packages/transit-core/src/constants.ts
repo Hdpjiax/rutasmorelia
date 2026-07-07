@@ -2,7 +2,12 @@ import type {Coordinates} from './types';
 
 export const MORELIA_CENTER: Coordinates = {latitude: 19.7027, longitude: -101.1944};
 
+export const MORELIA_CITY_ID = 1;
+
 export const MORELIA_PHOTON_ANCHOR = {lat: 19.702, lon: -101.194} as const;
+
+/** Radio aproximado del área metropolitana de Morelia (km). */
+export const MORELIA_METRO_RADIUS_KM = 25;
 
 export const PUBLISHED_ROUTES_BASE_URL = 'https://www.viamorelia.org/routes';
 
@@ -19,6 +24,6 @@ export const PERIPHERAL_ROAD_NAMES = [
 
 export const LOCAL_FAVORITES_KEY = 'local_favorites';
 
-export const ROUTES_CACHE_KEY = '@viamorelia/routes-v4';
+export const ROUTES_CACHE_KEY = '@viamorelia/routes-v5';
 
 export const GEOMETRY_CACHE_PREFIX = '@viamorelia/geometry-v1-';

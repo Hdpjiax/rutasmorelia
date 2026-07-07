@@ -19,10 +19,11 @@ export function isLocalBaseUrl(base: string): boolean {
 }
 
 export function getRouteFetchBases(): string[] {
-  if (__DEV__) {
-    return [LOCAL_ROUTES_BASE_URL, getPublishedRoutesBaseUrl()];
+  const published = getPublishedRoutesBaseUrl();
+  if (__DEV__ && env.routesBaseUrl) {
+    return [env.routesBaseUrl, published];
   }
-  return [getPublishedRoutesBaseUrl()];
+  return [published];
 }
 
 export function buildGeojsonUrl(base: string, geometryId: string): string {

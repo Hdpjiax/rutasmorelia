@@ -1,4 +1,5 @@
 import {
+  favoritesToSuggestions,
   filterFavoriteSuggestions,
   shouldShowFavoriteSuggestions,
   type Suggestion,
@@ -15,7 +16,7 @@ export function usePlaceSearch() {
   const destinationLabel = useTransitStore(s => s.destinationLabel);
   const routes = useTransitStore(s => s.routes);
   const favorites = useFavoritesStore(s => s.favorites);
-  const favoriteSuggestions = useFavoritesStore(s => s.favoriteSuggestions());
+  const favoriteSuggestions = useMemo(() => favoritesToSuggestions(favorites), [favorites]);
 
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,6 +36,7 @@ export function usePlaceSearch() {
     const cached = cache.current.get(cacheKey);
     if (cached) {
       setSuggestions(cached);
+      setLoading(false);
       return;
     }
 

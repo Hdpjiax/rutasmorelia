@@ -7,10 +7,12 @@ import {
 import type {KeyValueStorage} from './storage/storage.interface';
 import {getRouteFetchBases, isLocalBaseUrl} from '../lib/routes-config';
 
+export const MIN_EXPECTED_ROUTES = 50;
+
 export const FALLBACK_ROUTES: RouteItem[] = [
   {id: '78', geometryId: '78', number: 'A78', name: 'Alberca (Metropolis)', detail: 'Camión', time: 'Ver recorrido', color: '#FFC800'},
-  {id: '3', geometryId: '3', number: 'A3', name: 'Amarilla 1 Centro', detail: 'Camión', time: 'Ver recorrido', color: '#E5B900'},
-  {id: '4', geometryId: '4', number: 'C4', name: 'Alberca Gertrudis', detail: 'Combi', time: 'Ver recorrido', color: '#6F7E24'},
+  {id: '3', geometryId: '3', number: 'C3', name: 'Amarilla 1 Centro', detail: 'Combi', time: 'Ver recorrido', color: '#E5B900'},
+  {id: '79', geometryId: '79', number: 'C79', name: 'Alberca Gertrudis', detail: 'Combi', time: 'Ver recorrido', color: '#6F7E24'},
 ];
 
 type RoutesIndexPayload = {
@@ -35,6 +37,10 @@ export function mapRoutesFromIndex(entries: RouteIndexEntry[]): RouteItem[] {
   return entries.map(entry => mapRouteFromIndex(entry));
 }
 
+export function isReliableRouteCatalog(routes: RouteItem[]): boolean {
+  return routes.length >= MIN_EXPECTED_ROUTES;
+}
+
 async function fetchRoutesFromBase(
   base: string,
   signal?: AbortSignal,
@@ -45,10 +51,9 @@ async function fetchRoutesFromBase(
     if (isLocalBaseUrl(base)) fetchController.abort();
   }, localTimeoutMs);
 
-  const mergedSignal = signal;
   try {
     const response = await fetch(`${base}/index.json`, {
-      signal: mergedSignal ?? fetchController.signal,
+      signal: signal ?? fetchController.signal,
     });
     clearTimeout(timeoutId);
     if (!response.ok) throw new Error('routes fetch failed');
@@ -68,7 +73,7 @@ export async function loadRouteCatalog(
     try {
       const entries = await fetchRoutesFromBase(base, signal);
       const mapped = mapRoutesFromIndex(entries);
-      if (mapped.length > 0) return mapped;
+      if (isReliableRouteCatalog(mapped)) return mapped;
     } catch {
       // try next base
     }
@@ -81,12 +86,15 @@ export async function readCachedRoutes(storage: KeyValueStorage): Promise<RouteI
     const cached = await storage.getItem(ROUTES_CACHE_KEY);
     if (!cached) return null;
     const parsed = JSON.parse(cached) as {routes?: RouteItem[]};
-    return Array.isArray(parsed.routes) && parsed.routes.length > 0 ? parsed.routes : null;
+    const routes = Array.isArray(parsed.routes) ? parsed.routes : null;
+    if (!routes || !isReliableRouteCatalog(routes)) return null;
+    return routes;
   } catch {
     return null;
   }
 }
 
 export async function writeCachedRoutes(storage: KeyValueStorage, routes: RouteItem[]): Promise<void> {
+  if (!isReliableRouteCatalog(routes)) return;
   await storage.setItem(ROUTES_CACHE_KEY, JSON.stringify({savedAt: Date.now(), routes}));
 }

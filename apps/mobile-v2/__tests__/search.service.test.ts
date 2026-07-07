@@ -14,10 +14,9 @@ describe('search.service', () => {
     expect(results[0].label.toLowerCase()).toContain('amarilla');
   });
 
-  it('searchPlaces falls back to local routes when Supabase is null', async () => {
+  it('searchPlaces returns places only (no route fallback)', async () => {
     const results = await searchPlaces(null, 'alberca', sampleRoutes);
-    expect(results.length).toBeGreaterThan(0);
-    expect(results.some(item => item.label.toLowerCase().includes('alberca'))).toBe(true);
+    expect(results.every(item => item.entity_type !== 'route')).toBe(true);
   });
 
   it('searchPlaces returns empty for short queries', async () => {

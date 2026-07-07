@@ -1,5 +1,33 @@
+import {MORELIA_CENTER, MORELIA_METRO_RADIUS_KM} from './constants';
 import type {FeatureCollection} from 'geojson';
 import type {Coordinates, RouteGeometry} from './types';
+
+export function distanceKm(a: Coordinates, b: Coordinates): number {
+  const R = 6371;
+  const dLat = ((b.latitude - a.latitude) * Math.PI) / 180;
+  const dLon = ((b.longitude - a.longitude) * Math.PI) / 180;
+  const lat1 = (a.latitude * Math.PI) / 180;
+  const lat2 = (b.latitude * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
+
+export function distanceMeters(a: Coordinates, b: Coordinates): number {
+  return Math.round(distanceKm(a, b) * 1000);
+}
+
+export function lngLatToCoords(lngLat: [number, number]): Coordinates {
+  return {longitude: lngLat[0], latitude: lngLat[1]};
+}
+
+export function isWithinMoreliaMetro(
+  coords: Coordinates,
+  radiusKm = MORELIA_METRO_RADIUS_KM,
+): boolean {
+  return distanceKm(coords, MORELIA_CENTER) <= radiusKm;
+}
 
 export function getGeometryBounds(geometry: RouteGeometry): [number, number, number, number] | null {
   const coordinates = geometry.type === 'MultiLineString' ? geometry.coordinates.flat() : geometry.coordinates;

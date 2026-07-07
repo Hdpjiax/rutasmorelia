@@ -2,7 +2,7 @@ import type {ExpoConfig, ConfigContext} from 'expo/config';
 
 export default ({config}: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'Rutas Morelia',
+  name: 'Via Morelia',
   slug: 'rutas-morelia-v2',
   version: '1.0.0',
   scheme: 'rutasmorelia',
@@ -13,10 +13,18 @@ export default ({config}: ConfigContext): ExpoConfig => ({
     '@maplibre/maplibre-react-native',
     'expo-dev-client',
     [
+      'expo-splash-screen',
+      {
+        image: './assets/splash-icon.png',
+        resizeMode: 'contain',
+        backgroundColor: '#FFFFFF',
+      },
+    ],
+    [
       'expo-location',
       {
         locationAlwaysAndWhenInUsePermission:
-          'Rutas Morelia usa tu ubicación para mostrar paradas cercanas y planificar viajes.',
+          'Via Morelia usa tu ubicación para mostrar paradas cercanas y planificar viajes.',
       },
     ],
   ],

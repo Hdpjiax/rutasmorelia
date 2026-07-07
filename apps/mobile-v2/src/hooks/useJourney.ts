@@ -2,7 +2,7 @@ import {
   DEFAULT_ORIGIN_LABEL,
   findFavoriteBySuggestion,
   favoriteCoords,
-  selectInitialJourneyRouteId,
+  selectInitialJourneyOption,
   selectInitialJourneyTab,
   type Coordinates,
   type Suggestion,
@@ -11,7 +11,9 @@ import type {CameraRef} from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
 import {useCallback} from 'react';
 import {Keyboard} from 'react-native';
+import {prefetchJourneyOptionsGeometry} from '../services/geometry.service';
 import {planJourney} from '../services/journey.service';
+import {useMapStyle} from './useMapStyle';
 import {effectiveRouteCatalog} from '../services/route-catalog-id';
 import {resolveSuggestionCoords, searchPlaceByName} from '../services/places.service';
 import {supabase} from '../lib/supabase';
@@ -21,23 +23,22 @@ import {useUiStore} from '../stores/ui.store';
 import {useHaptics} from './useHaptics';
 
 export function useJourney(camera: React.RefObject<CameraRef | null>) {
+  const {scheme} = useMapStyle();
   const favorites = useFavoritesStore(s => s.favorites);
   const routes = useTransitStore(s => s.routes);
-  const {
-    originLabel,
-    destinationLabel,
-    origin,
-    destination,
-    setOrigin,
-    setDestination,
-    activateRoute,
-    setJourneyOptions,
-    setJourneyTab,
-    setJourneyLoading,
-    setSheetMode,
-    setActiveInput,
-    resetJourney,
-  } = useTransitStore();
+  const originLabel = useTransitStore(s => s.originLabel);
+  const destinationLabel = useTransitStore(s => s.destinationLabel);
+  const origin = useTransitStore(s => s.origin);
+  const destination = useTransitStore(s => s.destination);
+  const setOrigin = useTransitStore(s => s.setOrigin);
+  const setDestination = useTransitStore(s => s.setDestination);
+  const selectJourneyOption = useTransitStore(s => s.selectJourneyOption);
+  const setJourneyOptions = useTransitStore(s => s.setJourneyOptions);
+  const setJourneyTab = useTransitStore(s => s.setJourneyTab);
+  const setJourneyLoading = useTransitStore(s => s.setJourneyLoading);
+  const setSheetMode = useTransitStore(s => s.setSheetMode);
+  const setActiveInput = useTransitStore(s => s.setActiveInput);
+  const resetJourney = useTransitStore(s => s.resetJourney);
   const setMessage = useUiStore(s => s.setMessage);
   const {success, light} = useHaptics();
 
@@ -75,9 +76,10 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
         return;
       }
       setJourneyOptions(options);
-      setJourneyTab(selectInitialJourneyTab(options));
-      const initialRef = selectInitialJourneyRouteId(options);
-      if (initialRef) activateRoute(initialRef, catalog);
+      prefetchJourneyOptionsGeometry(options, catalog, scheme);
+      const tab = selectInitialJourneyTab(options);
+      setJourneyTab(tab);
+      selectJourneyOption(selectInitialJourneyOption(options));
       success();
       setMessage(
         fromFallback
@@ -88,7 +90,7 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
     },
     [
       dismissSearch,
-      activateRoute,
+      selectJourneyOption,
       setJourneyLoading,
       setJourneyOptions,
       setJourneyTab,
@@ -96,6 +98,7 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       setSheetMode,
       success,
       routes,
+      scheme,
     ],
   );
 
@@ -130,7 +133,9 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
         return;
       }
       setDestination(suggestion.label, coords);
-      if (suggestion.entity_type === 'route') activateRoute(suggestion.entity_id, routes);
+      if (suggestion.entity_type === 'route') {
+        useTransitStore.getState().activateRoute(suggestion.entity_id, routes);
+      }
       dismissSearch();
       if (origin) await planWithCoords(origin, coords);
       else setSheetMode('search');
@@ -141,7 +146,6 @@ export function useJourney(camera: React.RefObject<CameraRef | null>) {
       origin,
       planWithCoords,
       resolveCoords,
-      activateRoute,
       routes,
       setDestination,
       setMessage,

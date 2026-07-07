@@ -1,0 +1,3 @@
+/** 32×32 white chevron with dark outline — PNG for reliable MapLibre rendering on Android. */
+export const ROUTE_ARROW_ICON_URI =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAm0lEQVR4nO3WwQ2AIAwFUDRdwH+SCXT/aXQCPekIGowHY4zSQtVDf8IJmv/ghHMWi+WvqepmCUu7p7zbnIZOHUJPBwIiBL7dEPPYF68CtCHEHcgNIengGSLFkBRwhhwxHAilAq4wHAjlBEggpAHgQEgTAN+6T14AEcUqADCKswIgKE4GYC+VFosBSLhtEgCZi6MBUCr+zY/IYrGs1rZYakt7sk4AAAAASUVORK5CYII=';

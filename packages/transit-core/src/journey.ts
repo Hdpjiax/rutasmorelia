@@ -37,3 +37,26 @@ export function selectInitialJourneyRouteId(options: JourneyOption[]): string | 
   if (!first) return null;
   return String(first.route_code || first.route_id);
 }
+
+export function journeyOptionKey(option: JourneyOption): string {
+  return `${option.route_id}:${option.second_route_id ?? ''}:${option.route_code ?? ''}:${option.second_route_code ?? ''}`;
+}
+
+export function isSameJourneyOption(a: JourneyOption | null, b: JourneyOption | null): boolean {
+  if (!a || !b) return false;
+  return journeyOptionKey(a) === journeyOptionKey(b);
+}
+
+export function selectInitialJourneyOption(options: JourneyOption[]): JourneyOption | null {
+  const tab = selectInitialJourneyTab(options);
+  return filterJourneyOptions(options, tab)[0] ?? null;
+}
+
+export function routeRefsForJourneyOption(option: JourneyOption): string[] {
+  const refs = [String(option.route_code || option.route_id)];
+  if (hasTransfers(option)) {
+    const second = String(option.second_route_code || option.second_route_id || '');
+    if (second) refs.push(second);
+  }
+  return refs;
+}

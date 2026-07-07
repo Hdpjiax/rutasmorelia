@@ -79,9 +79,14 @@ export function mapPhotonFeatures(features: unknown[]): Suggestion[] {
     const city = String(p.city || 'Morelia');
     const state = String(p.state || 'Michoacán');
 
-    let label = name;
-    if (housenumber && !label.includes(housenumber)) {
+    let label = name || street || housenumber;
+    if (street && housenumber) {
+      label = name || `${street} ${housenumber}`;
+    } else if (housenumber && label && !label.includes(housenumber)) {
       label = `${label} ${housenumber}`;
+    }
+    if (!label.trim()) {
+      label = [street, city].filter(Boolean).join(', ') || 'Lugar en Morelia';
     }
 
     const subtitleParts: string[] = [];
