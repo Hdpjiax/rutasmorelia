@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -42,7 +43,11 @@ def main() -> int:
                 summary.append({"code": route.code, "status": "failed_validation"})
                 continue
             approve(route, reviewer="pipeline-pdf-moovit", pdf_reviewed=True)
-            published = publish(route, skip_supabase=True)
+            has_supabase = bool(
+                (os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL"))
+                and (os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("SUPABASE_SECRET_KEY"))
+            )
+            published = publish(route, skip_supabase=not has_supabase)
             summary.append({"code": route.code, "status": "published", "path": str(published)})
         except Exception as error:
             exit_code = 1

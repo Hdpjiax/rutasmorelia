@@ -7,6 +7,7 @@ from typing import Any
 
 from .artifacts import write_artifacts
 from .config import DATA_ROOT, NARANJA_CODES, OUTPUT_ROOT, QualityThresholds, RouteDefinition
+from .direction import normalize_route_directions
 from .geometry import distance_m, line_length_m, point_segment_distance_m
 from .kml import Direction, parse_shape_file
 from .valhalla_engine import MatchedComponent, actor_version, create_actor, match_component
@@ -20,24 +21,10 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
             f"Falta {config_path}. Ejecute primero: python -m route_pipeline bootstrap-map --pbf <archivo.osm.pbf>"
         )
     raw_directions = parse_shape_file(route.kml)
-    should_swap_and_reverse = route.code not in ("79", "13", "F15")
-    if should_swap_and_reverse and len(raw_directions) == 2:
-        dir1 = Direction(1, raw_directions[1].name, raw_directions[1].components)
-        dir2 = Direction(2, raw_directions[0].name, raw_directions[0].components)
-        directions = [dir1, dir2]
-    else:
-        directions = raw_directions
+    directions = normalize_route_directions(raw_directions)
     directions, reference_overrides = _apply_reference_overrides(route, directions)
     if len(directions) not in (1, 2):
         raise ValueError(f"La ruta debe contener uno o dos sentidos; se encontraron {len(directions)}")
-    if should_swap_and_reverse and len(directions) == 2:
-        reversed_directions = []
-        for d in directions:
-            rev_comps = []
-            for comp in reversed(d.components):
-                rev_comps.append(list(reversed(comp)))
-            reversed_directions.append(Direction(d.index, d.name, rev_comps))
-        directions = reversed_directions
     actor = create_actor(config_path)
     thresholds = QualityThresholds()
     if route.code in ["13", "15"]:
@@ -71,14 +58,14 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
         )
     elif route.code in NARANJA_CODES:
         thresholds = QualityThresholds(
-            p95_distance_m=28.0,
-            max_distance_m=70.0,
-            endpoint_distance_m=55.0,
-            search_radii_m=(12, 22, 35, 55),
-            densify_m=6.0,
-            max_trace_points=1800,
-            overlap_points=80,
-            breakage_distance_m=90,
+            p95_distance_m=15.0,
+            max_distance_m=35.0,
+            endpoint_distance_m=40.0,
+            search_radii_m=(10, 18, 28, 45),
+            densify_m=5.0,
+            max_trace_points=1200,
+            overlap_points=60,
+            breakage_distance_m=70,
         )
     matched = []
     reports = []
@@ -86,7 +73,7 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
     for direction in directions:
         direction_matches = []
         selected = _select_components(direction.index, direction.components, ignored_components)
-        use_segmented_matching = route.code in NARANJA_CODES or route.source_kind == "pdf-moovit"
+        use_segmented_matching = True
         for component_index, component in selected:
             result = match_component(actor, component, thresholds, segmented=use_segmented_matching)
             needs_spike_cleanup = route.code in ("13", "77", *tuple(NARANJA_CODES))
@@ -120,6 +107,8 @@ def build_route(route: RouteDefinition, config_path: Path | None = None) -> tupl
             "pdf": str(route.pdf) if route.pdf else None,
             "ignored_kml_components": ignored_components,
             "reference_overrides": reference_overrides,
+            "algorithm": "valhalla-hybrid-axis-v2",
+            "direction_labels": [direction.name for direction in directions],
         }
     )
     output = OUTPUT_ROOT / route.slug

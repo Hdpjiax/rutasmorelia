@@ -22,6 +22,10 @@ from .geometry import (
 class TraceActor(Protocol):
     def trace_attributes(self, request: dict[str, Any]) -> dict[str, Any]: ...
 
+    def route(self, request: dict[str, Any]) -> dict[str, Any]: ...
+
+    def locate(self, request: dict[str, Any]) -> dict[str, Any]: ...
+
 
 @dataclass
 class MatchedComponent:
@@ -49,6 +53,45 @@ def _decode_shape(encoded: str) -> list[Coordinate]:
     except ImportError as error:
         raise RuntimeError("No se encontró el decodificador de pyvalhalla") from error
     return [(float(lon), float(lat)) for lon, lat in decode_polyline(encoded, precision=6, order="lnglat")]
+
+
+def _parse_response(response: dict[str, Any] | str) -> dict[str, Any]:
+    if isinstance(response, str):
+        return json.loads(response)
+    return response
+
+
+def _route_request(locations: list[Coordinate], thresholds: QualityThresholds) -> dict[str, Any]:
+    return {
+        "locations": [{"lon": lon, "lat": lat} for lon, lat in locations],
+        "costing": "auto",
+        "costing_options": {"auto": {"ignore_oneways": thresholds.ignore_oneways}},
+        "directions_options": {"units": "kilometers"},
+    }
+
+
+def _decode_trip_shape(response: dict[str, Any]) -> list[Coordinate]:
+    trip = response.get("trip") or {}
+    coordinates: list[Coordinate] = []
+    for leg in trip.get("legs") or []:
+        encoded = leg.get("shape")
+        if isinstance(encoded, str):
+            coordinates.extend(_decode_shape(encoded))
+    return deduplicate(coordinates)
+
+
+def _locate_snap(actor: TraceActor, point: Coordinate, radius_m: int) -> Coordinate:
+    response = _parse_response(actor.locate({"locations": [{"lon": point[0], "lat": point[1]}], "costing": "auto"}))
+    candidates = response[0].get("edges") or []
+    best = point
+    best_distance = float("inf")
+    for edge in candidates:
+        snapped = (float(edge["correlated_lon"]), float(edge["correlated_lat"]))
+        distance = distance_m(point, snapped)
+        if distance <= radius_m and distance < best_distance:
+            best = snapped
+            best_distance = distance
+    return best
 
 
 def _trace_request(points: list[Coordinate], radius_m: int, thresholds: QualityThresholds) -> dict[str, Any]:
@@ -218,6 +261,62 @@ def _match_trace(
     return result
 
 
+def _anchor_points_for_routing(source: list[Coordinate], mode: str) -> list[Coordinate]:
+    if len(source) <= 2:
+        return source[:]
+    if mode == "straight":
+        dense = densify(source, 70.0)
+        indices = structural_anchors(dense, turn_degrees=18.0)
+        if len(indices) < 3:
+            step = max(1, len(dense) // 6)
+            indices = list(range(0, len(dense), step))
+            if indices[-1] != len(dense) - 1:
+                indices.append(len(dense) - 1)
+        return [dense[index] for index in sorted(set(indices))]
+    indices = structural_anchors(source, turn_degrees=14.0)
+    return [source[index] for index in indices]
+
+
+def _match_segment_hybrid(
+    actor: TraceActor,
+    segment_source: list[Coordinate],
+    mode: str,
+    thresholds: QualityThresholds,
+) -> MatchedComponent:
+    segment_thresholds = _thresholds_for_segment(mode, thresholds)
+    snap_radius = min(segment_thresholds.search_radii_m)
+
+    if mode in {"straight", "turn"} and len(segment_source) >= 3:
+        anchor_points = _anchor_points_for_routing(segment_source, mode)
+        snapped = [_locate_snap(actor, point, snap_radius) for point in anchor_points]
+        try:
+            response = _parse_response(actor.route(_route_request(snapped, segment_thresholds)))
+            routed = _decode_trip_shape(response)
+            cleaned = clean_matched_geometry(routed, segment_source, mode)
+            if len(cleaned) >= 2:
+                return MatchedComponent(
+                    coordinates=cleaned,
+                    edges=[],
+                    search_radius_m=snap_radius,
+                    source_points=len(segment_source),
+                    anchor_indices=structural_anchors(segment_source),
+                )
+        except Exception:
+            pass
+
+    observations = smart_densify(actor, segment_source, segment_thresholds.densify_m)
+    matched = _match_trace(actor, observations, segment_thresholds)
+    cleaned = clean_matched_geometry(matched.coordinates, segment_source, mode)
+    return MatchedComponent(
+        coordinates=cleaned or matched.coordinates,
+        edges=matched.edges,
+        matched_points=matched.matched_points,
+        search_radius_m=matched.search_radius_m,
+        source_points=matched.source_points,
+        anchor_indices=matched.anchor_indices,
+    )
+
+
 def _thresholds_for_segment(mode: str, base: QualityThresholds) -> QualityThresholds:
     if mode == "straight":
         return QualityThresholds(
@@ -253,9 +352,18 @@ def match_component(
     *,
     segmented: bool = False,
 ) -> MatchedComponent:
-    if not segmented or len(source) < 24:
+    if not segmented or len(source) < 12:
         observations = smart_densify(actor, source, thresholds.densify_m)
-        return _match_trace(actor, observations, thresholds)
+        matched = _match_trace(actor, observations, thresholds)
+        cleaned = clean_matched_geometry(matched.coordinates, source, "turn")
+        return MatchedComponent(
+            coordinates=cleaned or matched.coordinates,
+            edges=matched.edges,
+            matched_points=matched.matched_points,
+            search_radius_m=matched.search_radius_m,
+            source_points=matched.source_points,
+            anchor_indices=matched.anchor_indices,
+        )
 
     segments = segment_route_at_turns(
         source,
@@ -271,12 +379,8 @@ def match_component(
     anchor_indices: list[int] = []
 
     for mode, segment_source in segments:
-        segment_thresholds = _thresholds_for_segment(mode, thresholds)
-        observations = smart_densify(actor, segment_source, segment_thresholds.densify_m)
-        matched = _match_trace(actor, observations, segment_thresholds)
-        cleaned = clean_matched_geometry(matched.coordinates, segment_source, mode)
-        if not cleaned:
-            cleaned = matched.coordinates
+        matched = _match_segment_hybrid(actor, segment_source, mode, thresholds)
+        cleaned = matched.coordinates
         if stitched_coords and cleaned:
             if distance_m(stitched_coords[-1], cleaned[0]) < 0.2:
                 cleaned = cleaned[1:]

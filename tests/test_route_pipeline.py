@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from route_pipeline.config import PILOT_KML, QualityThresholds
+from route_pipeline.direction import normalize_route_directions
 from route_pipeline.bootstrap import _native_environment
 from route_pipeline.geometry import clean_matched_geometry, densify, distance_m, segment_route_at_turns
 from route_pipeline.kml import parse_kml
@@ -12,6 +13,19 @@ from route_pipeline.pipeline import _apply_reference_overrides, _select_componen
 from route_pipeline.config import ROUTES
 from route_pipeline.validation import validate_component
 from route_pipeline.valhalla_engine import MatchedComponent, _chunks, _trace_request
+
+
+class DirectionTests(unittest.TestCase):
+    def test_normalize_orders_ida_before_vuelta(self):
+        from route_pipeline.kml import Direction
+
+        raw = [
+            Direction(1, "Vuelta Centro", [[(-101.2, 19.7), (-101.19, 19.71)]]),
+            Direction(2, "Ida Centro", [[(-101.19, 19.71), (-101.2, 19.7)]]),
+        ]
+        ordered = normalize_route_directions(raw)
+        self.assertEqual(["Ida", "Vuelta"], [item.name for item in ordered])
+        self.assertEqual([1, 2], [item.index for item in ordered])
 
 
 class KmlTests(unittest.TestCase):
