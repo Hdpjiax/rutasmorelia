@@ -9,6 +9,7 @@
     "preandroid": "node scripts/ensure-rn-shims.js",
     "bundle:android": "node scripts/ensure-rn-shims.js && expo export --platform android --output-dir .expo/bundle-probe",
     "start": "expo start --dev-client",
+    "android:wait-emulator": "powershell -ExecutionPolicy Bypass -File scripts/wait-for-emulator.ps1",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "typecheck": "tsc --noEmit",
