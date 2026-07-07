@@ -5,6 +5,7 @@ import {
   loadRouteGeometry,
   normalizeRouteGeojson,
   readCachedGeometry,
+  resolveGeometryIdForActiveRoute,
   writeCachedGeometry,
   type CachedGeometry,
 } from '../services/geometry.service';
@@ -29,8 +30,7 @@ export function useRouteGeometry(camera: React.RefObject<CameraRef | null>) {
     }
 
     let cancelled = false;
-    const selected = routes.find(route => route.id === activeRouteId);
-    const geometryId = selected?.geometryId || activeRouteId;
+    const {geometryId, selected} = resolveGeometryIdForActiveRoute(activeRouteId, routes);
 
     const show = (cached: CachedGeometry, duration: number) => {
       setGeojson(normalizeRouteGeojson(cached.rawGeojson, activeRouteId, selected, scheme));

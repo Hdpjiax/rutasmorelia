@@ -20,6 +20,14 @@ export function geometryCacheKey(geometryId: string): string {
   return `${GEOMETRY_CACHE_PREFIX}${geometryId}`;
 }
 
+export function resolveGeometryIdForActiveRoute(
+  activeRouteId: string,
+  routes: RouteItem[],
+): {geometryId: string; selected: RouteItem | undefined} {
+  const selected = routes.find(route => route.id === activeRouteId);
+  return {geometryId: selected?.geometryId || activeRouteId, selected};
+}
+
 export function normalizeRouteGeojson(
   geojson: FeatureCollection,
   routeId: string,
