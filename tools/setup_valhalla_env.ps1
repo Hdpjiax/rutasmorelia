@@ -1,6 +1,6 @@
 # Bootstrap local Valhalla graph for Via Morelia route alignment.
 param(
-    [string]$PbfUrl = "https://download.geofabrik.de/north-america/mexico/michoacan-latest.osm.pbf",
+    [string]$PbfUrl = "https://download.geofabrik.de/north-america/mexico-latest.osm.pbf",
     [switch]$Force
 )
 

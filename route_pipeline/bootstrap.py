@@ -26,8 +26,15 @@ def sha256(path: Path) -> str:
 def _download(url: str, target: Path) -> None:
     partial = target.with_suffix(target.suffix + ".part")
     request = urllib.request.Request(url, headers={"User-Agent": "ViaMorelia-route-pipeline/1.0"})
-    with urllib.request.urlopen(request, timeout=120) as response, partial.open("wb") as output:
+    with urllib.request.urlopen(request, timeout=600) as response, partial.open("wb") as output:
         shutil.copyfileobj(response, output)
+    with partial.open("rb") as handle:
+        header = handle.read(16)
+    if header.startswith(b"<!DOCTYPE") or header.startswith(b"<html") or partial.stat().st_size < 1_000_000:
+        partial.unlink(missing_ok=True)
+        raise RuntimeError(
+            f"La descarga de {url} no produjo un PBF válido ({partial.stat().st_size if partial.exists() else 0} bytes)."
+        )
     partial.replace(target)
 
 
